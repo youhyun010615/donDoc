@@ -1,61 +1,93 @@
 <script setup>
-import { computed } from 'vue'
-import { useBudgetStore } from '../stores/useBudgetStore.js'
-import { usePigSystem } from '../composables/usePigSystem.js'
+import { computed, ref } from 'vue';
+import { useBudgetStore } from '../stores/useBudgetStore.js';
+import { usePigSystem } from '../composables/usePigSystem.js';
 
 const props = defineProps({
   selectedMonth: { type: String, required: true },
-})
+});
 
-const store = useBudgetStore()
-const { getPigState, formatCurrency } = usePigSystem()
+const store = useBudgetStore();
+const { getPigState } = usePigSystem();
 
-const WEEK_DAYS = ['일', '월', '화', '수', '목', '금', '토']
+const tooltip = ref(null); // 현재 호버된 day 데이터
+const tooltipPos = ref({}); // 툴팁 위치 (fixed 기준)
+
+function showTooltip(event, day) {
+  if (!day || (!day.pigState && day.income === 0 && day.expense === 0)) return;
+  const rect = event.currentTarget.getBoundingClientRect();
+  tooltip.value = day;
+  tooltipPos.value = {
+    top: rect.top - 8 + window.scrollY + 'px',
+    left: rect.left + rect.width / 2 + 'px',
+  };
+}
+
+function hideTooltip() {
+  tooltip.value = null;
+}
+
+const WEEK_DAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
 // 달력 그리드 생성
 const calendarDays = computed(() => {
-  const [year, month] = props.selectedMonth.split('-').map(Number)
-  const firstDay = new Date(year, month - 1, 1)
-  const lastDay = new Date(year, month, 0)
+  const [year, month] = props.selectedMonth.split('-').map(Number);
+  const firstDay = new Date(year, month - 1, 1);
+  const lastDay = new Date(year, month, 0);
 
   // 날짜별 지출 맵
-  const expenseMap = {}
+  const expenseMap = {};
   store.records
-    .filter((r) => r.date.startsWith(props.selectedMonth) && r.type === 'expense')
+    .filter(
+      (r) => r.date.startsWith(props.selectedMonth) && r.type === 'expense',
+    )
     .forEach((r) => {
-      expenseMap[r.date] = (expenseMap[r.date] || 0) + r.amount
-    })
+      expenseMap[r.date] = (expenseMap[r.date] || 0) + r.amount;
+    });
 
-  const days = []
+  // 날짜별 수입 맵
+  const incomeMap = {};
+  store.records
+    .filter(
+      (r) => r.date.startsWith(props.selectedMonth) && r.type === 'income',
+    )
+    .forEach((r) => {
+      incomeMap[r.date] = (incomeMap[r.date] || 0) + r.amount;
+    });
+
+  const days = [];
 
   // 앞 빈 칸
   for (let i = 0; i < firstDay.getDay(); i++) {
-    days.push(null)
+    days.push(null);
   }
 
   // 실제 날짜
   for (let d = 1; d <= lastDay.getDate(); d++) {
-    const dateStr = `${props.selectedMonth}-${String(d).padStart(2, '0')}`
-    const expense = expenseMap[dateStr] || 0
-    const pigState = expense > 0 ? getPigState(expense, store.dailyBudget) : null
+    const dateStr = `${props.selectedMonth}-${String(d).padStart(2, '0')}`;
+    const expense = expenseMap[dateStr] || 0;
+    const income = incomeMap[dateStr] || 0;
+    const pigState =
+      expense > 0 ? getPigState(expense, store.dailyBudget) : null; // 지출이 있는 날에만 getPigState()호출
 
-    const today = new Date().toISOString().slice(0, 10)
+    const today = new Date().toISOString().slice(0, 10);
     days.push({
       day: d,
       dateStr,
       expense,
+      income,
       pigState,
       isToday: dateStr === today,
-    })
+    });
   }
 
-  return days
-})
+  return days;
+});
 
 const selectedMonthLabel = computed(() => {
-  const [year, month] = props.selectedMonth.split('-')
-  return `${year}년 ${parseInt(month)}월`
-})
+  const [year, month] = props.selectedMonth.split('-');
+  return `${year}년 ${parseInt(month)}월`;
+});
 </script>
 
 <template>
@@ -64,7 +96,12 @@ const selectedMonthLabel = computed(() => {
 
     <!-- 요일 헤더 -->
     <div class="week-header">
-      <span v-for="d in WEEK_DAYS" :key="d" class="week-day" :class="{ sun: d === '일', sat: d === '토' }">
+      <span
+        v-for="d in WEEK_DAYS"
+        :key="d"
+        class="week-day"
+        :class="{ sun: d === '일', sat: d === '토' }"
+      >
         {{ d }}
       </span>
     </div>
@@ -76,24 +113,56 @@ const selectedMonthLabel = computed(() => {
         :key="idx"
         class="day-cell"
         :class="{ empty: !day, today: day?.isToday }"
+        @mouseenter="showTooltip($event, day)"
+        @mouseleave="hideTooltip"
       >
         <template v-if="day">
-          <span class="day-num" :class="{ sun: idx % 7 === 0, sat: idx % 7 === 6 }">
+          <span
+            class="day-num"
+            :class="{ sun: idx % 7 === 0, sat: idx % 7 === 6 }"
+          >
             {{ day.day }}
           </span>
           <span
-            v-if="day.pigState"
             class="day-pig"
-            :title="day.pigState.label + ': ' + formatCurrency(day.expense)"
+            :style="{ visibility: day.pigState ? 'visible' : 'hidden' }"
           >
-            {{ day.pigState.face }}
+            {{ day.pigState?.face ?? '🐷' }}
           </span>
-          <span v-if="day.expense > 0" class="day-amount">
-            {{ Math.round(day.expense / 1000) }}k
+          <span
+            class="day-income"
+            :style="{ visibility: day.income > 0 ? 'visible' : 'hidden' }"
+          >
+            +{{ day.income.toLocaleString('ko-KR') }}
+          </span>
+          <span
+            class="day-expense"
+            :style="{ visibility: day.expense > 0 ? 'visible' : 'hidden' }"
+          >
+            -{{ day.expense.toLocaleString('ko-KR') }}
           </span>
         </template>
       </div>
     </div>
+
+    <!-- 전역 툴팁 (position: fixed → overflow 영향 없음) -->
+    <Teleport to="body">
+      <div
+        v-if="tooltip"
+        class="day-tooltip-fixed"
+        :style="{ top: tooltipPos.top, left: tooltipPos.left }"
+      >
+        <span v-if="tooltip.pigState" class="tip-pig"
+          >{{ tooltip.pigState.face }} {{ tooltip.pigState.label }}</span
+        >
+        <span v-if="tooltip.income > 0" class="tip-income"
+          >수입 +{{ tooltip.income.toLocaleString('ko-KR') }}원</span
+        >
+        <span v-if="tooltip.expense > 0" class="tip-expense"
+          >지출 -{{ tooltip.expense.toLocaleString('ko-KR') }}원</span
+        >
+      </div>
+    </Teleport>
 
     <!-- 범례 -->
     <div class="legend">
@@ -111,7 +180,11 @@ const selectedMonthLabel = computed(() => {
 </template>
 
 <style scoped>
-.calendar-log { display: flex; flex-direction: column; gap: 0.8rem; }
+.calendar-log {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
 
 .calendar-title {
   text-align: center;
@@ -133,29 +206,42 @@ const selectedMonthLabel = computed(() => {
   color: var(--text-muted);
   padding: 4px 0;
 }
-.week-day.sun { color: #EF5350; }
-.week-day.sat { color: #1E88E5; }
+.week-day.sun {
+  color: #ef5350;
+}
+.week-day.sat {
+  color: #1e88e5;
+}
 
 .day-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: 64px;
   gap: 4px;
 }
 
 .day-cell {
-  aspect-ratio: 1;
+  height: 64px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   border-radius: 10px;
   padding: 2px;
-  min-height: 44px;
   position: relative;
+  overflow: hidden;
 }
 
-.day-cell.today { background: var(--primary-light); }
-.day-cell.empty { background: transparent; }
+.day-cell:hover {
+  z-index: 10;
+}
+
+.day-cell.today {
+  background: var(--primary-light);
+}
+.day-cell.empty {
+  background: transparent;
+}
 
 .day-num {
   font-size: 0.72rem;
@@ -163,15 +249,78 @@ const selectedMonthLabel = computed(() => {
   color: var(--text);
   line-height: 1;
 }
-.day-num.sun { color: #EF5350; }
-.day-num.sat { color: #1E88E5; }
+.day-num.sun {
+  color: #ef5350;
+}
+.day-num.sat {
+  color: #1e88e5;
+}
 
-.day-pig { font-size: 1.1rem; line-height: 1; }
+.day-pig {
+  font-size: 1.1rem;
+  line-height: 1;
+}
 
-.day-amount {
-  font-size: 0.58rem;
-  color: var(--text-muted);
-  margin-top: 1px;
+.day-income {
+  font-size: 0.5rem;
+  font-weight: 600;
+  color: #1e88e5;
+  text-align: center;
+  line-height: 1.3;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.day-expense {
+  font-size: 0.5rem;
+  font-weight: 600;
+  color: #e53935;
+  text-align: center;
+  line-height: 1.3;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 호버 툴팁 (body에 렌더링 → overflow 영향 없음) */
+.day-tooltip-fixed {
+  position: fixed;
+  transform: translate(-50%, -100%);
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 6px 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.tip-pig {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.tip-income {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #1e88e5;
+}
+
+.tip-expense {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #e53935;
 }
 
 /* Legend */
