@@ -1,21 +1,21 @@
 <script setup>
-import 'vue-datepicker-next/index.css';
-import DatePicker from 'vue-datepicker-next';
+import "vue-datepicker-next/index.css";
+import DatePicker from "vue-datepicker-next";
 
-import { computed, ref } from 'vue';
-import DailyLog from '../components/DailyLog.vue';
-import CalendarLog from '../components/CalendarLog.vue';
-import MonthlyLog from '../components/MonthlyLog.vue';
-import Summary from '../components/Summary.vue';
+import { computed, ref } from "vue";
+import DailyLog from "../components/DailyLog.vue";
+import CalendarLog from "../components/CalendarLog.vue";
+import MonthlyLog from "../components/MonthlyLog.vue";
+import Summary from "../components/Summary.vue";
 
 const selectedMonth = ref(new Date().toISOString().slice(0, 7));
-const activeTab = ref('summary'); // 'summary' | 'daily' | 'calendar' | 'monthly'
+const activeTab = ref("summary"); // 'summary' | 'daily' | 'calendar' | 'monthly'
 
 const tabs = [
-  { key: 'summary', label: '요약', icon: '📊' },
-  { key: 'daily', label: '일별', icon: '📅' },
-  { key: 'calendar', label: '달력', icon: '🗓️' },
-  { key: 'monthly', label: '월간', icon: '📆' },
+  { key: "summary", label: "요약", icon: "📊" },
+  { key: "daily", label: "일별", icon: "📅" },
+  { key: "calendar", label: "달력", icon: "🗓️" },
+  { key: "monthly", label: "월간", icon: "📆" },
 ];
 
 const months = computed(() => {
@@ -48,6 +48,7 @@ const months = computed(() => {
         placeholder="월 선택하기"
         :popup-style="{ right: '0px !important', transform: 'none !important' }"
         :append-to-body="false"
+        :clearable="false"
       ></date-picker>
     </div>
 
