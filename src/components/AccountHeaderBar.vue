@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore.js';
 import { usePigSystem } from '../composables/usePigSystem.js';
 
@@ -16,6 +16,19 @@ const emit = defineEmits([
   'update:filterType',
   'addClick',
 ]);
+
+const isOpen = ref(false);
+
+// 2. 항목 선택 시 실행될 함수
+const selectMonth = (m) => {
+  emit('update:selectedMonth', m); // 부모 컴포넌트의 selectedMonth 업데이트
+  isOpen.value = false; // 선택 후 목록 닫기
+};
+
+// 드롭다운 외부 클릭 시 닫기 위해 (선택사항)
+const toggleDropdown = () => {
+  isOpen.value = !isOpen.value;
+};
 
 const months = computed(() => {
   const result = [];
@@ -54,7 +67,7 @@ const monthlyExpense = computed(() =>
 <template>
   <div class="account-header">
     <!-- 월 선택 -->
-    <div class="month-selector">
+    <!-- <div class="month-selector">
       <select
         :value="selectedMonth"
         @change="$emit('update:selectedMonth', $event.target.value)"
@@ -63,6 +76,34 @@ const monthlyExpense = computed(() =>
         <option value="">모든 월 보기</option>
         <option v-for="m in months" :key="m" :value="m">{{ m }}</option>
       </select>
+    </div> -->
+
+    <div class="month-selector">
+      <!-- 현재 선택된 값을 보여주는 박스 (기존 .month-select 디자인 적용) -->
+      <div class="custom-select-box" @click="isOpen = !isOpen">
+        {{ selectedMonth === '' ? '모든 월 보기' : selectedMonth }}
+        <span class="arrow">{{ isOpen ? '▲' : '▼' }}</span>
+      </div>
+
+      <!-- 드롭다운 목록 -->
+      <div v-if="isOpen" class="custom-options">
+        <div
+          class="custom-option"
+          :class="{ active: selectedMonth === '' }"
+          @click="selectMonth('')"
+        >
+          모든 월 보기
+        </div>
+        <div
+          v-for="m in months"
+          :key="m"
+          class="custom-option"
+          :class="{ active: selectedMonth === m }"
+          @click="selectMonth(m)"
+        >
+          {{ m }}
+        </div>
+      </div>
     </div>
 
     <!-- 월간 요약 -->
@@ -231,5 +272,63 @@ const monthlyExpense = computed(() =>
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
+}
+.month-selector {
+  position: relative;
+  width: 100%;
+}
+
+/* 기존 .month-select 스타일을 그대로 가져옴 */
+.custom-select-box {
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg-main);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 드롭다운 목록 상자 */
+.custom-options {
+  position: absolute;
+  top: 110%; /* 살짝 띄움 */
+  left: 0;
+  width: 100%;
+  background: var(--bg-main);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  z-index: 100;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 개별 옵션 디자인 (여기서 마음껏 수정 가능!) */
+.custom-option {
+  padding: 0.6rem 0.8rem;
+  font-size: 0.9rem;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.2s;
+  font-weight: 600;
+}
+
+.custom-option:hover {
+  background: var(--border); /* 마우스 올렸을 때 */
+}
+
+.custom-option.active {
+  background: var(--border);
+  color: var(--point-color, #3b82f6); /* 선택된 상태 강조 */
+}
+
+.arrow {
+  font-size: 0.7rem;
+  transition: transform 0.2s;
 }
 </style>

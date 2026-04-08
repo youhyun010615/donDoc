@@ -202,6 +202,16 @@
       "userId": "1",
       "createdAt": "2026-04-08T00:46:51.799Z",
       "id": "EwD_nyv"
+    },
+    {
+      "type": "expense",
+      "date": "2026-02-04",
+      "category": "식비",
+      "amount": 11,
+      "memo": "",
+      "userId": "1",
+      "createdAt": "2026-04-08T04:54:36.826Z",
+      "id": "L9EHYEX"
     }
   ],
   "dailyStatus": [
