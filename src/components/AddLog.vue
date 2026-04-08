@@ -1,21 +1,22 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
-import { useBudgetStore } from '../stores/useBudgetStore.js'
+import { ref, computed, watch } from 'vue';
+import { useBudgetStore } from '../stores/useBudgetStore.js';
 
 const props = defineProps({
   editRecord: { type: Object, default: null },
-})
+});
 
-const emit = defineEmits(['saved', 'cancel'])
-const store = useBudgetStore()
+const emit = defineEmits(['saved', 'cancel']);
+const store = useBudgetStore();
 
 const form = ref({
   type: 'expense',
   date: new Date().toISOString().slice(0, 10),
   category: '',
   amount: '',
+  content: '',
   memo: '',
-})
+});
 
 // 수정 모드일 때 기존 값 세팅
 watch(
@@ -27,49 +28,63 @@ watch(
         date: rec.date,
         category: rec.category,
         amount: rec.amount,
+        content: rec.content || '',
         memo: rec.memo || '',
-      }
+      };
     }
   },
-  { immediate: true }
-)
+  { immediate: true },
+);
 
 const categories = computed(() =>
   form.value.type === 'income'
     ? store.incomeCategories
-    : store.expenseCategories
-)
+    : store.expenseCategories,
+);
 
 // 타입 변경 시 카테고리 초기화
 watch(
   () => form.value.type,
-  () => { form.value.category = '' }
-)
+  () => {
+    form.value.category = '';
+  },
+);
 
-const errorMsg = ref('')
+const errorMsg = ref('');
 
 async function handleSubmit() {
-  errorMsg.value = ''
-  if (!form.value.category) { errorMsg.value = '카테고리를 선택해주세요'; return }
-  if (!form.value.amount || Number(form.value.amount) <= 0) {
-    errorMsg.value = '금액을 올바르게 입력해주세요'; return
+  errorMsg.value = '';
+  if (!form.value.category) {
+    errorMsg.value = '카테고리를 선택해주세요';
+    return;
   }
+  if (!form.value.amount || Number(form.value.amount) <= 0) {
+    errorMsg.value = '금액을 올바르게 입력해주세요';
+    return;
+  }
+  // if (!form.value.content) {
+  //   errorMsg.value = '내용을 입력해주세요';
+  //   return;
+  // }
 
   const payload = {
     ...form.value,
     amount: Number(form.value.amount),
     id: props.editRecord?.id,
-  }
+  };
 
   try {
     if (props.editRecord) {
-      await store.updateRecord(props.editRecord.id, { ...props.editRecord, ...payload })
+      await store.updateRecord(props.editRecord.id, {
+        ...props.editRecord,
+        ...payload,
+      });
     } else {
-      await store.addRecord(payload)
+      await store.addRecord(payload);
     }
-    emit('saved')
+    emit('saved');
   } catch (e) {
-    errorMsg.value = '저장에 실패했어요. 다시 시도해주세요.'
+    errorMsg.value = '저장에 실패했어요. 다시 시도해주세요.';
   }
 }
 </script>
@@ -90,13 +105,17 @@ async function handleSubmit() {
             class="type-tab"
             :class="{ active: form.type === 'expense' }"
             @click="form.type = 'expense'"
-          >지출</button>
+          >
+            지출
+          </button>
           <button
             type="button"
             class="type-tab"
             :class="{ active: form.type === 'income' }"
             @click="form.type = 'income'"
-          >수입</button>
+          >
+            수입
+          </button>
         </div>
 
         <!-- 날짜 -->
@@ -139,9 +158,21 @@ async function handleSubmit() {
           </div>
         </div>
 
+        <!-- 내용 -->
+        <div class="form-group">
+          <label>내용 <span class="optional"></span></label>
+          <input
+            type="text"
+            v-model="form.content"
+            class="form-input"
+            placeholder="내용을 입력하세요"
+            maxlength="50"
+          />
+        </div>
+
         <!-- 메모 -->
         <div class="form-group">
-          <label>메모 <span class="optional">(선택)</span></label>
+          <label>메모 <span class="optional"></span></label>
           <input
             type="text"
             v-model="form.memo"
@@ -155,9 +186,11 @@ async function handleSubmit() {
 
         <!-- 버튼 -->
         <div class="form-actions">
-          <button type="button" class="btn-cancel" @click="emit('cancel')">취소</button>
+          <button type="button" class="btn-cancel" @click="emit('cancel')">
+            취소
+          </button>
           <button type="submit" class="btn-save" :disabled="store.loading">
-            {{ store.loading ? '저장 중...' : (editRecord ? '수정' : '추가') }}
+            {{ store.loading ? '저장 중...' : editRecord ? '수정' : '추가' }}
           </button>
         </div>
       </form>
@@ -188,8 +221,14 @@ async function handleSubmit() {
 }
 
 @keyframes slideUp {
-  from { transform: translateY(100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .sheet-header {
@@ -219,7 +258,11 @@ async function handleSubmit() {
   color: var(--text-muted);
 }
 
-.log-form { display: flex; flex-direction: column; gap: 1rem; }
+.log-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 
 .type-tabs {
   display: grid;
@@ -245,10 +288,14 @@ async function handleSubmit() {
 .type-tab.active {
   background: #fff;
   color: var(--primary);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
 
 .form-group label {
   font-size: 0.82rem;
@@ -256,7 +303,10 @@ async function handleSubmit() {
   color: var(--text-muted);
 }
 
-.optional { font-weight: 400; font-size: 0.75rem; }
+.optional {
+  font-weight: 400;
+  font-size: 0.75rem;
+}
 
 .form-input {
   border: 1.5px solid var(--border);
@@ -270,10 +320,16 @@ async function handleSubmit() {
   font-family: inherit;
 }
 
-.form-input:focus { border-color: var(--primary); }
+.form-input:focus {
+  border-color: var(--primary);
+}
 
-.amount-wrap { position: relative; }
-.amount-wrap .form-input { padding-right: 2.5rem; }
+.amount-wrap {
+  position: relative;
+}
+.amount-wrap .form-input {
+  padding-right: 2.5rem;
+}
 .currency {
   position: absolute;
   right: 0.9rem;
@@ -305,7 +361,9 @@ async function handleSubmit() {
   transition: all 0.2s;
 }
 
-.cat-btn span:first-child { font-size: 1.3rem; }
+.cat-btn span:first-child {
+  font-size: 1.3rem;
+}
 
 .cat-btn.selected {
   border-color: var(--primary);
@@ -315,7 +373,7 @@ async function handleSubmit() {
 }
 
 .error-msg {
-  color: #E53935;
+  color: #e53935;
   font-size: 0.82rem;
   margin: 0;
 }
@@ -350,5 +408,8 @@ async function handleSubmit() {
   transition: opacity 0.2s;
 }
 
-.btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 </style>
