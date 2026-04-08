@@ -3,6 +3,12 @@ import { computed } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore.js';
 import { usePigSystem } from '../composables/usePigSystem.js';
 
+// Chart.js 관련 임포트
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Doughnut } from 'vue-chartjs';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
+
 const props = defineProps({
   selectedMonth: { type: String, required: true },
 });
@@ -66,6 +72,75 @@ const expenseByCat = computed(() => {
         : 0,
     }));
 });
+
+// 차트 옵션 설정
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: false, // 커스텀 레전드를 사용하므로 기본 레전드는 끔
+    },
+    tooltip: {
+      callbacks: {
+        label: (context) => {
+          const label = context.label || '';
+          const value = context.raw || 0;
+          const total = context.dataset.data.reduce((a, b) => a + b, 0);
+          const percentage = Math.round((value / total) * 100);
+          return `${label}: ${formatCurrency(value)} (${percentage}%)`;
+        },
+      },
+    },
+  },
+  cutout: '70%', // 도넛 중앙의 구멍 크기
+};
+
+// 수입 차트 데이터
+const incomeChartData = computed(() => ({
+  labels: incomeByCat.value.map((c) => c.category),
+  datasets: [
+    {
+      data: incomeByCat.value.map((c) => c.amount),
+      backgroundColor: [
+        '#1B5E20', // Deep Green
+        '#388E3C', // Forest Green
+        '#4CAF50', // Material Green
+        '#81C784', // Light Green
+        '#C8E6C9', // Pale Green
+        '#004D40', // Teal Green (Dark)
+        '#00796B', // Teal
+        '#4DB6AC', // Light Teal
+        '#A5D6A7', // Mint
+        '#E8F5E9', // Off White Green
+      ],
+      borderWidth: 0,
+    },
+  ],
+}));
+
+// 지출 차트 데이터
+const expenseChartData = computed(() => ({
+  labels: expenseByCat.value.map((c) => c.category),
+  datasets: [
+    {
+      data: expenseByCat.value.map((c) => c.amount),
+      backgroundColor: [
+        '#B71C1C', // Dark Red
+        '#D32F2F', // Crimson
+        '#F44336', // Bright Red
+        '#E57373', // Coral
+        '#FFCDD2', // Pale Red
+        '#880E4F', // Wine Red
+        '#C2185B', // Pink Red
+        '#E91E63', // Pink
+        '#F48FB1', // Light Pink
+        '#FFEBEE', // Off White Red
+      ],
+      borderWidth: 0,
+    },
+  ],
+}));
 
 const savingRate = computed(() => {
   if (!totalIncome.value) return 0;
@@ -135,23 +210,26 @@ const avgDailyExpense = computed(() => {
     <!-- 수입 구성 -->
     <div v-if="incomeByCat.length > 0" class="chart-card">
       <p class="chart-title">💰 수입 구성</p>
-      <div class="bar-chart">
-        <div v-for="cat in incomeByCat" :key="cat.category" class="bar-row">
-          <div class="bar-label">
-            <span :title="`${cat.icon} ${cat.category}`"
+      <div class="chart-container">
+        <div class="chart-wrapper">
+          <Doughnut :data="incomeChartData" :options="chartOptions" />
+          <div class="chart-center">
+            <span class="center-label">총 수입</span>
+            <span class="center-value income"
+              >+{{ formatCurrency(totalIncome) }}</span
+            >
+          </div>
+        </div>
+        <div class="custom-legend">
+          <div v-for="cat in incomeByCat" :key="cat.category" class="legend-row">
+            <span class="legend-label" :title="`${cat.icon} ${cat.category}`"
               >{{ cat.icon }} {{ cat.category }}</span
             >
-            <span class="bar-pct">{{ cat.ratio }}%</span>
+            <span class="legend-pct">{{ cat.ratio }}%</span>
+            <span class="legend-amount" :title="formatCurrency(cat.amount)">{{
+              formatCurrency(cat.amount)
+            }}</span>
           </div>
-          <div class="bar-track">
-            <div
-              class="bar-fill income"
-              :style="{ width: cat.ratio + '%' }"
-            ></div>
-          </div>
-          <span class="bar-amount" :title="formatCurrency(cat.amount)">{{
-            formatCurrency(cat.amount)
-          }}</span>
         </div>
       </div>
     </div>
@@ -159,23 +237,26 @@ const avgDailyExpense = computed(() => {
     <!-- 지출 구성 -->
     <div v-if="expenseByCat.length > 0" class="chart-card">
       <p class="chart-title">💸 지출 구성</p>
-      <div class="bar-chart">
-        <div v-for="cat in expenseByCat" :key="cat.category" class="bar-row">
-          <div class="bar-label">
-            <span :title="`${cat.icon} ${cat.category}`"
+      <div class="chart-container">
+        <div class="chart-wrapper">
+          <Doughnut :data="expenseChartData" :options="chartOptions" />
+          <div class="chart-center">
+            <span class="center-label">총 지출</span>
+            <span class="center-value expense"
+              >-{{ formatCurrency(totalExpense) }}</span
+            >
+          </div>
+        </div>
+        <div class="custom-legend">
+          <div v-for="cat in expenseByCat" :key="cat.category" class="legend-row">
+            <span class="legend-label" :title="`${cat.icon} ${cat.category}`"
               >{{ cat.icon }} {{ cat.category }}</span
             >
-            <span class="bar-pct">{{ cat.ratio }}%</span>
+            <span class="legend-pct">{{ cat.ratio }}%</span>
+            <span class="legend-amount" :title="formatCurrency(cat.amount)">{{
+              formatCurrency(cat.amount)
+            }}</span>
           </div>
-          <div class="bar-track">
-            <div
-              class="bar-fill expense"
-              :style="{ width: cat.ratio + '%' }"
-            ></div>
-          </div>
-          <span class="bar-amount" :title="formatCurrency(cat.amount)">{{
-            formatCurrency(cat.amount)
-          }}</span>
         </div>
       </div>
     </div>
@@ -206,7 +287,7 @@ const avgDailyExpense = computed(() => {
   border-radius: 14px;
   padding: 0.7rem 0.4rem;
   text-align: center;
-  min-width: 0; /* 자식의 overflow 처리를 위해 필요 */
+  min-width: 0;
 }
 
 .kpi-label {
@@ -237,71 +318,100 @@ const avgDailyExpense = computed(() => {
   color: var(--text);
 }
 
-/* Bar Chart */
+/* Chart Cards */
 .chart-card {
   background: #fff;
   border: 1.5px solid var(--border);
   border-radius: 16px;
-  padding: 1rem;
+  padding: 1.2rem;
 }
 
 .chart-title {
-  font-size: 0.9rem;
-  font-weight: 700;
-  margin: 0 0 0.8rem;
+  font-size: 1rem;
+  font-weight: 800;
+  margin: 0 0 1.2rem;
 }
 
-.bar-chart {
+.chart-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.chart-wrapper {
+  position: relative;
+  height: 180px;
+  width: 100%;
+}
+
+.chart-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  width: 100px;
+  pointer-events: none;
+}
+
+.center-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.center-value {
+  font-size: 0.85rem;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.center-value.income {
+  color: #43a047;
+}
+.center-value.expense {
+  color: #e53935;
+}
+
+/* Custom Legend */
+.custom-legend {
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--border);
 }
 
-.bar-row {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.bar-label {
+.legend-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  gap: 8px;
+  font-size: 0.8rem;
 }
 
-.bar-pct {
-  font-weight: 700;
-  flex-shrink: 0;
-}
-
-.bar-track {
-  height: 10px;
-  background: var(--bg-main);
-  border-radius: 99px;
+.legend-label {
+  flex: 1;
+  color: var(--text);
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.bar-fill {
-  height: 100%;
-  border-radius: 99px;
-  transition: width 0.5s ease;
-  min-width: 4px;
+.legend-pct {
+  font-weight: 700;
+  color: var(--text-muted);
+  margin: 0 10px;
+  width: 35px;
+  text-align: right;
 }
 
-.bar-fill.income {
-  background: #66bb6a;
-}
-.bar-fill.expense {
-  background: #ef5350;
-}
-
-.bar-amount {
-  font-size: 0.78rem;
+.legend-amount {
   font-weight: 700;
   color: var(--text);
+  min-width: 80px;
   text-align: right;
   overflow: hidden;
   text-overflow: ellipsis;
