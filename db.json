@@ -4,28 +4,93 @@
       "id": "1",
       "userName": "기본사용자",
       "monthlyIncome": 3000000,
-      "targetExpenseRatio": 50,
+      "targetExpenseRatio": 25,
       "currentPigLevel": 5,
       "houseLevel": 1,
       "createdAt": "2026-04-07"
     }
   ],
   "incomeCategories": [
-    { "id": "income_001", "name": "월급", "icon": "💰", "type": "income" },
-    { "id": "income_002", "name": "부수입", "icon": "💵", "type": "income" },
-    { "id": "income_003", "name": "투자수익", "icon": "📈", "type": "income" },
-    { "id": "income_004", "name": "용돈", "icon": "🎁", "type": "income" },
-    { "id": "income_005", "name": "기타수입", "icon": "✨", "type": "income" }
+    {
+      "id": "income_001",
+      "name": "월급",
+      "icon": "💰",
+      "type": "income"
+    },
+    {
+      "id": "income_002",
+      "name": "부수입",
+      "icon": "💵",
+      "type": "income"
+    },
+    {
+      "id": "income_003",
+      "name": "투자수익",
+      "icon": "📈",
+      "type": "income"
+    },
+    {
+      "id": "income_004",
+      "name": "용돈",
+      "icon": "🎁",
+      "type": "income"
+    },
+    {
+      "id": "income_005",
+      "name": "기타수입",
+      "icon": "✨",
+      "type": "income"
+    }
   ],
   "expenseCategories": [
-    { "id": "expense_001", "name": "식비", "icon": "🍔", "type": "expense" },
-    { "id": "expense_002", "name": "교통비", "icon": "🚌", "type": "expense" },
-    { "id": "expense_003", "name": "쇼핑", "icon": "🛍️", "type": "expense" },
-    { "id": "expense_004", "name": "문화생활", "icon": "🎬", "type": "expense" },
-    { "id": "expense_005", "name": "의료/건강", "icon": "🏥", "type": "expense" },
-    { "id": "expense_006", "name": "교육", "icon": "📚", "type": "expense" },
-    { "id": "expense_007", "name": "주거/통신", "icon": "🏠", "type": "expense" },
-    { "id": "expense_008", "name": "기타지출", "icon": "💸", "type": "expense" }
+    {
+      "id": "expense_001",
+      "name": "식비",
+      "icon": "🍔",
+      "type": "expense"
+    },
+    {
+      "id": "expense_002",
+      "name": "교통비",
+      "icon": "🚌",
+      "type": "expense"
+    },
+    {
+      "id": "expense_003",
+      "name": "쇼핑",
+      "icon": "🛍️",
+      "type": "expense"
+    },
+    {
+      "id": "expense_004",
+      "name": "문화생활",
+      "icon": "🎬",
+      "type": "expense"
+    },
+    {
+      "id": "expense_005",
+      "name": "의료/건강",
+      "icon": "🏥",
+      "type": "expense"
+    },
+    {
+      "id": "expense_006",
+      "name": "교육",
+      "icon": "📚",
+      "type": "expense"
+    },
+    {
+      "id": "expense_007",
+      "name": "주거/통신",
+      "icon": "🏠",
+      "type": "expense"
+    },
+    {
+      "id": "expense_008",
+      "name": "기타지출",
+      "icon": "💸",
+      "type": "expense"
+    }
   ],
   "records": [
     {
@@ -107,6 +172,36 @@
       "amount": 8500,
       "memo": "편의점",
       "createdAt": "2026-04-04T18:30:00Z"
+    },
+    {
+      "type": "expense",
+      "date": "2026-04-08",
+      "category": "식비",
+      "amount": 11555,
+      "memo": "",
+      "userId": "1",
+      "createdAt": "2026-04-08T00:24:31.638Z",
+      "id": "Wl_n3rp"
+    },
+    {
+      "type": "income",
+      "date": "2026-04-08",
+      "category": "월급",
+      "amount": 111111,
+      "memo": "",
+      "userId": "1",
+      "createdAt": "2026-04-08T00:37:27.179Z",
+      "id": "fE3NzLP"
+    },
+    {
+      "type": "expense",
+      "date": "2026-03-03",
+      "category": "식비",
+      "amount": 111,
+      "memo": "",
+      "userId": "1",
+      "createdAt": "2026-04-08T00:46:51.799Z",
+      "id": "EwD_nyv"
     }
   ],
   "dailyStatus": [

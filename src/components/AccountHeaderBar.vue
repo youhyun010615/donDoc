@@ -1,39 +1,54 @@
 <script setup>
-import { computed } from 'vue'
-import { useBudgetStore } from '../stores/useBudgetStore.js'
-import { usePigSystem } from '../composables/usePigSystem.js'
+import { computed } from 'vue';
+import { useBudgetStore } from '../stores/useBudgetStore.js';
+import { usePigSystem } from '../composables/usePigSystem.js';
 
-const store = useBudgetStore()
-const { formatCurrency } = usePigSystem()
+const store = useBudgetStore();
+const { formatCurrency } = usePigSystem();
 
 const props = defineProps({
   selectedMonth: { type: String, required: true },
   filterType: { type: String, default: 'all' },
-})
+});
 
-const emit = defineEmits(['update:selectedMonth', 'update:filterType', 'addClick'])
+const emit = defineEmits([
+  'update:selectedMonth',
+  'update:filterType',
+  'addClick',
+]);
 
 const months = computed(() => {
-  const result = []
-  const now = new Date()
-  for (let i = 5; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
-    result.push(d.toISOString().slice(0, 7))
+  const result = [];
+  const now = new Date();
+  const oldestDate = new Date(
+    [...store.records].sort((a, b) => a.date.localeCompare(b.date))[0].date,
+  );
+  const diff =
+    (now.getFullYear() - oldestDate.getFullYear()) * 12 +
+    (now.getMonth() - oldestDate.getMonth());
+
+  for (let i = diff; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
+    result.push(d.toISOString().slice(0, 7));
   }
-  return result
-})
+  return result;
+});
 
 const monthlyIncome = computed(() =>
   store.records
-    .filter((r) => r.date.startsWith(props.selectedMonth) && r.type === 'income')
-    .reduce((s, r) => s + r.amount, 0)
-)
+    .filter(
+      (r) => r.date.startsWith(props.selectedMonth) && r.type === 'income',
+    )
+    .reduce((s, r) => s + r.amount, 0),
+);
 
 const monthlyExpense = computed(() =>
   store.records
-    .filter((r) => r.date.startsWith(props.selectedMonth) && r.type === 'expense')
-    .reduce((s, r) => s + r.amount, 0)
-)
+    .filter(
+      (r) => r.date.startsWith(props.selectedMonth) && r.type === 'expense',
+    )
+    .reduce((s, r) => s + r.amount, 0),
+);
 </script>
 
 <template>
@@ -65,9 +80,10 @@ const monthlyExpense = computed(() =>
         <span class="s-label">합계</span>
         <span
           class="s-value"
-          :class="(monthlyIncome - monthlyExpense) >= 0 ? 'positive' : 'negative'"
+          :class="monthlyIncome - monthlyExpense >= 0 ? 'positive' : 'negative'"
         >
-          {{ (monthlyIncome - monthlyExpense) >= 0 ? '+' : '' }}{{ formatCurrency(monthlyIncome - monthlyExpense) }}
+          {{ monthlyIncome - monthlyExpense >= 0 ? '+' : ''
+          }}{{ formatCurrency(monthlyIncome - monthlyExpense) }}
         </span>
       </div>
     </div>
@@ -79,17 +95,23 @@ const monthlyExpense = computed(() =>
           class="filter-tab"
           :class="{ active: filterType === 'all' }"
           @click="$emit('update:filterType', 'all')"
-        >전체</button>
+        >
+          전체
+        </button>
         <button
           class="filter-tab"
           :class="{ active: filterType === 'income' }"
           @click="$emit('update:filterType', 'income')"
-        >수입</button>
+        >
+          수입
+        </button>
         <button
           class="filter-tab"
           :class="{ active: filterType === 'expense' }"
           @click="$emit('update:filterType', 'expense')"
-        >지출</button>
+        >
+          지출
+        </button>
       </div>
       <button class="add-btn" @click="$emit('addClick')">+ 추가</button>
     </div>
@@ -152,10 +174,18 @@ const monthlyExpense = computed(() =>
   font-weight: 700;
 }
 
-.summary-item.income .s-value { color: #43A047; }
-.summary-item.expense .s-value { color: #E53935; }
-.s-value.positive { color: #43A047; }
-.s-value.negative { color: #E53935; }
+.summary-item.income .s-value {
+  color: #43a047;
+}
+.summary-item.expense .s-value {
+  color: #e53935;
+}
+.s-value.positive {
+  color: #43a047;
+}
+.s-value.negative {
+  color: #e53935;
+}
 
 .filter-row {
   display: flex;
@@ -187,7 +217,7 @@ const monthlyExpense = computed(() =>
 .filter-tab.active {
   background: #fff;
   color: var(--primary);
-  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
 }
 
 .add-btn {
