@@ -1,65 +1,65 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { useBudgetStore } from '../stores/useBudgetStore.js'
-import { usePigSystem } from '../composables/usePigSystem.js'
-import AccountHeaderBar from '../components/AccountHeaderBar.vue'
-import AddLog from '../components/AddLog.vue'
+import { ref, computed } from 'vue';
+import { useBudgetStore } from '../stores/useBudgetStore.js';
+import { usePigSystem } from '../composables/usePigSystem.js';
+import AccountHeaderBar from '../components/AccountHeaderBar.vue';
+import AddLog from '../components/AddLog.vue';
 
-const store = useBudgetStore()
-const { formatCurrency, formatDate } = usePigSystem()
+const store = useBudgetStore();
+const { formatCurrency, formatDate } = usePigSystem();
 
-const selectedMonth = ref(new Date().toISOString().slice(0, 7))
-const filterType = ref('all')
-const showAddLog = ref(false)
-const editRecord = ref(null)
+const selectedMonth = ref(new Date().toISOString().slice(0, 7));
+const filterType = ref('all');
+const showAddLog = ref(false);
+const editRecord = ref(null);
 
 // 확인 삭제 모달
-const deleteTarget = ref(null)
+const deleteTarget = ref(null);
 
 function openAdd() {
-  editRecord.value = null
-  showAddLog.value = true
+  editRecord.value = null;
+  showAddLog.value = true;
 }
 
 function openEdit(record) {
-  editRecord.value = record
-  showAddLog.value = true
+  editRecord.value = record;
+  showAddLog.value = true;
 }
 
 function handleSaved() {
-  showAddLog.value = false
-  editRecord.value = null
+  showAddLog.value = false;
+  editRecord.value = null;
 }
 
 async function confirmDelete() {
-  if (!deleteTarget.value) return
-  await store.deleteRecord(deleteTarget.value.id)
-  deleteTarget.value = null
+  if (!deleteTarget.value) return;
+  await store.deleteRecord(deleteTarget.value.id);
+  deleteTarget.value = null;
 }
 
 // 필터된 레코드: 날짜 그룹화
 const filteredRecords = computed(() => {
   return store.records.filter((r) => {
-    const matchMonth = r.date.startsWith(selectedMonth.value)
-    const matchType = filterType.value === 'all' || r.type === filterType.value
-    return matchMonth && matchType
-  })
-})
+    const matchMonth = r.date.startsWith(selectedMonth.value);
+    const matchType = filterType.value === 'all' || r.type === filterType.value;
+    return matchMonth && matchType;
+  });
+});
 
 // 날짜별 그룹화
 const groupedRecords = computed(() => {
-  const groups = {}
+  const groups = {};
   filteredRecords.value.forEach((r) => {
-    if (!groups[r.date]) groups[r.date] = []
-    groups[r.date].push(r)
-  })
+    if (!groups[r.date]) groups[r.date] = [];
+    groups[r.date].push(r);
+  });
   // 날짜 내림차순 정렬
   return Object.entries(groups)
     .sort(([a], [b]) => b.localeCompare(a))
     .map(([date, records]) => ({
       date,
       records: records.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
       ),
       totalIncome: records
         .filter((r) => r.type === 'income')
@@ -67,12 +67,13 @@ const groupedRecords = computed(() => {
       totalExpense: records
         .filter((r) => r.type === 'expense')
         .reduce((s, r) => s + r.amount, 0),
-    }))
-})
+    }));
+});
 
 function getCategoryIcon(categoryName, type) {
-  const cats = type === 'income' ? store.incomeCategories : store.expenseCategories
-  return cats.find((c) => c.name === categoryName)?.icon ?? '💰'
+  const cats =
+    type === 'income' ? store.incomeCategories : store.expenseCategories;
+  return cats.find((c) => c.name === categoryName)?.icon ?? '💰';
 }
 </script>
 
@@ -98,8 +99,12 @@ function getCategoryIcon(categoryName, type) {
         <div class="date-header">
           <span class="date-label">{{ formatDate(group.date) }}</span>
           <div class="date-summary">
-            <span v-if="group.totalIncome > 0" class="ds-income">+{{ formatCurrency(group.totalIncome) }}</span>
-            <span v-if="group.totalExpense > 0" class="ds-expense">-{{ formatCurrency(group.totalExpense) }}</span>
+            <span v-if="group.totalIncome > 0" class="ds-income"
+              >+{{ formatCurrency(group.totalIncome) }}</span
+            >
+            <span v-if="group.totalExpense > 0" class="ds-expense"
+              >-{{ formatCurrency(group.totalExpense) }}</span
+            >
           </div>
         </div>
 
@@ -115,16 +120,31 @@ function getCategoryIcon(categoryName, type) {
               </div>
               <div class="record-info">
                 <p class="record-category">{{ record.category }}</p>
-                <p class="record-memo">{{ record.memo || '메모 없음' }}</p>
+                <p class="record-content">
+                  {{ record.content || '내용 없음' }}
+                </p>
               </div>
             </div>
             <div class="record-right">
               <span class="record-amount" :class="record.type">
-                {{ record.type === 'income' ? '+' : '-' }}{{ formatCurrency(record.amount) }}
+                {{ record.type === 'income' ? '+' : '-'
+                }}{{ formatCurrency(record.amount) }}
               </span>
               <div class="record-actions">
-                <button class="action-btn edit" @click="openEdit(record)" title="수정">✏️</button>
-                <button class="action-btn delete" @click="deleteTarget = record" title="삭제">🗑️</button>
+                <button
+                  class="action-btn edit"
+                  @click="openEdit(record)"
+                  title="수정"
+                >
+                  ✏️
+                </button>
+                <button
+                  class="action-btn delete"
+                  @click="deleteTarget = record"
+                  title="삭제"
+                >
+                  🗑️
+                </button>
               </div>
             </div>
           </div>
@@ -141,7 +161,11 @@ function getCategoryIcon(categoryName, type) {
     />
 
     <!-- 삭제 확인 모달 -->
-    <div v-if="deleteTarget" class="confirm-overlay" @click.self="deleteTarget = null">
+    <div
+      v-if="deleteTarget"
+      class="confirm-overlay"
+      @click.self="deleteTarget = null"
+    >
       <div class="confirm-modal">
         <p class="confirm-icon">🗑️</p>
         <p class="confirm-title">삭제할까요?</p>
@@ -160,7 +184,11 @@ function getCategoryIcon(categoryName, type) {
 </template>
 
 <style scoped>
-.account-page { display: flex; flex-direction: column; gap: 0; }
+.account-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
 
 .page-title {
   font-size: 1.4rem;
@@ -170,9 +198,17 @@ function getCategoryIcon(categoryName, type) {
 }
 
 /* Record Groups */
-.record-groups { display: flex; flex-direction: column; gap: 1rem; }
+.record-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 
-.date-group { display: flex; flex-direction: column; gap: 0.4rem; }
+.date-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
 
 .date-header {
   display: flex;
@@ -181,11 +217,26 @@ function getCategoryIcon(categoryName, type) {
   padding: 0 0.2rem;
 }
 
-.date-label { font-size: 0.82rem; font-weight: 700; color: var(--text-muted); }
+.date-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
 
-.date-summary { display: flex; gap: 0.5rem; }
-.ds-income { font-size: 0.8rem; font-weight: 600; color: #43A047; }
-.ds-expense { font-size: 0.8rem; font-weight: 600; color: #E53935; }
+.date-summary {
+  display: flex;
+  gap: 0.5rem;
+}
+.ds-income {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #43a047;
+}
+.ds-expense {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #e53935;
+}
 
 .record-card {
   background: #fff;
@@ -203,10 +254,18 @@ function getCategoryIcon(categoryName, type) {
   transition: background 0.15s;
 }
 
-.record-item:last-child { border-bottom: none; }
-.record-item:hover { background: var(--bg-main); }
+.record-item:last-child {
+  border-bottom: none;
+}
+.record-item:hover {
+  background: var(--bg-main);
+}
 
-.record-left { display: flex; align-items: center; gap: 0.7rem; }
+.record-left {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
 
 .record-icon {
   width: 40px;
@@ -219,12 +278,33 @@ function getCategoryIcon(categoryName, type) {
   flex-shrink: 0;
 }
 
-.record-icon.income { background: #E8F5E9; }
-.record-icon.expense { background: #FFEBEE; }
+.record-icon.income {
+  background: #e8f5e9;
+}
+.record-icon.expense {
+  background: #ffebee;
+}
 
-.record-info { min-width: 0; }
-.record-category { font-size: 0.9rem; font-weight: 600; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.record-memo { font-size: 0.75rem; color: var(--text-muted); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
+.record-info {
+  min-width: 0;
+}
+.record-category {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.record-content {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
 
 .record-right {
   display: flex;
@@ -234,11 +314,21 @@ function getCategoryIcon(categoryName, type) {
   flex-shrink: 0;
 }
 
-.record-amount { font-size: 0.95rem; font-weight: 700; }
-.record-amount.income { color: #43A047; }
-.record-amount.expense { color: #E53935; }
+.record-amount {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+.record-amount.income {
+  color: #43a047;
+}
+.record-amount.expense {
+  color: #e53935;
+}
 
-.record-actions { display: flex; gap: 4px; }
+.record-actions {
+  display: flex;
+  gap: 4px;
+}
 
 .action-btn {
   background: none;
@@ -251,7 +341,9 @@ function getCategoryIcon(categoryName, type) {
   transition: opacity 0.15s;
 }
 
-.action-btn:hover { opacity: 1; }
+.action-btn:hover {
+  opacity: 1;
+}
 
 /* Empty State */
 .empty-state {
@@ -264,7 +356,9 @@ function getCategoryIcon(categoryName, type) {
   gap: 0.8rem;
 }
 
-.empty-icon { font-size: 3rem; }
+.empty-icon {
+  font-size: 3rem;
+}
 
 .btn-primary {
   background: var(--primary);
@@ -300,15 +394,37 @@ function getCategoryIcon(categoryName, type) {
 }
 
 @keyframes fadeIn {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
-.confirm-icon { font-size: 2.5rem; margin: 0 0 0.5rem; }
-.confirm-title { font-size: 1.1rem; font-weight: 700; margin: 0 0 0.5rem; }
-.confirm-desc { font-size: 0.85rem; color: var(--text-muted); margin: 0 0 1.5rem; line-height: 1.5; }
+.confirm-icon {
+  font-size: 2.5rem;
+  margin: 0 0 0.5rem;
+}
+.confirm-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+.confirm-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0 0 1.5rem;
+  line-height: 1.5;
+}
 
-.confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.confirm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
 
 .btn-cancel {
   border: 1.5px solid var(--border);
@@ -322,7 +438,7 @@ function getCategoryIcon(categoryName, type) {
 }
 
 .btn-delete {
-  background: #EF5350;
+  background: #ef5350;
   color: #fff;
   border: none;
   border-radius: 12px;
