@@ -1,38 +1,54 @@
 <script setup>
-import { ref } from 'vue'
-import DailyLog from '../components/DailyLog.vue'
-import CalendarLog from '../components/CalendarLog.vue'
-import MonthlyLog from '../components/MonthlyLog.vue'
-import Summary from '../components/Summary.vue'
+import 'vue-datepicker-next/index.css';
+import DatePicker from 'vue-datepicker-next';
 
-const selectedMonth = ref(new Date().toISOString().slice(0, 7))
-const activeTab = ref('summary') // 'summary' | 'daily' | 'calendar' | 'monthly'
+import { computed, ref } from 'vue';
+import DailyLog from '../components/DailyLog.vue';
+import CalendarLog from '../components/CalendarLog.vue';
+import MonthlyLog from '../components/MonthlyLog.vue';
+import Summary from '../components/Summary.vue';
+
+const selectedMonth = ref(new Date().toISOString().slice(0, 7));
+const activeTab = ref('summary'); // 'summary' | 'daily' | 'calendar' | 'monthly'
 
 const tabs = [
   { key: 'summary', label: '요약', icon: '📊' },
   { key: 'daily', label: '일별', icon: '📅' },
   { key: 'calendar', label: '달력', icon: '🗓️' },
   { key: 'monthly', label: '월간', icon: '📆' },
-]
+];
 
-const months = (() => {
-  const result = []
-  const now = new Date()
-  for (let i = 5; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
-    result.push(d.toISOString().slice(0, 7))
+const months = computed(() => {
+  const result = [];
+  const now = new Date();
+  const oldestDate = new Date(
+    [...store.records].sort((a, b) => a.date.localeCompare(b.date))[0].date,
+  );
+  const diff =
+    (now.getFullYear() - oldestDate.getFullYear()) * 12 +
+    (now.getMonth() - oldestDate.getMonth());
+
+  for (let i = diff; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
+    result.push(d.toISOString().slice(0, 7));
   }
-  return result
-})()
+  return result;
+});
 </script>
 
 <template>
   <div class="statistics-page">
     <div class="page-top">
       <h1 class="page-title">📊 통계</h1>
-      <select v-model="selectedMonth" class="month-select">
-        <option v-for="m in months" :key="m" :value="m">{{ m }}</option>
-      </select>
+      <date-picker
+        v-model:value="selectedMonth"
+        format="YYYY년 MM월"
+        value-type="YYYY-MM"
+        type="month"
+        placeholder="월 선택하기"
+        :popup-style="{ right: '0px !important', transform: 'none !important' }"
+        :append-to-body="false"
+      ></date-picker>
     </div>
 
     <!-- 탭 네비게이션 -->
@@ -52,15 +68,28 @@ const months = (() => {
     <!-- 탭 콘텐츠 -->
     <div class="tab-content">
       <Summary v-if="activeTab === 'summary'" :selectedMonth="selectedMonth" />
-      <DailyLog v-else-if="activeTab === 'daily'" :selectedMonth="selectedMonth" />
-      <CalendarLog v-else-if="activeTab === 'calendar'" :selectedMonth="selectedMonth" />
-      <MonthlyLog v-else-if="activeTab === 'monthly'" :selectedMonth="selectedMonth" />
+      <DailyLog
+        v-else-if="activeTab === 'daily'"
+        :selectedMonth="selectedMonth"
+      />
+      <CalendarLog
+        v-else-if="activeTab === 'calendar'"
+        :selectedMonth="selectedMonth"
+      />
+      <MonthlyLog
+        v-else-if="activeTab === 'monthly'"
+        :selectedMonth="selectedMonth"
+      />
     </div>
   </div>
 </template>
 
 <style scoped>
-.statistics-page { display: flex; flex-direction: column; gap: 1rem; }
+.statistics-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 
 .page-top {
   display: flex;
@@ -114,12 +143,28 @@ const months = (() => {
   transition: all 0.2s;
 }
 
-.tab-btn span:first-child { font-size: 1.1rem; }
+.tab-btn span:first-child {
+  font-size: 1.1rem;
+}
 
 .tab-btn.active {
   background: var(--primary-light);
   color: var(--primary);
 }
 
-.tab-content { padding-bottom: 0.5rem; }
+.tab-content {
+  padding-bottom: 0.5rem;
+}
+
+:deep(.mx-input) {
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg-main);
+  height: auto;
+  box-shadow: none;
+}
 </style>
