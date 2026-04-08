@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore.js';
 import { usePigSystem } from '../composables/usePigSystem.js';
 
@@ -15,6 +15,8 @@ const props = defineProps({
 
 const store = useBudgetStore();
 const { formatCurrency } = usePigSystem();
+
+const activeTab = ref('total');
 
 const monthRecords = computed(() =>
   store.records.filter((r) => r.date.startsWith(props.selectedMonth)),
@@ -96,6 +98,18 @@ const chartOptions = {
   cutout: '70%', // 도넛 중앙의 구멍 크기
 };
 
+// 통합 차트 데이터 (수입 vs 지출)
+const totalChartData = computed(() => ({
+  labels: ['총 수입', '총 지출'],
+  datasets: [
+    {
+      data: [totalIncome.value, totalExpense.value],
+      backgroundColor: ['#43a047', '#e53935'],
+      borderWidth: 0,
+    },
+  ],
+}));
+
 // 수입 차트 데이터
 const incomeChartData = computed(() => ({
   labels: incomeByCat.value.map((c) => c.category),
@@ -156,8 +170,33 @@ const avgDailyExpense = computed(() => {
 
 <template>
   <div class="summary-view">
-    <!-- 핵심 지표 -->
-    <div class="kpi-grid">
+    <!-- 탭 메뉴 -->
+    <div class="tabs">
+      <button
+        class="tab-btn"
+        :class="{ active: activeTab === 'total' }"
+        @click="activeTab = 'total'"
+      >
+        전체 요약
+      </button>
+      <button
+        class="tab-btn"
+        :class="{ active: activeTab === 'income' }"
+        @click="activeTab = 'income'"
+      >
+        수입 상세
+      </button>
+      <button
+        class="tab-btn"
+        :class="{ active: activeTab === 'expense' }"
+        @click="activeTab = 'expense'"
+      >
+        지출 상세
+      </button>
+    </div>
+
+    <!-- 핵심 지표 (모든 탭에서 공통 노출) -->
+    <div v-if="activeTab === 'total'" class="kpi-grid">
       <div class="kpi-card">
         <p class="kpi-label" title="총 수입">총 수입</p>
         <p class="kpi-value income" :title="`+${formatCurrency(totalIncome)}`">
@@ -207,8 +246,47 @@ const avgDailyExpense = computed(() => {
       </div>
     </div>
 
-    <!-- 수입 구성 -->
-    <div v-if="incomeByCat.length > 0" class="chart-card">
+    <!-- 1. 전체 요약 탭: 통합 그래프 -->
+    <div
+      v-if="activeTab === 'total' && monthRecords.length > 0"
+      class="chart-card"
+    >
+      <p class="chart-title">⚖️ 수지 균형</p>
+      <div class="chart-container">
+        <div class="chart-wrapper">
+          <Doughnut :data="totalChartData" :options="chartOptions" />
+          <div class="chart-center">
+            <span class="center-label">순수익</span>
+            <span
+              class="center-value"
+              :class="netIncome >= 0 ? 'income' : 'expense'"
+            >
+              {{ netIncome >= 0 ? '+' : '' }}{{ formatCurrency(netIncome) }}
+            </span>
+          </div>
+        </div>
+        <div class="custom-legend">
+          <div class="legend-row">
+            <span class="legend-label">💰 총 수입</span>
+            <span class="legend-amount income"
+              >+{{ formatCurrency(totalIncome) }}</span
+            >
+          </div>
+          <div class="legend-row">
+            <span class="legend-label">💸 총 지출</span>
+            <span class="legend-amount expense"
+              >-{{ formatCurrency(totalExpense) }}</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. 수입 상세 탭 -->
+    <div
+      v-if="activeTab === 'income' && incomeByCat.length > 0"
+      class="chart-card"
+    >
       <p class="chart-title">💰 수입 구성</p>
       <div class="chart-container">
         <div class="chart-wrapper">
@@ -234,8 +312,11 @@ const avgDailyExpense = computed(() => {
       </div>
     </div>
 
-    <!-- 지출 구성 -->
-    <div v-if="expenseByCat.length > 0" class="chart-card">
+    <!-- 3. 지출 상세 탭 -->
+    <div
+      v-if="activeTab === 'expense' && expenseByCat.length > 0"
+      class="chart-card"
+    >
       <p class="chart-title">💸 지출 구성</p>
       <div class="chart-container">
         <div class="chart-wrapper">
@@ -272,6 +353,34 @@ const avgDailyExpense = computed(() => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  background: #eee;
+  padding: 0.3rem;
+  border-radius: 12px;
+}
+
+.tab-btn {
+  flex: 1;
+  border: none;
+  background: none;
+  padding: 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 9px;
+  transition: all 0.2s;
+}
+
+.tab-btn.active {
+  background: #fff;
+  color: var(--text);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 /* KPI Grid */
@@ -352,7 +461,7 @@ const avgDailyExpense = computed(() => {
   text-align: center;
   display: flex;
   flex-direction: column;
-  width: 100px;
+  width: 120px;
   pointer-events: none;
 }
 
@@ -416,6 +525,13 @@ const avgDailyExpense = computed(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.legend-amount.income {
+  color: #43a047;
+}
+.legend-amount.expense {
+  color: #e53935;
 }
 
 .empty {
