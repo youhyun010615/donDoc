@@ -1,10 +1,19 @@
 {
+  "users": [
+    {
+      "id": "1",
+      "loginId": "demo",
+      "password": "1234",
+      "name": "데모 사용자"
+    }
+  ],
   "profile": [
     {
       "id": "1",
+      "userId": "1",
       "userName": "강태규",
       "monthlyIncome": 3000000,
-      "targetExpenseRatio": 40,
+      "targetExpenseRatio": 75,
       "currentPigLevel": 5,
       "houseLevel": 1,
       "createdAt": "2026-04-07"

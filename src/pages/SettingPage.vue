@@ -1,9 +1,13 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useBudgetStore } from '../stores/useBudgetStore.js'
+import { useAuthStore } from '../stores/useAuthStore.js'
 import { usePigSystem } from '../composables/usePigSystem.js'
 
+const router = useRouter()
 const store = useBudgetStore()
+const authStore = useAuthStore()
 const { getHouseInfo, formatCurrency } = usePigSystem()
 
 const form = ref({
@@ -66,6 +70,15 @@ async function handleSave() {
   } catch (e) {
     errorMsg.value = '저장에 실패했어요. 다시 시도해주세요.'
   }
+}
+
+function handleLogout() {
+  const shouldLogout = window.confirm('로그아웃하시겠어요?')
+
+  if (!shouldLogout) return
+
+  authStore.logout()
+  router.replace('/login')
 }
 
 const HOUSE_LEVELS = [
@@ -202,6 +215,18 @@ const HOUSE_LEVELS = [
       <p class="info-desc">
         "내 소비의 주치의, 돼지 건강으로 보는 나의 재정 상태"
       </p>
+    </div>
+
+    <div class="logout-card">
+      <div class="logout-copy">
+        <h2 class="card-title">계정</h2>
+        <p class="logout-desc">
+          현재 로그인: {{ authStore.currentUser?.name || authStore.currentUser?.loginId || '사용자' }}
+        </p>
+      </div>
+      <button type="button" class="btn-logout" @click="handleLogout">
+        로그아웃
+      </button>
     </div>
 
     <!-- 돼지 상태 가이드 -->
@@ -342,6 +367,29 @@ const HOUSE_LEVELS = [
   padding: 1rem;
 }
 
+.logout-card {
+  background: linear-gradient(180deg, #fff 0%, #fff6f8 100%);
+  border: 1.5px solid #ffd7e5;
+  border-radius: 16px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.logout-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.logout-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
 .card-title {
   font-size: 0.95rem;
   font-weight: 700;
@@ -441,6 +489,17 @@ const HOUSE_LEVELS = [
 }
 
 .btn-save:disabled { opacity: 0.7; cursor: not-allowed; }
+
+.btn-logout {
+  border: 1px solid rgba(229, 90, 138, 0.18);
+  background: #fff;
+  color: var(--primary-dark);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
 
 /* Info Card */
 .info-list { display: flex; flex-direction: column; gap: 0; }

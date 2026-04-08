@@ -5,16 +5,14 @@ import axios from 'axios';
 const API_BASE = 'http://localhost:3000';
 
 export const useBudgetStore = defineStore('budget', () => {
-  // --- State ---
   const profile = ref(null);
   const records = ref([]);
   const incomeCategories = ref([]);
   const expenseCategories = ref([]);
-  const currentMonth = ref(new Date().toISOString().slice(0, 7)); // 'YYYY-MM'
+  const currentMonth = ref(new Date().toISOString().slice(0, 7));
   const loading = ref(false);
   const error = ref(null);
 
-  // --- Getters ---
   const monthlyRecords = computed(() =>
     records.value.filter((r) => r.date.startsWith(currentMonth.value)),
   );
@@ -66,11 +64,27 @@ export const useBudgetStore = defineStore('budget', () => {
     ...expenseCategories.value,
   ]);
 
-  // --- Actions ---
-  async function fetchProfile() {
+  async function fetchProfile(userId = '1') {
     try {
-      const res = await axios.get(`${API_BASE}/profile`);
-      profile.value = Array.isArray(res.data) ? res.data[0] : res.data;
+      const res = await axios.get(`${API_BASE}/profile?userId=${userId}`);
+      const matchedProfile = Array.isArray(res.data) ? res.data[0] ?? null : res.data;
+
+      if (matchedProfile) {
+        profile.value = matchedProfile;
+        return;
+      }
+
+      const fallbackRes = await axios.get(`${API_BASE}/profile`);
+      const fallbackProfile = Array.isArray(fallbackRes.data)
+        ? fallbackRes.data[0] ?? null
+        : fallbackRes.data;
+
+      profile.value = fallbackProfile
+        ? {
+            ...fallbackProfile,
+            userId: fallbackProfile.userId ?? userId,
+          }
+        : null;
     } catch (e) {
       error.value = '프로필 조회 실패';
       console.error(e);
@@ -112,7 +126,7 @@ export const useBudgetStore = defineStore('budget', () => {
       loading.value = true;
       const res = await axios.post(`${API_BASE}/records`, {
         ...newRecord,
-        userId: '1',
+        userId: profile.value?.userId ?? '1',
         createdAt: new Date().toISOString(),
       });
       records.value = [res.data, ...records.value].sort((a, b) =>
@@ -176,15 +190,23 @@ export const useBudgetStore = defineStore('budget', () => {
     }
   }
 
-  async function initStore() {
+  function resetStore() {
+    profile.value = null;
+    records.value = [];
+    incomeCategories.value = [];
+    expenseCategories.value = [];
+    error.value = null;
+  }
+
+  async function initStore(userId = '1') {
     loading.value = true;
     error.value = null;
     try {
       await Promise.all([
-        fetchProfile(),
+        fetchProfile(userId),
         fetchIncomeCategories(),
         fetchExpenseCategories(),
-        fetchRecords(),
+        fetchRecords(userId),
       ]);
     } finally {
       loading.value = false;
@@ -192,7 +214,6 @@ export const useBudgetStore = defineStore('budget', () => {
   }
 
   return {
-    // state
     profile,
     records,
     incomeCategories,
@@ -200,7 +221,6 @@ export const useBudgetStore = defineStore('budget', () => {
     currentMonth,
     loading,
     error,
-    // getters
     monthlyRecords,
     todayRecords,
     totalExpenseThisMonth,
@@ -211,7 +231,6 @@ export const useBudgetStore = defineStore('budget', () => {
     todayNetIncome,
     dailyBudget,
     allCategories,
-    // actions
     fetchProfile,
     fetchIncomeCategories,
     fetchExpenseCategories,
@@ -220,6 +239,7 @@ export const useBudgetStore = defineStore('budget', () => {
     updateRecord,
     deleteRecord,
     updateProfile,
+    resetStore,
     initStore,
   };
 });
