@@ -1,4 +1,7 @@
 <script setup>
+import 'vue-datepicker-next/index.css';
+import DatePicker from 'vue-datepicker-next';
+
 import { computed, ref } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore.js';
 import { usePigSystem } from '../composables/usePigSystem.js';
@@ -16,19 +19,6 @@ const emit = defineEmits([
   'update:filterType',
   'addClick',
 ]);
-
-const isOpen = ref(false);
-
-// 2. 항목 선택 시 실행될 함수
-const selectMonth = (m) => {
-  emit('update:selectedMonth', m); // 부모 컴포넌트의 selectedMonth 업데이트
-  isOpen.value = false; // 선택 후 목록 닫기
-};
-
-// 드롭다운 외부 클릭 시 닫기 위해 (선택사항)
-const toggleDropdown = () => {
-  isOpen.value = !isOpen.value;
-};
 
 const months = computed(() => {
   const result = [];
@@ -67,44 +57,16 @@ const monthlyExpense = computed(() =>
 <template>
   <div class="account-header">
     <!-- 월 선택 -->
-    <!-- <div class="month-selector">
-      <select
-        :value="selectedMonth"
-        @change="$emit('update:selectedMonth', $event.target.value)"
-        class="month-select"
-      >
-        <option value="">모든 월 보기</option>
-        <option v-for="m in months" :key="m" :value="m">{{ m }}</option>
-      </select>
-    </div> -->
-
-    <div class="month-selector">
-      <!-- 현재 선택된 값을 보여주는 박스 (기존 .month-select 디자인 적용) -->
-      <div class="custom-select-box" @click="isOpen = !isOpen">
-        {{ selectedMonth === '' ? '모든 월 보기' : selectedMonth }}
-        <span class="arrow">{{ isOpen ? '▲' : '▼' }}</span>
-      </div>
-
-      <!-- 드롭다운 목록 -->
-      <div v-if="isOpen" class="custom-options">
-        <div
-          class="custom-option"
-          :class="{ active: selectedMonth === '' }"
-          @click="selectMonth('')"
-        >
-          모든 월 보기
-        </div>
-        <div
-          v-for="m in months"
-          :key="m"
-          class="custom-option"
-          :class="{ active: selectedMonth === m }"
-          @click="selectMonth(m)"
-        >
-          {{ m }}
-        </div>
-      </div>
-    </div>
+    <date-picker
+      :value="selectedMonth"
+      @change="(val) => $emit('update:selectedMonth', val || '')"
+      format="YYYY년 MM월"
+      value-type="YYYY-MM"
+      type="month"
+      placeholder="월 선택하기"
+      :popup-style="{ left: '0px !important', transform: 'none !important' }"
+      :append-to-body="false"
+    ></date-picker>
 
     <!-- 월간 요약 -->
     <div class="month-summary">
@@ -330,5 +292,21 @@ const monthlyExpense = computed(() =>
 .arrow {
   font-size: 0.7rem;
   transition: transform 0.2s;
+}
+
+:deep(.mx-input) {
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg-main);
+  height: auto;
+  box-shadow: none;
+}
+
+:deep(.mx-datepicker) {
+  width: 100%; /* 너비가 안 먹을 때 필수 */
 }
 </style>
