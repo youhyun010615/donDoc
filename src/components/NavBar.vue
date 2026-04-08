@@ -42,6 +42,9 @@ const route = useRoute()
   bottom: 0;
   left: 0;
   right: 0;
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
   background: #fff;
   border-top: 1px solid var(--border);
   display: flex;
