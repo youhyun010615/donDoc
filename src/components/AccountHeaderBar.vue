@@ -60,6 +60,7 @@ const monthlyExpense = computed(() =>
         @change="$emit('update:selectedMonth', $event.target.value)"
         class="month-select"
       >
+        <option value="">모든 월 보기</option>
         <option v-for="m in months" :key="m" :value="m">{{ m }}</option>
       </select>
     </div>
