@@ -302,7 +302,7 @@ const state = computed(() => {
 
 <style scoped>
 .pig-art {
-  display: block;
+  
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
