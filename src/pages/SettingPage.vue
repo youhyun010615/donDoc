@@ -202,39 +202,11 @@ const HOUSE_LEVELS = [
       </form>
     </div>
 
-    <!-- 로그아웃 -->
-    <button class="btn-logout" @click="handleLogout">로그아웃</button>
-
-    <!-- 앱 정보 -->
-    <div class="info-card">
-      <h2 class="card-title">ℹ️ 앱 정보</h2>
-      <div class="info-list">
-        <div class="info-row">
-          <span>앱 이름</span>
-          <span>🐷 돈독 (Don-Doc)</span>
-        </div>
-        <div class="info-row">
-          <span>버전</span>
-          <span>v1.0.0</span>
-        </div>
-        <div class="info-row">
-          <span>개발 기간</span>
-          <span>2026.04.07 ~ 04.13</span>
-        </div>
-        <div class="info-row">
-          <span>팀장</span>
-          <span>유현</span>
-        </div>
-      </div>
-      <p class="info-desc">
-        "내 소비의 주치의, 돼지 건강으로 보는 나의 재정 상태"
-      </p>
-    </div>
-
     <!-- 돼지 상태 가이드 -->
     <div class="guide-card">
       <h2 class="card-title">🐷 돼지 상태 가이드</h2>
       <div class="guide-list">
+        <!-- ... existing guide rows ... -->
         <div class="guide-row">
           <span class="g-face">😄</span>
           <div class="g-info">
@@ -307,6 +279,9 @@ const HOUSE_LEVELS = [
         </div>
       </div>
     </div>
+
+    <!-- 로그아웃 -->
+    <button class="btn-logout" @click="handleLogout">로그아웃</button>
   </div>
 </template>
 
