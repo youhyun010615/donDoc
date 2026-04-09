@@ -20,15 +20,16 @@ const state = computed(() => {
 </script>
 
 <!--
-  픽셀 아트 돼지 SVG
+  픽셀 아트 돼지 SVG — 마인크래프트 스타일
   viewBox: 200 × 270
   각 rect는 픽셀 아트 격자에 맞춰 배치됨 (shape-rendering: crispEdges)
 
   체형 비교:
-    fat    → 몸통 192px 너비 (거의 꽉 참)
-    normal → 몸통 160px 너비
-    thin   → 몸통 56px 너비 + 갈비뼈 4개
-    crisis → 몸통 40px 너비 + 갈비뼈 10개 + X눈
+    fat    → 황금 뚱뚱 돼지 (lv 9-10) — 황금색, 왕관, 반짝이
+    chubby → 통통 분홍 돼지 (lv 6-8)  — 밝은 핑크, 마인크래프트 스타일
+    normal → 보통 분홍 돼지 (lv 4-5)  — 기본 핑크
+    thin   → 홀쭉 창백 돼지 (lv 2-3)  — 갈비뼈 4개
+    grill  → 삼겹살 구이   (lv 1)     — 불판 위 삼겹살
 -->
 <template>
   <svg
@@ -39,129 +40,147 @@ const state = computed(() => {
   >
 
     <!-- ==============================
-         FAT PIG — 황금 뚱뚱 돼지 (lv 8-10)
-         몸통이 화면 꽉 참, 황금색, 반짝이
+         FAT PIG — 황금 뚱뚱 돼지 (lv 9-10)
+         마인크래프트 스타일, 황금색, 왕관
          ============================== -->
     <g v-if="state === 'fat'">
       <!-- 황금 후광 -->
-      <ellipse cx="100" cy="195" rx="98" ry="75" fill="#FFF9C4" opacity="0.65"/>
+      <ellipse cx="100" cy="200" rx="92" ry="20" fill="#FFD700" opacity="0.25"/>
+
+      <!-- 왕관 -->
+      <rect x="52"  y="0"  width="96" height="8"  fill="#FFD700"/>
+      <rect x="52"  y="8"  width="8"  height="16" fill="#FFD700"/>
+      <rect x="96"  y="8"  width="8"  height="20" fill="#FFD700"/>
+      <rect x="140" y="8"  width="8"  height="16" fill="#FFD700"/>
+      <rect x="60"  y="8"  width="36" height="8"  fill="#FFD700"/>
+      <rect x="104" y="8"  width="36" height="8"  fill="#FFD700"/>
+      <!-- 왕관 보석 -->
+      <rect x="96"  y="0"  width="8"  height="8"  fill="#E53935"/>
+      <rect x="52"  y="0"  width="8"  height="8"  fill="#1E88E5"/>
+      <rect x="140" y="0"  width="8"  height="8"  fill="#43A047"/>
 
       <!-- 왼쪽 귀 -->
-      <rect x="20"  y="0"  width="40" height="48" fill="#4A2500"/>
-      <rect x="24"  y="4"  width="32" height="40" fill="#FF8FAB"/>
+      <rect x="16"  y="24" width="32" height="32" fill="#E8A000"/>
+      <rect x="20"  y="28" width="24" height="24" fill="#FFD700"/>
       <!-- 오른쪽 귀 -->
-      <rect x="140" y="0"  width="40" height="48" fill="#4A2500"/>
-      <rect x="144" y="4"  width="32" height="40" fill="#FF8FAB"/>
+      <rect x="152" y="24" width="32" height="32" fill="#E8A000"/>
+      <rect x="156" y="28" width="24" height="24" fill="#FFD700"/>
 
-      <!-- 머리 (192px 너비) -->
-      <rect x="4"   y="32" width="192" height="100" fill="#4A2500"/>
-      <rect x="8"   y="36" width="184" height="92"  fill="#FFD700"/>
+      <!-- 머리 -->
+      <rect x="8"   y="48" width="184" height="88" fill="#E8A000"/>
+      <rect x="12"  y="52" width="176" height="80" fill="#FFD700"/>
       <!-- 볼 홍조 -->
-      <rect x="12"  y="72" width="40"  height="28"  fill="#FF69B4" opacity="0.4"/>
-      <rect x="148" y="72" width="40"  height="28"  fill="#FF69B4" opacity="0.4"/>
+      <rect x="16"  y="80" width="32"  height="24" fill="#FFA000" opacity="0.5"/>
+      <rect x="152" y="80" width="32"  height="24" fill="#FFA000" opacity="0.5"/>
 
-      <!-- 눈 (큰 정사각 눈 + 반짝) -->
-      <rect x="44"  y="52" width="32" height="32" fill="#1A237E"/>
-      <rect x="44"  y="52" width="14" height="14" fill="#FFFFFF"/>
-      <rect x="124" y="52" width="32" height="32" fill="#1A237E"/>
-      <rect x="124" y="52" width="14" height="14" fill="#FFFFFF"/>
+      <!-- 눈 — 마인크래프트 스타일 (검정 사각형) -->
+      <rect x="44"  y="64" width="24" height="24" fill="#1A1A1A"/>
+      <rect x="44"  y="64" width="8"  height="8"  fill="#FFFFFF"/>
+      <rect x="132" y="64" width="24" height="24" fill="#1A1A1A"/>
+      <rect x="132" y="64" width="8"  height="8"  fill="#FFFFFF"/>
 
       <!-- 코 -->
-      <rect x="56"  y="88" width="88" height="40" fill="#4A2500"/>
-      <rect x="60"  y="92" width="80" height="32" fill="#FF8FAB"/>
-      <rect x="68"  y="100" width="26" height="16" fill="#C2185B"/>
-      <rect x="106" y="100" width="26" height="16" fill="#C2185B"/>
+      <rect x="64"  y="96" width="72" height="32" fill="#E8A000"/>
+      <rect x="68"  y="100" width="64" height="24" fill="#FFA000"/>
+      <rect x="72"  y="104" width="20" height="12" fill="#E65100"/>
+      <rect x="108" y="104" width="20" height="12" fill="#E65100"/>
 
-      <!-- 입 (U자 미소) -->
-      <rect x="60"  y="128" width="8"  height="8"  fill="#C2185B"/>
-      <rect x="68"  y="132" width="64" height="8"  fill="#C2185B"/>
-      <rect x="132" y="128" width="8"  height="8"  fill="#C2185B"/>
+      <!-- 입 (U자 웃음) -->
+      <rect x="72"  y="128" width="8"  height="8"  fill="#E65100"/>
+      <rect x="80"  y="132" width="40" height="8"  fill="#E65100"/>
+      <rect x="120" y="128" width="8"  height="8"  fill="#E65100"/>
 
-      <!-- 몸통 (꽉 참 — 192px 너비) -->
-      <rect x="0"   y="136" width="200" height="112" fill="#4A2500"/>
-      <rect x="4"   y="140" width="192" height="104" fill="#FFD700"/>
-      <!-- 몸통 아래 그림자 -->
-      <rect x="4"   y="220" width="192" height="20"  fill="#E8A000"/>
+      <!-- 몸통 -->
+      <rect x="0"   y="140" width="200" height="104" fill="#E8A000"/>
+      <rect x="4"   y="144" width="192" height="96"  fill="#FFD700"/>
+      <rect x="4"   y="216" width="192" height="24"  fill="#FFA000"/>
 
-      <!-- 꼬리 (몸통 위에 겹쳐서 표현) -->
-      <rect x="184" y="152" width="16" height="8"  fill="#FF8FAB"/>
-      <rect x="188" y="144" width="12" height="8"  fill="#FF8FAB"/>
-      <rect x="184" y="136" width="8"  height="8"  fill="#FF8FAB"/>
+      <!-- 배 무늬 (밝은 원) -->
+      <rect x="64"  y="160" width="72" height="56" fill="#FFE082" opacity="0.6"/>
 
-      <!-- 뚱뚱한 다리 4개 -->
-      <rect x="16"  y="244" width="40" height="24" fill="#4A2500"/>
-      <rect x="20"  y="248" width="32" height="16" fill="#FFD700"/>
-      <rect x="64"  y="244" width="40" height="24" fill="#4A2500"/>
-      <rect x="68"  y="248" width="32" height="16" fill="#FFD700"/>
-      <rect x="96"  y="244" width="40" height="24" fill="#4A2500"/>
-      <rect x="100" y="248" width="32" height="16" fill="#FFD700"/>
-      <rect x="144" y="244" width="40" height="24" fill="#4A2500"/>
-      <rect x="148" y="248" width="32" height="16" fill="#FFD700"/>
+      <!-- 꼬리 (돌돌) -->
+      <rect x="180" y="148" width="16" height="8"  fill="#FFA000"/>
+      <rect x="188" y="140" width="8"  height="8"  fill="#FFA000"/>
+      <rect x="192" y="156" width="8"  height="8"  fill="#FFD700"/>
+
+      <!-- 다리 4개 -->
+      <rect x="12"  y="244" width="40" height="24" fill="#E8A000"/>
+      <rect x="16"  y="248" width="32" height="16" fill="#FFD700"/>
+      <rect x="60"  y="244" width="40" height="24" fill="#E8A000"/>
+      <rect x="64"  y="248" width="32" height="16" fill="#FFD700"/>
+      <rect x="100" y="244" width="40" height="24" fill="#E8A000"/>
+      <rect x="104" y="248" width="32" height="16" fill="#FFD700"/>
+      <rect x="148" y="244" width="40" height="24" fill="#E8A000"/>
+      <rect x="152" y="248" width="32" height="16" fill="#FFD700"/>
 
       <!-- 반짝 픽셀 -->
-      <rect x="0" y="12" width="8" height="8" fill="#FFF59D"/>
-      <rect x="4" y="20" width="8" height="8" fill="#FFE082"/>
-      <rect x="164" y="12" width="8" height="8" fill="#FFF59D"/>
-      <rect x="168" y="20" width="8" height="8" fill="#FFE082"/>
-      <rect x="0" y="172" width="8" height="8" fill="#FFF59D"/>
-      <rect x="4" y="180" width="8" height="8" fill="#FFE082"/>
+      <rect x="0"   y="52"  width="8" height="8" fill="#FFF59D"/>
+      <rect x="8"   y="44"  width="8" height="8" fill="#FFEE58"/>
+      <rect x="184" y="52"  width="8" height="8" fill="#FFF59D"/>
+      <rect x="176" y="44"  width="8" height="8" fill="#FFEE58"/>
+      <rect x="0"   y="180" width="8" height="8" fill="#FFF59D"/>
+      <rect x="192" y="180" width="8" height="8" fill="#FFEE58"/>
     </g>
 
 
     <!-- ==============================
-         NORMAL PIG — 분홍 건강 돼지 (lv 5-7)
-         몸통 160px 너비, 핑크, 보통 표정
+         CHUBBY PIG — 통통 분홍 돼지 (lv 6-8)
+         마인크래프트 스타일, 밝은 핑크, 행복한 표정
          ============================== -->
-    <g v-else-if="state === 'normal'">
+    <g v-else-if="state === 'chubby'">
       <!-- 왼쪽 귀 -->
-      <rect x="36"  y="4"  width="28" height="40" fill="#4A2500"/>
-      <rect x="40"  y="8"  width="20" height="32" fill="#FF8FAB"/>
+      <rect x="28"  y="8"  width="32" height="36" fill="#C2185B"/>
+      <rect x="32"  y="12" width="24" height="28" fill="#F48FB1"/>
       <!-- 오른쪽 귀 -->
-      <rect x="136" y="4"  width="28" height="40" fill="#4A2500"/>
-      <rect x="140" y="8"  width="20" height="32" fill="#FF8FAB"/>
+      <rect x="140" y="8"  width="32" height="36" fill="#C2185B"/>
+      <rect x="144" y="12" width="24" height="28" fill="#F48FB1"/>
 
-      <!-- 머리 (160px 너비) -->
-      <rect x="20"  y="36" width="160" height="92" fill="#4A2500"/>
-      <rect x="24"  y="40" width="152" height="84" fill="#FFB6C1"/>
+      <!-- 머리 -->
+      <rect x="16"  y="40" width="168" height="88" fill="#C2185B"/>
+      <rect x="20"  y="44" width="160" height="80" fill="#F8BBD0"/>
       <!-- 볼 홍조 -->
-      <rect x="28"  y="76" width="28" height="20" fill="#FF80AB" opacity="0.4"/>
-      <rect x="144" y="76" width="28" height="20" fill="#FF80AB" opacity="0.4"/>
+      <rect x="24"  y="76" width="28" height="20" fill="#F06292" opacity="0.5"/>
+      <rect x="148" y="76" width="28" height="20" fill="#F06292" opacity="0.5"/>
 
-      <!-- 눈 (중간 크기) -->
-      <rect x="52"  y="56" width="24" height="24" fill="#1A237E"/>
-      <rect x="52"  y="56" width="10" height="10" fill="#FFFFFF"/>
-      <rect x="124" y="56" width="24" height="24" fill="#1A237E"/>
-      <rect x="124" y="56" width="10" height="10" fill="#FFFFFF"/>
+      <!-- 눈 — 마인크래프트 스타일 -->
+      <rect x="48"  y="56" width="24" height="24" fill="#1A1A1A"/>
+      <rect x="48"  y="56" width="8"  height="8"  fill="#FFFFFF"/>
+      <rect x="128" y="56" width="24" height="24" fill="#1A1A1A"/>
+      <rect x="128" y="56" width="8"  height="8"  fill="#FFFFFF"/>
 
       <!-- 코 -->
-      <rect x="64"  y="88" width="72" height="36" fill="#4A2500"/>
-      <rect x="68"  y="92" width="64" height="28" fill="#FF8FAB"/>
-      <rect x="76"  y="100" width="20" height="14" fill="#C2185B"/>
-      <rect x="104" y="100" width="20" height="14" fill="#C2185B"/>
+      <rect x="64"  y="92" width="72" height="32" fill="#C2185B"/>
+      <rect x="68"  y="96" width="64" height="24" fill="#F48FB1"/>
+      <rect x="72"  y="100" width="20" height="12" fill="#AD1457"/>
+      <rect x="108" y="100" width="20" height="12" fill="#AD1457"/>
 
-      <!-- 입 (평범한 일자) -->
-      <rect x="72"  y="124" width="56" height="6"  fill="#C2185B"/>
+      <!-- 입 (U자 웃음) -->
+      <rect x="72"  y="124" width="8"  height="8"  fill="#AD1457"/>
+      <rect x="80"  y="128" width="40" height="8"  fill="#AD1457"/>
+      <rect x="120" y="124" width="8"  height="8"  fill="#AD1457"/>
 
-      <!-- 몸통 (160px 너비) -->
-      <rect x="16"  y="132" width="168" height="112" fill="#4A2500"/>
-      <rect x="20"  y="136" width="160" height="104" fill="#FFB6C1"/>
-      <!-- 몸통 아래 그림자 -->
-      <rect x="20"  y="216" width="160" height="20"  fill="#F48FB1"/>
+      <!-- 몸통 -->
+      <rect x="8"   y="132" width="184" height="108" fill="#C2185B"/>
+      <rect x="12"  y="136" width="176" height="100" fill="#F8BBD0"/>
+      <rect x="12"  y="212" width="176" height="24"  fill="#F48FB1"/>
+
+      <!-- 배 무늬 -->
+      <rect x="56"  y="152" width="88" height="60" fill="#FCE4EC" opacity="0.7"/>
 
       <!-- 꼬리 -->
-      <rect x="180" y="152" width="12" height="8"  fill="#FF8FAB"/>
-      <rect x="184" y="144" width="8"  height="8"  fill="#FF8FAB"/>
-      <rect x="180" y="136" width="8"  height="8"  fill="#FF8FAB"/>
+      <rect x="176" y="148" width="16" height="8"  fill="#F48FB1"/>
+      <rect x="184" y="140" width="8"  height="8"  fill="#F48FB1"/>
+      <rect x="188" y="156" width="8"  height="8"  fill="#F8BBD0"/>
 
-      <!-- 다리 4개 (중간 크기) -->
-      <rect x="28"  y="244" width="30" height="22" fill="#4A2500"/>
-      <rect x="32"  y="248" width="22" height="14" fill="#FFB6C1"/>
-      <rect x="72"  y="244" width="30" height="22" fill="#4A2500"/>
-      <rect x="76"  y="248" width="22" height="14" fill="#FFB6C1"/>
-      <rect x="100" y="244" width="30" height="22" fill="#4A2500"/>
-      <rect x="104" y="248" width="22" height="14" fill="#FFB6C1"/>
-      <rect x="144" y="244" width="30" height="22" fill="#4A2500"/>
-      <rect x="148" y="248" width="22" height="14" fill="#FFB6C1"/>
+      <!-- 다리 4개 -->
+      <rect x="20"  y="244" width="36" height="24" fill="#C2185B"/>
+      <rect x="24"  y="248" width="28" height="16" fill="#F8BBD0"/>
+      <rect x="64"  y="244" width="36" height="24" fill="#C2185B"/>
+      <rect x="68"  y="248" width="28" height="16" fill="#F8BBD0"/>
+      <rect x="100" y="244" width="36" height="24" fill="#C2185B"/>
+      <rect x="104" y="248" width="28" height="16" fill="#F8BBD0"/>
+      <rect x="144" y="244" width="36" height="24" fill="#C2185B"/>
+      <rect x="148" y="248" width="28" height="16" fill="#F8BBD0"/>
     </g>
 
 
