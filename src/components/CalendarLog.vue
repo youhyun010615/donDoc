@@ -7,6 +7,8 @@ const props = defineProps({
   selectedMonth: { type: String, required: true },
 });
 
+const emit = defineEmits(['update:selectedMonth']);
+
 const store = useBudgetStore();
 const { getPigState } = usePigSystem();
 
