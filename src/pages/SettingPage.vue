@@ -43,7 +43,9 @@ const monthlyBudget = computed(() => {
 
 const dailyBudget = computed(() => Math.round(monthlyBudget.value / 30));
 
-const houseInfo = computed(() => getHouseInfo(authStore.currentUser?.houseLevel ?? 3));
+const houseInfo = computed(() =>
+  getHouseInfo(authStore.currentUser?.houseLevel ?? 3),
+);
 
 async function handleSave() {
   errorMsg.value = '';
@@ -53,6 +55,10 @@ async function handleSave() {
   }
   if (!form.value.monthlyIncome || Number(form.value.monthlyIncome) <= 0) {
     errorMsg.value = '월 소득을 올바르게 입력해주세요';
+    return;
+  }
+  if (form.value.monthlyIncome > 1_000_000_000) {
+    errorMsg.value = '월 소득을 10억 이하로 입력해주세요';
     return;
   }
   if (
@@ -212,38 +218,6 @@ const HOUSE_LEVELS = [
       </form>
     </div>
 
-    <!-- 로그아웃 -->
-    <button class="btn-logout" @click="handleLogout">로그아웃</button>
-
-    <!-- 앱 정보 -->
-    <div class="info-card">
-      <h2 class="card-title">앱 정보</h2>
-      <div class="info-list">
-        <div class="info-row">
-          <span>앱 이름</span>
-          <span class="with-icon">
-            <PixelIcon icon="pig" size="0.9rem" />
-            <span>돈독 (Don-Doc)</span>
-          </span>
-        </div>
-        <div class="info-row">
-          <span>버전</span>
-          <span>v1.0.0</span>
-        </div>
-        <div class="info-row">
-          <span>개발 기간</span>
-          <span>2026.04.07 ~ 04.13</span>
-        </div>
-        <div class="info-row">
-          <span>팀장</span>
-          <span>유현</span>
-        </div>
-      </div>
-      <p class="info-desc">
-        "내 소비의 주치의, 돼지 건강으로 보는 나의 재정 상태"
-      </p>
-    </div>
-
     <!-- 돼지 상태 가이드 -->
     <div class="guide-card">
       <h2 class="card-title">
@@ -251,6 +225,7 @@ const HOUSE_LEVELS = [
         <span>돼지 상태 가이드</span>
       </h2>
       <div class="guide-list">
+        <!-- ... existing guide rows ... -->
         <div class="guide-row">
           <PixelIcon class="g-face" icon="face_good" size="1.2rem" />
           <div class="g-info">
@@ -323,6 +298,9 @@ const HOUSE_LEVELS = [
         </div>
       </div>
     </div>
+
+    <!-- 로그아웃 -->
+    <button class="btn-logout" @click="handleLogout">로그아웃</button>
   </div>
 </template>
 
@@ -546,18 +524,18 @@ const HOUSE_LEVELS = [
 .btn-logout {
   width: 100%;
   background: none;
-  border: 1.5px solid #EF5350;
+  border: 1.5px solid #ef5350;
   border-radius: 14px;
   padding: 0.8rem;
   font-size: 0.95rem;
   font-weight: 700;
-  color: #EF5350;
+  color: #ef5350;
   cursor: pointer;
   transition: background 0.15s;
 }
 
 .btn-logout:hover {
-  background: #FFEBEE;
+  background: #ffebee;
 }
 
 /* Info Card */

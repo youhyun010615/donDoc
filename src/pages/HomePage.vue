@@ -69,9 +69,20 @@ const todayRecordsSorted = computed(() =>
           {{ authStore.currentUser?.userName ?? '...' }}님의 재정
         </p>
       </div>
+
+      <div class="header-actions">
+        <button
+          class="guide-btn"
+          type="button"
+          aria-label="앱 가이드 열기"
+          @click="router.push({ name: 'Guide' })"
+        >
+          ?
+        </button>
       <div class="house-badge" :title="houseInfo.description">
         <PixelIcon class="house-emoji" :icon="houseInfo.emoji" size="1.5rem" />
         <span class="house-name">{{ houseInfo.name }}</span>
+        </div>
       </div>
     </header>
 
@@ -284,6 +295,24 @@ const todayRecordsSorted = computed(() =>
   font-size: 0.78rem;
   color: var(--text-muted);
   margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.guide-btn {
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid var(--border);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--primary);
+  font-size: 1rem;
+  font-weight: 900;
+  cursor: pointer;
 }
 
 .house-badge {
