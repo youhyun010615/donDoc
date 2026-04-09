@@ -86,6 +86,22 @@ const calendarDays = computed(() => {
   return days;
 });
 
+const prevMonth = computed(() => {
+  const [year, month] = props.selectedMonth.split('-').map(Number)
+  const d = new Date(year, month - 2, 1) // month-1이 현재달, month-2가 이전달
+  return d.toISOString().slice(0, 7)
+})
+
+const nextMonth = computed(() => {
+  const [year, month] = props.selectedMonth.split('-').map(Number)
+  const d = new Date(year, month, 1) // month가 다음달 (0-based라서)
+  return d.toISOString().slice(0, 7)
+})
+
+const isCurrentMonth = computed(() => {
+  return props.selectedMonth === new Date().toISOString().slice(0, 7)
+})
+
 const selectedMonthLabel = computed(() => {
   const [year, month] = props.selectedMonth.split('-');
   return `${year}년 ${parseInt(month)}월`;
@@ -97,7 +113,7 @@ const selectedMonthLabel = computed(() => {
     <div class="calendar-title">
       <button class="month-arrow" @click="emit('update:selectedMonth', prevMonth)">◀</button>
       <span>{{ selectedMonthLabel }}</span>
-      <button class="month-arrow" @click="emit('update:selectedMonth', nextMonth)">▶</button>
+      <button class="month-arrow" @click="emit('update:selectedMonth', nextMonth)" :disabled="isCurrentMonth">▶</button>
     </div>
 
     <!-- 요일 헤더 -->
@@ -213,9 +229,14 @@ const selectedMonthLabel = computed(() => {
   transition: background 0.15s, color 0.15s;
 }
 
-.month-arrow:hover {
+.month-arrow:hover:not(:disabled) {
   background: var(--primary-light);
   color: var(--primary);
+}
+
+.month-arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 .week-header {
