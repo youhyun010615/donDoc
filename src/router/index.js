@@ -5,9 +5,11 @@ import AccountPage from '../pages/AccountPage.vue'
 import StatisticsPage from '../pages/StatisticsPage.vue'
 import SettingPage from '../pages/SettingPage.vue'
 import LoginPage from '../pages/LoginPage.vue'
+import SignupPage from '../pages/SignupPage.vue'
 
 const routes = [
   { path: '/login', name: 'Login', component: LoginPage, meta: { public: true } },
+  { path: '/signup', name: 'Signup', component: SignupPage, meta: { public: true } },
   { path: '/', name: 'Home', component: HomePage },
   { path: '/account', name: 'Account', component: AccountPage },
   { path: '/statistics', name: 'Statistics', component: StatisticsPage },
@@ -24,7 +26,7 @@ router.beforeEach((to) => {
   if (!to.meta.public && !authStore.isLoggedIn) {
     return { name: 'Login' }
   }
-  if (to.name === 'Login' && authStore.isLoggedIn) {
+  if ((to.name === 'Login' || to.name === 'Signup') && authStore.isLoggedIn) {
     return { name: 'Home' }
   }
 })

@@ -71,6 +71,11 @@ async function handleLogin() {
           <span v-if="loading">로그인 중...</span>
           <span v-else>로그인</span>
         </button>
+
+        <div class="signup-link">
+          <span>계정이 없으신가요?</span>
+          <router-link to="/signup">회원가입</router-link>
+        </div>
       </form>
     </div>
   </div>
@@ -186,5 +191,25 @@ async function handleLogin() {
 .btn-login:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+.signup-link {
+  margin-top: 0.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.signup-link a {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.signup-link a:hover {
+  text-decoration: underline;
 }
 </style>
