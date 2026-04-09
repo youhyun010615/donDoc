@@ -42,7 +42,9 @@ const monthlyBudget = computed(() => {
 
 const dailyBudget = computed(() => Math.round(monthlyBudget.value / 30));
 
-const houseInfo = computed(() => getHouseInfo(authStore.currentUser?.houseLevel ?? 3));
+const houseInfo = computed(() =>
+  getHouseInfo(authStore.currentUser?.houseLevel ?? 3),
+);
 
 async function handleSave() {
   errorMsg.value = '';
@@ -52,6 +54,10 @@ async function handleSave() {
   }
   if (!form.value.monthlyIncome || Number(form.value.monthlyIncome) <= 0) {
     errorMsg.value = '월 소득을 올바르게 입력해주세요';
+    return;
+  }
+  if (form.value.monthlyIncome > 1_000_000_000) {
+    errorMsg.value = '월 소득을 10억 이하로 입력해주세요';
     return;
   }
   if (
@@ -518,18 +524,18 @@ const HOUSE_LEVELS = [
 .btn-logout {
   width: 100%;
   background: none;
-  border: 1.5px solid #EF5350;
+  border: 1.5px solid #ef5350;
   border-radius: 14px;
   padding: 0.8rem;
   font-size: 0.95rem;
   font-weight: 700;
-  color: #EF5350;
+  color: #ef5350;
   cursor: pointer;
   transition: background 0.15s;
 }
 
 .btn-logout:hover {
-  background: #FFEBEE;
+  background: #ffebee;
 }
 
 /* Info Card */
