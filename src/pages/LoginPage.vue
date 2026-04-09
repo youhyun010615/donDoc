@@ -24,7 +24,7 @@ async function handleLogin() {
     loading.value = true
     await authStore.login(userId.value.trim(), password.value)
     await budgetStore.initStore()
-    router.push('/')
+    router.push({ name: 'Guide', query: { source: 'login' } })
   } catch (e) {
     errorMsg.value = e.message
   } finally {

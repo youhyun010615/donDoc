@@ -7,12 +7,14 @@ import SettingPage from '../pages/SettingPage.vue'
 import LoginPage from '../pages/LoginPage.vue'
 import SignupPage from '../pages/SignupPage.vue'
 import SetupPage from '../pages/SetupPage.vue'
+import GuidePage from '../pages/GuidePage.vue'
 
 const routes = [
   { path: '/login', name: 'Login', component: LoginPage, meta: { public: true } },
   { path: '/signup', name: 'Signup', component: SignupPage, meta: { public: true } },
   { path: '/setup', name: 'Setup', component: SetupPage },
   { path: '/', name: 'Home', component: HomePage },
+  { path: '/guide', name: 'Guide', component: GuidePage },
   { path: '/account', name: 'Account', component: AccountPage },
   { path: '/statistics', name: 'Statistics', component: StatisticsPage },
   { path: '/settings', name: 'Settings', component: SettingPage },
