@@ -94,7 +94,11 @@ const selectedMonthLabel = computed(() => {
 
 <template>
   <div class="calendar-log">
-    <p class="calendar-title">{{ selectedMonthLabel }}</p>
+    <div class="calendar-title">
+      <button class="month-arrow" @click="emit('update:selectedMonth', prevMonth)">◀</button>
+      <span>{{ selectedMonthLabel }}</span>
+      <button class="month-arrow" @click="emit('update:selectedMonth', nextMonth)">▶</button>
+    </div>
 
     <!-- 요일 헤더 -->
     <div class="week-header">
@@ -189,10 +193,29 @@ const selectedMonthLabel = computed(() => {
 }
 
 .calendar-title {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
   font-weight: 700;
   font-size: 0.95rem;
   margin: 0;
+}
+
+.month-arrow {
+  background: none;
+  border: none;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.month-arrow:hover {
+  background: var(--primary-light);
+  color: var(--primary);
 }
 
 .week-header {
