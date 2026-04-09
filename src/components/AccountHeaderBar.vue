@@ -20,22 +20,6 @@ const emit = defineEmits([
   'addClick',
 ]);
 
-const months = computed(() => {
-  const result = [];
-  const now = new Date();
-  const oldestDate = new Date(
-    [...store.records].sort((a, b) => a.date.localeCompare(b.date))[0].date,
-  );
-  const diff =
-    (now.getFullYear() - oldestDate.getFullYear()) * 12 +
-    (now.getMonth() - oldestDate.getMonth());
-
-  for (let i = diff; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
-    result.push(d.toISOString().slice(0, 7));
-  }
-  return result;
-});
 
 const monthlyIncome = computed(() =>
   store.records
@@ -52,6 +36,24 @@ const monthlyExpense = computed(() =>
     )
     .reduce((s, r) => s + r.amount, 0),
 );
+
+const monthlyNet = computed(() => monthlyIncome.value - monthlyExpense.value);
+
+const tooltip = ref(null);
+const tooltipPos = ref({});
+
+function showTooltip(event, label, value, colorClass) {
+  const rect = event.currentTarget.getBoundingClientRect();
+  tooltip.value = { label, value, colorClass };
+  tooltipPos.value = {
+    top: rect.top - 8 + window.scrollY + 'px',
+    left: rect.left + rect.width / 2 + 'px',
+  };
+}
+
+function hideTooltip() {
+  tooltip.value = null;
+}
 </script>
 
 <template>
@@ -70,27 +72,47 @@ const monthlyExpense = computed(() =>
 
     <!-- 월간 요약 -->
     <div class="month-summary">
-      <div class="summary-item income">
+      <div
+        class="summary-item income"
+        @mouseenter="showTooltip($event, '수입', '+' + formatCurrency(monthlyIncome), 'income')"
+        @mouseleave="hideTooltip"
+      >
         <span class="s-label">수입</span>
-        <span class="s-value">+{{ formatCurrency(monthlyIncome) }}</span>
+        <span class="s-value truncate">+{{ formatCurrency(monthlyIncome) }}</span>
       </div>
       <div class="divider"></div>
-      <div class="summary-item expense">
+      <div
+        class="summary-item expense"
+        @mouseenter="showTooltip($event, '지출', '-' + formatCurrency(monthlyExpense), 'expense')"
+        @mouseleave="hideTooltip"
+      >
         <span class="s-label">지출</span>
-        <span class="s-value">-{{ formatCurrency(monthlyExpense) }}</span>
+        <span class="s-value truncate">-{{ formatCurrency(monthlyExpense) }}</span>
       </div>
       <div class="divider"></div>
-      <div class="summary-item net">
+      <div
+        class="summary-item net"
+        @mouseenter="showTooltip($event, '합계', (monthlyNet >= 0 ? '+' : '') + formatCurrency(monthlyNet), monthlyNet >= 0 ? 'income' : 'expense')"
+        @mouseleave="hideTooltip"
+      >
         <span class="s-label">합계</span>
-        <span
-          class="s-value"
-          :class="monthlyIncome - monthlyExpense >= 0 ? 'positive' : 'negative'"
-        >
-          {{ monthlyIncome - monthlyExpense >= 0 ? '+' : ''
-          }}{{ formatCurrency(monthlyIncome - monthlyExpense) }}
+        <span class="s-value truncate" :class="monthlyNet >= 0 ? 'positive' : 'negative'">
+          {{ monthlyNet >= 0 ? '+' : '' }}{{ formatCurrency(monthlyNet) }}
         </span>
       </div>
     </div>
+
+    <!-- 툴팁 -->
+    <Teleport to="body">
+      <div
+        v-if="tooltip"
+        class="summary-tooltip"
+        :style="{ top: tooltipPos.top, left: tooltipPos.left }"
+      >
+        <span class="tip-label">{{ tooltip.label }}</span>
+        <span :class="'tip-' + tooltip.colorClass">{{ tooltip.value }}</span>
+      </div>
+    </Teleport>
 
     <!-- 필터 탭 + 추가 버튼 -->
     <div class="filter-row">
@@ -160,6 +182,51 @@ const monthlyExpense = computed(() =>
   align-items: center;
   gap: 2px;
   flex: 1;
+  min-width: 0;
+  cursor: default;
+}
+
+.truncate {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+}
+
+/* 툴팁 */
+.summary-tooltip {
+  position: fixed;
+  transform: translate(-50%, -100%);
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 6px 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.tip-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.tip-income {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #43a047;
+}
+
+.tip-expense {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #e53935;
 }
 
 .divider {
