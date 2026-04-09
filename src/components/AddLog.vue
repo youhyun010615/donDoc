@@ -62,6 +62,9 @@ async function handleSubmit() {
     errorMsg.value = '금액을 올바르게 입력해주세요';
     return;
   }
+  if (form.value.amount > 100000000) {
+    errorMsg.value = '1억을 초과하는 금액은 입력할 수 없습니다';
+  }
   // if (!form.value.content) {
   //   errorMsg.value = '내용을 입력해주세요';
   //   return;
