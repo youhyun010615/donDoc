@@ -9,10 +9,8 @@ const authStore = useAuthStore()
 const form = reactive({
   userId: '',
   password: '',
-  userName: '',
-  age: null,
-  monthlyIncome: null,
-  targetExpenseRatio: 60
+  confirmPassword: '',
+  userName: '' // 닉네임으로 사용
 })
 
 const errorMsg = ref('')
@@ -21,25 +19,26 @@ const loading = ref(false)
 async function handleSignup() {
   errorMsg.value = ''
   
-  // 간단한 유효성 검사
   if (!form.userId.trim() || !form.password.trim() || !form.userName.trim()) {
-    errorMsg.value = '필수 항목을 모두 입력해주세요'
+    errorMsg.value = '모든 필드를 입력해주세요'
     return
   }
   
-  if (form.age === null || form.monthlyIncome === null) {
-    errorMsg.value = '나이와 월 수입을 입력해주세요'
+  if (form.password !== form.confirmPassword) {
+    errorMsg.value = '비밀번호가 일치하지 않아요'
     return
   }
 
   try {
     loading.value = true
     await authStore.signup({
-      ...form,
       userId: form.userId.trim(),
-      age: Number(form.age),
-      monthlyIncome: Number(form.monthlyIncome),
-      targetExpenseRatio: Number(form.targetExpenseRatio)
+      password: form.password,
+      userName: form.userName.trim(),
+      // 초기값 설정 (나중에 SetupPage에서 업데이트)
+      age: null,
+      monthlyIncome: 0,
+      targetExpenseRatio: 60
     })
     alert('회원가입이 완료되었습니다! 로그인해주세요.')
     router.push('/login')
@@ -60,36 +59,24 @@ async function handleSignup() {
       </div>
 
       <form class="signup-form" @submit.prevent="handleSignup">
-        <div class="form-grid">
-          <div class="form-group">
-            <label>아이디 *</label>
-            <input v-model="form.userId" type="text" class="form-input" placeholder="아이디" required />
-          </div>
+        <div class="form-group">
+          <label>아이디</label>
+          <input v-model="form.userId" type="text" class="form-input" placeholder="사용할 아이디" required />
+        </div>
 
-          <div class="form-group">
-            <label>비밀번호 *</label>
-            <input v-model="form.password" type="password" class="form-input" placeholder="비밀번호" required />
-          </div>
+        <div class="form-group">
+          <label>닉네임</label>
+          <input v-model="form.userName" type="text" class="form-input" placeholder="멋진 닉네임" required />
+        </div>
 
-          <div class="form-group">
-            <label>이름 *</label>
-            <input v-model="form.userName" type="text" class="form-input" placeholder="홍길동" required />
-          </div>
+        <div class="form-group">
+          <label>비밀번호</label>
+          <input v-model="form.password" type="password" class="form-input" placeholder="비밀번호" required />
+        </div>
 
-          <div class="form-group">
-            <label>나이 *</label>
-            <input v-model="form.age" type="number" class="form-input" placeholder="25" required />
-          </div>
-
-          <div class="form-group">
-            <label>월 수입 (원) *</label>
-            <input v-model="form.monthlyIncome" type="number" class="form-input" placeholder="3000000" required />
-          </div>
-
-          <div class="form-group">
-            <label>목표 지출 비율 (%)</label>
-            <input v-model="form.targetExpenseRatio" type="number" class="form-input" placeholder="60" />
-          </div>
+        <div class="form-group">
+          <label>비밀번호 확인</label>
+          <input v-model="form.confirmPassword" type="password" class="form-input" placeholder="비밀번호 다시 입력" required />
         </div>
 
         <p v-if="errorMsg" class="error-msg">⚠️ {{ errorMsg }}</p>
@@ -100,7 +87,7 @@ async function handleSignup() {
             <span v-else>회원가입</span>
           </button>
           <button type="button" class="btn-back" @click="router.push('/login')">
-            로그인으로 돌아가기
+            이미 계정이 있나요? 로그인
           </button>
         </div>
       </form>
@@ -124,7 +111,7 @@ async function handleSignup() {
   border-radius: 24px;
   padding: 2.5rem 2rem;
   width: 100%;
-  max-width: 480px;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -150,19 +137,7 @@ async function handleSignup() {
 .signup-form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
-@media (max-width: 400px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
+  gap: 1.2rem;
 }
 
 .form-group {
@@ -204,6 +179,7 @@ async function handleSignup() {
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
+  margin-top: 1rem;
 }
 
 .btn-signup {
