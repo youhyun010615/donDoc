@@ -9,6 +9,8 @@ const route = useRoute()
 const authStore = useAuthStore()
 const budgetStore = useBudgetStore()
 
+const hideNavRoutes = ['Login', 'Guide']
+
 onMounted(async () => {
   if (authStore.isLoggedIn) {
     await budgetStore.initStore()
@@ -18,8 +20,11 @@ onMounted(async () => {
 
 <template>
   <div id="app-wrapper">
-    <NavBar v-if="authStore.isLoggedIn && route.name !== 'Login'" />
-    <main class="main-content" :class="{ 'no-nav': !authStore.isLoggedIn }">
+    <NavBar v-if="authStore.isLoggedIn && !hideNavRoutes.includes(route.name)" />
+    <main
+      class="main-content"
+      :class="{ 'no-nav': !authStore.isLoggedIn }"
+    >
       <RouterView />
     </main>
   </div>
