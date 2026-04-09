@@ -84,6 +84,7 @@ const chartOptions = {
       display: false, // 커스텀 레전드를 사용하므로 기본 레전드는 끔
     },
     tooltip: {
+      backgroundColor: '#000000',
       callbacks: {
         label: (context) => {
           const label = context.label || '';
@@ -254,13 +255,16 @@ const avgDailyExpense = computed(() => {
       <p class="chart-title">⚖️ 수지 균형</p>
       <div class="chart-container">
         <div class="chart-wrapper">
-          <Doughnut :data="totalChartData" :options="chartOptions" />
-          <div class="chart-center">
+          <Doughnut
+            :data="totalChartData"
+            :options="chartOptions"
+            style="position: relative; z-index: 2; background: transparent"
+          />
+          <div class="chart-center" style="position: absolute; z-index: 1">
             <span class="center-label">순수익</span>
             <span
               class="center-value"
               :class="netIncome >= 0 ? 'income' : 'expense'"
-              style="z-index: 3"
             >
               {{ netIncome >= 0 ? '+' : '' }}{{ formatCurrency(netIncome) }}
             </span>
@@ -291,8 +295,12 @@ const avgDailyExpense = computed(() => {
       <p class="chart-title">💰 수입 구성</p>
       <div class="chart-container">
         <div class="chart-wrapper">
-          <Doughnut :data="incomeChartData" :options="chartOptions" />
-          <div class="chart-center">
+          <Doughnut
+            :data="incomeChartData"
+            :options="chartOptions"
+            style="position: relative; z-index: 2; background: transparent"
+          />
+          <div class="chart-center" style="position: absolute; z-index: 1">
             <span class="center-label">총 수입</span>
             <span class="center-value income"
               >+{{ formatCurrency(totalIncome) }}</span
@@ -325,8 +333,12 @@ const avgDailyExpense = computed(() => {
       <p class="chart-title">💸 지출 구성</p>
       <div class="chart-container">
         <div class="chart-wrapper">
-          <Doughnut :data="expenseChartData" :options="chartOptions" />
-          <div class="chart-center">
+          <Doughnut
+            :data="expenseChartData"
+            :options="chartOptions"
+            style="position: relative; z-index: 2; background: transparent"
+          />
+          <div class="chart-center" style="position: absolute; z-index: 1">
             <span class="center-label">총 지출</span>
             <span class="center-value expense"
               >-{{ formatCurrency(totalExpense) }}</span
