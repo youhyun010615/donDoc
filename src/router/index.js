@@ -5,10 +5,12 @@ import AccountPage from '../pages/AccountPage.vue'
 import StatisticsPage from '../pages/StatisticsPage.vue'
 import SettingPage from '../pages/SettingPage.vue'
 import LoginPage from '../pages/LoginPage.vue'
+import GuidePage from '../pages/GuidePage.vue'
 
 const routes = [
   { path: '/login', name: 'Login', component: LoginPage, meta: { public: true } },
   { path: '/', name: 'Home', component: HomePage },
+  { path: '/guide', name: 'Guide', component: GuidePage },
   { path: '/account', name: 'Account', component: AccountPage },
   { path: '/statistics', name: 'Statistics', component: StatisticsPage },
   { path: '/settings', name: 'Settings', component: SettingPage },
