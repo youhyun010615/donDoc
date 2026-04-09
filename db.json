@@ -10,7 +10,20 @@
       "targetExpenseRatio": 60,
       "currentPigLevel": 5,
       "houseLevel": 5,
-      "createdAt": "2026-04-07"
+      "createdAt": "2026-04-07",
+      "farm": ["1", "2"]
+    }
+  ],
+  "farm": [
+    {
+      "id": "1",
+      "name": "kb농장",
+      "members": ["1", "2", "3", "4"]
+    },
+    {
+      "id": "2",
+      "name": "26회차 농장",
+      "members": ["1", "2", "3", "4"]
     }
   ],
   "incomeCategories": [
