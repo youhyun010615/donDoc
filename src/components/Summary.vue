@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore.js';
 import { usePigSystem } from '../composables/usePigSystem.js';
+import PixelIcon from './PixelIcon.vue';
 
 // Chart.js 관련 임포트
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
@@ -49,7 +50,7 @@ const incomeByCat = computed(() => {
       category,
       amount,
       icon:
-        store.incomeCategories.find((c) => c.name === category)?.icon ?? '💰',
+        store.incomeCategories.find((c) => c.name === category)?.icon ?? 'money',
       ratio: totalIncome.value
         ? Math.round((amount / totalIncome.value) * 100)
         : 0,
@@ -68,7 +69,7 @@ const expenseByCat = computed(() => {
       category,
       amount,
       icon:
-        store.expenseCategories.find((c) => c.name === category)?.icon ?? '💸',
+        store.expenseCategories.find((c) => c.name === category)?.icon ?? 'expense',
       ratio: totalExpense.value
         ? Math.round((amount / totalExpense.value) * 100)
         : 0,
@@ -252,7 +253,7 @@ const avgDailyExpense = computed(() => {
       v-if="activeTab === 'total' && monthRecords.length > 0"
       class="chart-card"
     >
-      <p class="chart-title">⚖️ 수지 균형</p>
+      <p class="chart-title">수지 균형</p>
       <div class="chart-container">
         <div class="chart-wrapper">
           <Doughnut
@@ -272,13 +273,19 @@ const avgDailyExpense = computed(() => {
         </div>
         <div class="custom-legend">
           <div class="legend-row">
-            <span class="legend-label">💰 총 수입</span>
+            <span class="legend-label">
+              <PixelIcon icon="money" size="0.9rem" />
+              <span>총 수입</span>
+            </span>
             <span class="legend-amount income"
               >+{{ formatCurrency(totalIncome) }}</span
             >
           </div>
           <div class="legend-row">
-            <span class="legend-label">💸 총 지출</span>
+            <span class="legend-label">
+              <PixelIcon icon="expense" size="0.9rem" />
+              <span>총 지출</span>
+            </span>
             <span class="legend-amount expense"
               >-{{ formatCurrency(totalExpense) }}</span
             >
@@ -292,7 +299,7 @@ const avgDailyExpense = computed(() => {
       v-if="activeTab === 'income' && incomeByCat.length > 0"
       class="chart-card"
     >
-      <p class="chart-title">💰 수입 구성</p>
+      <p class="chart-title">수입 구성</p>
       <div class="chart-container">
         <div class="chart-wrapper">
           <Doughnut
@@ -313,9 +320,10 @@ const avgDailyExpense = computed(() => {
             :key="cat.category"
             class="legend-row"
           >
-            <span class="legend-label" :title="`${cat.icon} ${cat.category}`"
-              >{{ cat.icon }} {{ cat.category }}</span
-            >
+            <span class="legend-label" :title="cat.category">
+              <PixelIcon :icon="cat.icon" size="0.9rem" />
+              <span>{{ cat.category }}</span>
+            </span>
             <span class="legend-pct">{{ cat.ratio }}%</span>
             <span class="legend-amount" :title="formatCurrency(cat.amount)">{{
               formatCurrency(cat.amount)
@@ -330,7 +338,7 @@ const avgDailyExpense = computed(() => {
       v-if="activeTab === 'expense' && expenseByCat.length > 0"
       class="chart-card"
     >
-      <p class="chart-title">💸 지출 구성</p>
+      <p class="chart-title">지출 구성</p>
       <div class="chart-container">
         <div class="chart-wrapper">
           <Doughnut
@@ -351,9 +359,10 @@ const avgDailyExpense = computed(() => {
             :key="cat.category"
             class="legend-row"
           >
-            <span class="legend-label" :title="`${cat.icon} ${cat.category}`"
-              >{{ cat.icon }} {{ cat.category }}</span
-            >
+            <span class="legend-label" :title="cat.category">
+              <PixelIcon :icon="cat.icon" size="0.9rem" />
+              <span>{{ cat.category }}</span>
+            </span>
             <span class="legend-pct">{{ cat.ratio }}%</span>
             <span class="legend-amount" :title="formatCurrency(cat.amount)">{{
               formatCurrency(cat.amount)
@@ -364,7 +373,10 @@ const avgDailyExpense = computed(() => {
     </div>
 
     <div v-if="monthRecords.length === 0" class="empty">
-      <p>📊 이달 데이터가 없어요</p>
+      <p class="empty-title">
+        <PixelIcon icon="nav_stats" size="0.95rem" />
+        <span>이달 데이터가 없어요</span>
+      </p>
     </div>
   </div>
 </template>
@@ -524,6 +536,9 @@ const avgDailyExpense = computed(() => {
 
 .legend-label {
   flex: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
   color: var(--text);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -559,5 +574,11 @@ const avgDailyExpense = computed(() => {
   text-align: center;
   padding: 2rem;
   color: var(--text-muted);
+}
+
+.empty-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 </style>

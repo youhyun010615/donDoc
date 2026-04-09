@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useBudgetStore } from '../stores/useBudgetStore.js'
 import { usePigSystem } from '../composables/usePigSystem.js'
+import PixelIcon from './PixelIcon.vue'
 
 const props = defineProps({
   selectedMonth: { type: String, required: true },
@@ -55,7 +56,7 @@ const categoryExpenses = computed(() => {
   return Object.entries(map)
     .sort(([, a], [, b]) => b - a)
     .map(([category, amount]) => {
-      const icon = store.expenseCategories.find((c) => c.name === category)?.icon ?? '💸'
+      const icon = store.expenseCategories.find((c) => c.name === category)?.icon ?? 'expense'
       return { category, amount, icon, ratio: monthExpense.value ? Math.round((amount / monthExpense.value) * 100) : 0 }
     })
 })
@@ -71,7 +72,7 @@ const isCurrentMonth = computed(() => {
     <!-- 월간 요약 -->
     <div class="month-summary-card">
       <div class="avg-pig">
-        <span class="avg-pig-face">{{ avgPigState.face }}</span>
+        <PixelIcon class="avg-pig-face" :icon="avgPigState.face" size="2rem" />
         <div>
           <p class="avg-pig-label" :style="{ color: avgPigState.color }">
             월평균 {{ avgPigState.label }}
@@ -105,20 +106,29 @@ const isCurrentMonth = computed(() => {
 
     <!-- 집 업그레이드 예상 -->
     <div class="house-card">
-      <p class="house-card-title">🏠 집 업그레이드 현황</p>
+      <p class="house-card-title">
+        <PixelIcon icon="house" size="0.95rem" />
+        <span>집 업그레이드 현황</span>
+      </p>
       <div class="house-status">
         <div class="house-current">
-          <span class="house-emoji">{{ currentHouse.emoji }}</span>
+          <PixelIcon class="house-emoji" :icon="currentHouse.emoji" size="1.8rem" />
           <span class="house-name">{{ currentHouse.name }}</span>
           <span class="house-tag current">현재</span>
         </div>
         <div class="house-arrow">
-          <span v-if="willUpgrade" class="arrow up">↗️</span>
-          <span v-else-if="willDowngrade" class="arrow down">↘️</span>
-          <span v-else class="arrow same">→</span>
+          <span v-if="willUpgrade" class="arrow up">
+            <PixelIcon icon="arrow_up" size="1rem" />
+          </span>
+          <span v-else-if="willDowngrade" class="arrow down">
+            <PixelIcon icon="arrow_down" size="1rem" />
+          </span>
+          <span v-else class="arrow same">
+            <PixelIcon icon="arrow_right" size="1rem" />
+          </span>
         </div>
         <div class="house-next">
-          <span class="house-emoji">{{ nextHouse.emoji }}</span>
+          <PixelIcon class="house-emoji" :icon="nextHouse.emoji" size="1.8rem" />
           <span class="house-name">{{ nextHouse.name }}</span>
           <span
             class="house-tag"
@@ -130,7 +140,7 @@ const isCurrentMonth = computed(() => {
       </div>
       <p class="house-hint">
         <span v-if="isCurrentMonth">
-          {{ willUpgrade ? '🎉 이달 목표를 달성하면 집이 업그레이드돼요!' : willDowngrade ? '😰 지출을 줄여 집을 유지하세요!' : '😊 현재 집을 유지할 수 있어요!' }}
+          {{ willUpgrade ? '이달 목표를 달성하면 집이 업그레이드돼요!' : willDowngrade ? '지출을 줄여 집을 유지하세요!' : '현재 집을 유지할 수 있어요!' }}
         </span>
         <span v-else>{{ selectedMonth }} 결산 기준</span>
       </p>
@@ -142,7 +152,7 @@ const isCurrentMonth = computed(() => {
       <div class="cat-list">
         <div v-for="cat in categoryExpenses" :key="cat.category" class="cat-item">
           <div class="cat-left">
-            <span class="cat-icon">{{ cat.icon }}</span>
+            <PixelIcon class="cat-icon" :icon="cat.icon" size="1rem" />
             <span class="cat-name">{{ cat.category }}</span>
           </div>
           <div class="cat-right">
@@ -181,7 +191,7 @@ const isCurrentMonth = computed(() => {
   gap: 0.8rem;
 }
 
-.avg-pig-face { font-size: 2.5rem; line-height: 1; }
+.avg-pig-face { line-height: 1; }
 
 .avg-pig-label { font-size: 0.95rem; font-weight: 700; margin: 0; }
 .avg-pig-ratio { font-size: 0.82rem; color: var(--text-muted); margin: 0; }
@@ -217,6 +227,9 @@ const isCurrentMonth = computed(() => {
   font-size: 0.9rem;
   font-weight: 700;
   margin: 0 0 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .house-status {
@@ -233,7 +246,6 @@ const isCurrentMonth = computed(() => {
   gap: 4px;
 }
 
-.house-emoji { font-size: 2rem; }
 .house-name { font-size: 0.82rem; font-weight: 700; }
 .house-tag {
   font-size: 0.65rem;
@@ -285,7 +297,7 @@ const isCurrentMonth = computed(() => {
   flex-shrink: 0;
 }
 
-.cat-icon { font-size: 1.1rem; }
+.cat-icon { flex-shrink: 0; }
 .cat-name { font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .cat-right {

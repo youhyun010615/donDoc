@@ -97,10 +97,13 @@ const state = computed(() => {
       <rect x="144" y="244" width="40" height="24" fill="#4A2500"/>
       <rect x="148" y="248" width="32" height="16" fill="#FFD700"/>
 
-      <!-- 반짝 이모티콘 (shape-rendering 일시 해제) -->
-      <text x="0"   y="26" font-size="22" style="shape-rendering:auto">✨</text>
-      <text x="165" y="26" font-size="20" style="shape-rendering:auto">⭐</text>
-      <text x="0"   y="182" font-size="18" style="shape-rendering:auto">✨</text>
+      <!-- 반짝 픽셀 -->
+      <rect x="0" y="12" width="8" height="8" fill="#FFF59D"/>
+      <rect x="4" y="20" width="8" height="8" fill="#FFE082"/>
+      <rect x="164" y="12" width="8" height="8" fill="#FFF59D"/>
+      <rect x="168" y="20" width="8" height="8" fill="#FFE082"/>
+      <rect x="0" y="172" width="8" height="8" fill="#FFF59D"/>
+      <rect x="4" y="180" width="8" height="8" fill="#FFE082"/>
     </g>
 
 
@@ -221,9 +224,11 @@ const state = computed(() => {
       <rect x="100" y="252" width="20" height="16" fill="#4A2500"/>
       <rect x="104" y="256" width="12" height="8"  fill="#FFCDD2"/>
 
-      <!-- 땀 이모티콘 -->
-      <text x="32" y="76" font-size="22" style="shape-rendering:auto">💧</text>
-      <text x="148" y="100" font-size="18" style="shape-rendering:auto">💧</text>
+      <!-- 땀 픽셀 아이콘 -->
+      <rect x="28" y="60" width="8" height="8" fill="#90CAF9"/>
+      <rect x="32" y="68" width="8" height="8" fill="#64B5F6"/>
+      <rect x="148" y="86" width="8" height="8" fill="#90CAF9"/>
+      <rect x="152" y="94" width="8" height="8" fill="#64B5F6"/>
     </g>
 
 
@@ -290,11 +295,15 @@ const state = computed(() => {
       <rect x="88"  y="256" width="12" height="12" fill="#37474F"/>
       <rect x="100" y="256" width="12" height="12" fill="#37474F"/>
 
-      <!-- 혼절/위기 이모티콘 -->
-      <text x="24"  y="60" font-size="20" style="shape-rendering:auto">💫</text>
-      <text x="148" y="60" font-size="20" style="shape-rendering:auto">💀</text>
-      <text x="32"  y="180" font-size="16" style="shape-rendering:auto">💧</text>
-      <text x="148" y="180" font-size="16" style="shape-rendering:auto">💧</text>
+      <!-- 혼절/위기 픽셀 아이콘 -->
+      <rect x="24" y="44" width="8" height="8" fill="#FFE082"/>
+      <rect x="32" y="52" width="8" height="8" fill="#FFD54F"/>
+      <rect x="148" y="44" width="12" height="12" fill="#B0BEC5"/>
+      <rect x="152" y="48" width="4" height="4" fill="#37474F"/>
+      <rect x="32" y="168" width="8" height="8" fill="#90CAF9"/>
+      <rect x="36" y="176" width="8" height="8" fill="#64B5F6"/>
+      <rect x="148" y="168" width="8" height="8" fill="#90CAF9"/>
+      <rect x="152" y="176" width="8" height="8" fill="#64B5F6"/>
     </g>
 
   </svg>

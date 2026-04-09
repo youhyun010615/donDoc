@@ -1,12 +1,13 @@
 <script setup>
 import { useRoute } from 'vue-router'
+import PixelIcon from './PixelIcon.vue';
 const route = useRoute()
 </script>
 
 <template>
   <nav class="navbar">
     <RouterLink to="/" class="nav-item" :class="{ active: route.path === '/' }">
-      <span class="nav-icon">🏠</span>
+      <PixelIcon class="nav-icon" icon="nav_home" alt="홈" size="1.4rem" />
       <span class="nav-label">홈</span>
     </RouterLink>
     <RouterLink
@@ -14,7 +15,7 @@ const route = useRoute()
       class="nav-item"
       :class="{ active: route.path === '/account' }"
     >
-      <span class="nav-icon">📒</span>
+      <PixelIcon class="nav-icon" icon="nav_account" alt="가계부" size="1.4rem" />
       <span class="nav-label">가계부</span>
     </RouterLink>
     <RouterLink
@@ -22,15 +23,23 @@ const route = useRoute()
       class="nav-item"
       :class="{ active: route.path === '/statistics' }"
     >
-      <span class="nav-icon">📊</span>
+      <PixelIcon class="nav-icon" icon="nav_stats" alt="통계" size="1.4rem" />
       <span class="nav-label">통계</span>
+    </RouterLink>
+    <RouterLink
+      to="/farm"
+      class="nav-item"
+      :class="{ active: route.path === '/farm' }"
+    >
+      <PixelIcon class="nav-icon farm-icon" icon="nav_farm" alt="농장" size="1.4rem" />
+      <span class="nav-label">농장</span>
     </RouterLink>
     <RouterLink
       to="/settings"
       class="nav-item"
       :class="{ active: route.path === '/settings' }"
     >
-      <span class="nav-icon">⚙️</span>
+      <PixelIcon class="nav-icon" icon="nav_settings" alt="설정" size="1.4rem" />
       <span class="nav-label">설정</span>
     </RouterLink>
   </nav>
@@ -62,7 +71,7 @@ const route = useRoute()
   gap: 2px;
   text-decoration: none;
   color: var(--text-muted);
-  padding: 0.3rem 1rem;
+  padding: 0.3rem 0.4rem;
   border-radius: 12px;
   transition: all 0.2s;
   flex: 1;
@@ -77,9 +86,16 @@ const route = useRoute()
 }
 
 .nav-icon {
-  font-size: 1.4rem;
   transition: transform 0.2s;
-  line-height: 1;
+  display: block;
+}
+
+.farm-icon {
+  transform: scale(1.25);
+}
+
+.nav-item.active .farm-icon {
+  transform: scale(1.45);
 }
 
 .nav-label {

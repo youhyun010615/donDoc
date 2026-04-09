@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore.js';
 import { usePigSystem } from '../composables/usePigSystem.js';
+import PixelIcon from './PixelIcon.vue';
 
 const props = defineProps({
   selectedMonth: { type: String, required: true },
@@ -115,7 +116,7 @@ const selectedMonthLabel = computed(() => {
         class="month-arrow"
         @click="emit('update:selectedMonth', prevMonth)"
       >
-        ◀
+        이전
       </button>
       <span>{{ selectedMonthLabel }}</span>
       <button
@@ -123,7 +124,7 @@ const selectedMonthLabel = computed(() => {
         @click="emit('update:selectedMonth', nextMonth)"
         :disabled="isCurrentMonth"
       >
-        ▶
+        다음
       </button>
     </div>
 
@@ -160,7 +161,7 @@ const selectedMonthLabel = computed(() => {
             class="day-pig"
             :style="{ visibility: day.pigState ? 'visible' : 'hidden' }"
           >
-            {{ day.pigState?.face ?? '🐷' }}
+            <PixelIcon :icon="day.pigState?.face ?? 'pig'" size="0.85rem" />
           </span>
           <span
             class="day-income"
@@ -185,9 +186,10 @@ const selectedMonthLabel = computed(() => {
         class="day-tooltip-fixed"
         :style="{ top: tooltipPos.top, left: tooltipPos.left }"
       >
-        <span v-if="tooltip.pigState" class="tip-pig"
-          >{{ tooltip.pigState.face }} {{ tooltip.pigState.label }}</span
-        >
+        <span v-if="tooltip.pigState" class="tip-pig">
+          <PixelIcon :icon="tooltip.pigState.face" size="0.9rem" />
+          <span>{{ tooltip.pigState.label }}</span>
+        </span>
         <span v-if="tooltip.income > 0" class="tip-income"
           >수입 +{{ tooltip.income.toLocaleString('ko-KR') }}원</span
         >
@@ -201,12 +203,12 @@ const selectedMonthLabel = computed(() => {
     <div class="legend">
       <p class="legend-title">돼지 상태 범례</p>
       <div class="legend-items">
-        <span>😄 완벽</span>
-        <span>😊 우수</span>
-        <span>🙂 좋음</span>
-        <span>😐 평범</span>
-        <span>😕 주의</span>
-        <span>😟 경고↑</span>
+        <span><PixelIcon icon="face_good" size="0.9rem" /> 완벽</span>
+        <span><PixelIcon icon="face_good" size="0.9rem" /> 우수</span>
+        <span><PixelIcon icon="face_good" size="0.9rem" /> 좋음</span>
+        <span><PixelIcon icon="face_warn" size="0.9rem" /> 평범</span>
+        <span><PixelIcon icon="face_warn" size="0.9rem" /> 주의</span>
+        <span><PixelIcon icon="face_warn" size="0.9rem" /> 경고↑</span>
       </div>
     </div>
   </div>
@@ -318,6 +320,9 @@ const selectedMonthLabel = computed(() => {
 .day-pig {
   font-size: 1.1rem;
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .day-income {
@@ -368,6 +373,9 @@ const selectedMonthLabel = computed(() => {
   font-size: 0.8rem;
   font-weight: 700;
   color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 
 .tip-income {
@@ -406,5 +414,8 @@ const selectedMonthLabel = computed(() => {
 .legend-items span {
   font-size: 0.75rem;
   color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 </style>
