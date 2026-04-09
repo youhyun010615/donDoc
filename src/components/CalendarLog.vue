@@ -7,11 +7,13 @@ const props = defineProps({
   selectedMonth: { type: String, required: true },
 });
 
+const emit = defineEmits(['update:selectedMonth']);
+
 const store = useBudgetStore();
 const { getPigState } = usePigSystem();
 
 const tooltip = ref(null); // 현재 호버된 day 데이터
-const tooltipPos = ref({}); // 툴팁 위치 (fixed 기준)
+const tooltipPos = ref({}); // 툴팁 위치 (fixed 기준) 준
 
 function showTooltip(event, day) {
   if (!day || (!day.pigState && day.income === 0 && day.expense === 0)) return;
@@ -84,6 +86,22 @@ const calendarDays = computed(() => {
   return days;
 });
 
+const prevMonth = computed(() => {
+  const [year, month] = props.selectedMonth.split('-').map(Number);
+  const d = new Date(year, month - 2, 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+});
+
+const nextMonth = computed(() => {
+  const [year, month] = props.selectedMonth.split('-').map(Number);
+  const d = new Date(year, month, 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+});
+
+const isCurrentMonth = computed(() => {
+  return props.selectedMonth === new Date().toISOString().slice(0, 7);
+});
+
 const selectedMonthLabel = computed(() => {
   const [year, month] = props.selectedMonth.split('-');
   return `${year}년 ${parseInt(month)}월`;
@@ -92,7 +110,22 @@ const selectedMonthLabel = computed(() => {
 
 <template>
   <div class="calendar-log">
-    <p class="calendar-title">{{ selectedMonthLabel }}</p>
+    <div class="calendar-title">
+      <button
+        class="month-arrow"
+        @click="emit('update:selectedMonth', prevMonth)"
+      >
+        ◀
+      </button>
+      <span>{{ selectedMonthLabel }}</span>
+      <button
+        class="month-arrow"
+        @click="emit('update:selectedMonth', nextMonth)"
+        :disabled="isCurrentMonth"
+      >
+        ▶
+      </button>
+    </div>
 
     <!-- 요일 헤더 -->
     <div class="week-header">
@@ -187,10 +220,36 @@ const selectedMonthLabel = computed(() => {
 }
 
 .calendar-title {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
   font-weight: 700;
   font-size: 0.95rem;
   margin: 0;
+}
+
+.month-arrow {
+  background: none;
+  border: none;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.month-arrow:hover:not(:disabled) {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.month-arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 .week-header {
