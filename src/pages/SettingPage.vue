@@ -38,7 +38,7 @@ const monthlyBudget = computed(() => {
 
 const dailyBudget = computed(() => Math.round(monthlyBudget.value / 30))
 
-const houseInfo = computed(() => getHouseInfo(store.profile?.houseLevel ?? 1))
+const houseInfo = computed(() => getHouseInfo(store.profile?.houseLevel ?? 3))
 
 async function handleSave() {
   errorMsg.value = ''
@@ -95,7 +95,7 @@ const HOUSE_LEVELS = [
           v-for="h in HOUSE_LEVELS"
           :key="h.level"
           class="house-step"
-          :class="{ active: h.level <= (store.profile?.houseLevel ?? 1), current: h.level === (store.profile?.houseLevel ?? 1) }"
+          :class="{ active: h.level <= (store.profile?.houseLevel ?? 3), current: h.level === (store.profile?.houseLevel ?? 3) }"
         >
           <span class="step-emoji">{{ h.emoji }}</span>
           <span class="step-name">{{ h.name }}</span>
