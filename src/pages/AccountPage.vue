@@ -99,10 +99,16 @@ function getCategoryIcon(categoryName, type) {
         <div class="date-header">
           <span class="date-label">{{ formatDate(group.date) }}</span>
           <div class="date-summary">
-            <span v-if="group.totalIncome > 0" class="ds-income"
+            <span
+              v-if="group.totalIncome > 0"
+              class="ds-income"
+              :title="'+' + formatCurrency(group.totalIncome)"
               >+{{ formatCurrency(group.totalIncome) }}</span
             >
-            <span v-if="group.totalExpense > 0" class="ds-expense"
+            <span
+              v-if="group.totalExpense > 0"
+              class="ds-expense"
+              :title="'-' + formatCurrency(group.totalExpense)"
               >-{{ formatCurrency(group.totalExpense) }}</span
             >
           </div>
@@ -126,7 +132,11 @@ function getCategoryIcon(categoryName, type) {
               </div>
             </div>
             <div class="record-right">
-              <span class="record-amount" :class="record.type">
+              <span
+                class="record-amount"
+                :class="record.type"
+                :title="(record.type === 'income' ? '+' : '-') + formatCurrency(record.amount)"
+              >
                 {{ record.type === 'income' ? '+' : '-'
                 }}{{ formatCurrency(record.amount) }}
               </span>
@@ -215,26 +225,35 @@ function getCategoryIcon(categoryName, type) {
   align-items: center;
   justify-content: space-between;
   padding: 0 0.2rem;
+  gap: 1rem;
 }
 
 .date-label {
   font-size: 0.82rem;
   font-weight: 700;
   color: var(--text-muted);
+  flex-shrink: 0;
 }
 
 .date-summary {
   display: flex;
   gap: 0.5rem;
+  min-width: 0;
+  justify-content: flex-end;
 }
-.ds-income {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #43a047;
-}
+.ds-income,
 .ds-expense {
   font-size: 0.8rem;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+.ds-income {
+  color: #43a047;
+}
+.ds-expense {
   color: #e53935;
 }
 
@@ -265,6 +284,8 @@ function getCategoryIcon(categoryName, type) {
   display: flex;
   align-items: center;
   gap: 0.7rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .record-icon {
@@ -286,6 +307,7 @@ function getCategoryIcon(categoryName, type) {
 }
 
 .record-info {
+  flex: 1;
   min-width: 0;
 }
 .record-category {
@@ -303,7 +325,6 @@ function getCategoryIcon(categoryName, type) {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 150px;
 }
 
 .record-right {
@@ -312,11 +333,18 @@ function getCategoryIcon(categoryName, type) {
   align-items: flex-end;
   gap: 4px;
   flex-shrink: 0;
+  margin-left: 1rem;
+  max-width: 40%;
 }
 
 .record-amount {
   font-size: 0.95rem;
   font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  text-align: right;
 }
 .record-amount.income {
   color: #43a047;
