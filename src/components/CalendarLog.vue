@@ -7,8 +7,6 @@ const props = defineProps({
   selectedMonth: { type: String, required: true },
 });
 
-const emit = defineEmits(['update:selectedMonth']);
-
 const store = useBudgetStore();
 const { getPigState } = usePigSystem();
 
@@ -86,22 +84,6 @@ const calendarDays = computed(() => {
   return days;
 });
 
-const prevMonth = computed(() => {
-  const [year, month] = props.selectedMonth.split('-').map(Number);
-  const d = new Date(year, month - 2, 1);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-});
-
-const nextMonth = computed(() => {
-  const [year, month] = props.selectedMonth.split('-').map(Number);
-  const d = new Date(year, month, 1);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-});
-
-const isCurrentMonth = computed(() => {
-  return props.selectedMonth === new Date().toISOString().slice(0, 7);
-});
-
 const selectedMonthLabel = computed(() => {
   const [year, month] = props.selectedMonth.split('-');
   return `${year}년 ${parseInt(month)}월`;
@@ -110,22 +92,7 @@ const selectedMonthLabel = computed(() => {
 
 <template>
   <div class="calendar-log">
-    <div class="calendar-title">
-      <button
-        class="month-arrow"
-        @click="emit('update:selectedMonth', prevMonth)"
-      >
-        ◀
-      </button>
-      <span>{{ selectedMonthLabel }}</span>
-      <button
-        class="month-arrow"
-        @click="emit('update:selectedMonth', nextMonth)"
-        :disabled="isCurrentMonth"
-      >
-        ▶
-      </button>
-    </div>
+    <p class="calendar-title">{{ selectedMonthLabel }}</p>
 
     <!-- 요일 헤더 -->
     <div class="week-header">
@@ -220,36 +187,10 @@ const selectedMonthLabel = computed(() => {
 }
 
 .calendar-title {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
+  text-align: center;
   font-weight: 700;
   font-size: 0.95rem;
   margin: 0;
-}
-
-.month-arrow {
-  background: none;
-  border: none;
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 6px;
-  transition:
-    background 0.15s,
-    color 0.15s;
-}
-
-.month-arrow:hover:not(:disabled) {
-  background: var(--primary-light);
-  color: var(--primary);
-}
-
-.month-arrow:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
 }
 
 .week-header {
