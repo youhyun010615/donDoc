@@ -185,78 +185,76 @@ const state = computed(() => {
 
 
     <!-- ==============================
-         THIN PIG — 홀쭉 창백 돼지 (lv 3-4)
-         몸통 56px 너비 (화면 중앙 좁은 띠)
-         갈비뼈 4개 표시, 슬픈 표정
+         NORMAL PIG — 홀쭉 분홍 돼지 (lv 4-5)
+         좁은 몸통, 갈비뼈 4개, 슬픈 표정
          ============================== -->
-    <g v-else-if="state === 'thin'">
-      <!-- 배경에 옅은 원래 실루엣 (얼마나 줄었는지 비교) -->
-      <rect x="20" y="36" width="160" height="212" fill="#FFCDD2" opacity="0.15"/>
+    <g v-else-if="state === 'normal'">
+      <!-- 희미한 실루엣 -->
+      <rect x="24" y="40" width="152" height="196" fill="#FFCDD2" opacity="0.12"/>
 
       <!-- 왼쪽 귀 (작아짐) -->
-      <rect x="72"  y="8"  width="20" height="28" fill="#4A2500"/>
-      <rect x="76"  y="12" width="12" height="20" fill="#EF9A9A"/>
+      <rect x="68"  y="12" width="24" height="28" fill="#AD1457"/>
+      <rect x="72"  y="16" width="16" height="20" fill="#FFCDD2"/>
       <!-- 오른쪽 귀 -->
-      <rect x="108" y="8"  width="20" height="28" fill="#4A2500"/>
-      <rect x="112" y="12" width="12" height="20" fill="#EF9A9A"/>
+      <rect x="108" y="12" width="24" height="28" fill="#AD1457"/>
+      <rect x="112" y="16" width="16" height="20" fill="#FFCDD2"/>
 
-      <!-- 머리 (88px 너비) -->
-      <rect x="56"  y="32" width="88" height="80" fill="#4A2500"/>
-      <rect x="60"  y="36" width="80" height="72" fill="#FFCDD2"/>
+      <!-- 머리 (작아짐) -->
+      <rect x="52"  y="36" width="96" height="80" fill="#AD1457"/>
+      <rect x="56"  y="40" width="88" height="72" fill="#FFCDD2"/>
 
-      <!-- 슬픈 눈썹 (안쪽이 올라가 있음 = 슬픔) -->
-      <rect x="68" y="44" width="8"  height="4" fill="#4A2500"/>
-      <rect x="76" y="48" width="12" height="4" fill="#4A2500"/>
-      <rect x="120" y="44" width="8"  height="4" fill="#4A2500"/>
-      <rect x="112" y="48" width="8"  height="4" fill="#4A2500"/>
+      <!-- 슬픈 눈썹 -->
+      <rect x="64"  y="48" width="8"  height="4" fill="#1A1A1A"/>
+      <rect x="72"  y="52" width="12" height="4" fill="#1A1A1A"/>
+      <rect x="116" y="48" width="8"  height="4" fill="#1A1A1A"/>
+      <rect x="108" y="52" width="8"  height="4" fill="#1A1A1A"/>
 
-      <!-- 슬픈 눈 (더 작고 어두움) -->
-      <rect x="68"  y="52" width="20" height="16" fill="#455A64"/>
-      <rect x="112" y="52" width="20" height="16" fill="#455A64"/>
-      <!-- 눈 테두리 -->
-      <rect x="66"  y="50" width="24" height="20" fill="none" stroke="#4A2500" stroke-width="2"/>
-      <rect x="110" y="50" width="24" height="20" fill="none" stroke="#4A2500" stroke-width="2"/>
+      <!-- 눈 — 마인크래프트 스타일, 슬픔 -->
+      <rect x="64"  y="56" width="20" height="20" fill="#1A1A1A"/>
+      <rect x="64"  y="56" width="6"  height="6"  fill="#FFFFFF"/>
+      <rect x="116" y="56" width="20" height="20" fill="#1A1A1A"/>
+      <rect x="116" y="56" width="6"  height="6"  fill="#FFFFFF"/>
 
-      <!-- 코 (작아짐) -->
-      <rect x="76"  y="80" width="48" height="32" fill="#4A2500"/>
-      <rect x="80"  y="84" width="40" height="24" fill="#EF9A9A"/>
-      <rect x="84"  y="90" width="14" height="12" fill="#C2185B"/>
-      <rect x="102" y="90" width="14" height="12" fill="#C2185B"/>
+      <!-- 코 -->
+      <rect x="72"  y="84" width="56" height="28" fill="#AD1457"/>
+      <rect x="76"  y="88" width="48" height="20" fill="#FFCDD2"/>
+      <rect x="80"  y="92" width="14" height="10" fill="#880E4F"/>
+      <rect x="106" y="92" width="14" height="10" fill="#880E4F"/>
 
       <!-- 입 (역U자 찡그림) -->
-      <rect x="80"  y="112" width="8"  height="8" fill="#C2185B"/>
-      <rect x="88"  y="108" width="24" height="8" fill="#C2185B"/>
-      <rect x="112" y="112" width="8"  height="8" fill="#C2185B"/>
+      <rect x="76"  y="112" width="8"  height="8" fill="#880E4F"/>
+      <rect x="84"  y="108" width="32" height="8" fill="#880E4F"/>
+      <rect x="116" y="112" width="8"  height="8" fill="#880E4F"/>
 
-      <!-- 몸통 (56px 너비 — 좁은 막대) -->
-      <rect x="72"  y="120" width="56" height="132" fill="#4A2500"/>
-      <rect x="76"  y="124" width="48" height="124" fill="#FFCDD2"/>
+      <!-- 몸통 (좁음) -->
+      <rect x="68"  y="120" width="64" height="128" fill="#AD1457"/>
+      <rect x="72"  y="124" width="56" height="120" fill="#FFCDD2"/>
 
-      <!-- 갈비뼈 4개 (뚜렷하게 보임) -->
-      <rect x="80" y="148" width="40" height="6" fill="#EF9A9A" opacity="0.75"/>
-      <rect x="80" y="168" width="40" height="6" fill="#EF9A9A" opacity="0.75"/>
-      <rect x="80" y="188" width="40" height="6" fill="#EF9A9A" opacity="0.75"/>
-      <rect x="80" y="208" width="40" height="6" fill="#EF9A9A" opacity="0.75"/>
+      <!-- 갈비뼈 4개 -->
+      <rect x="76" y="144" width="48" height="6" fill="#EF9A9A" opacity="0.8"/>
+      <rect x="76" y="164" width="48" height="6" fill="#EF9A9A" opacity="0.8"/>
+      <rect x="76" y="184" width="48" height="6" fill="#EF9A9A" opacity="0.8"/>
+      <rect x="76" y="204" width="48" height="6" fill="#EF9A9A" opacity="0.8"/>
 
       <!-- 다리 2개 (가는 다리) -->
-      <rect x="80"  y="252" width="20" height="16" fill="#4A2500"/>
-      <rect x="84"  y="256" width="12" height="8"  fill="#FFCDD2"/>
-      <rect x="100" y="252" width="20" height="16" fill="#4A2500"/>
-      <rect x="104" y="256" width="12" height="8"  fill="#FFCDD2"/>
+      <rect x="76"  y="248" width="20" height="20" fill="#AD1457"/>
+      <rect x="80"  y="252" width="12" height="12" fill="#FFCDD2"/>
+      <rect x="104" y="248" width="20" height="20" fill="#AD1457"/>
+      <rect x="108" y="252" width="12" height="12" fill="#FFCDD2"/>
 
-      <!-- 땀 픽셀 아이콘 -->
-      <rect x="28" y="60" width="8" height="8" fill="#90CAF9"/>
-      <rect x="32" y="68" width="8" height="8" fill="#64B5F6"/>
-      <rect x="148" y="86" width="8" height="8" fill="#90CAF9"/>
-      <rect x="152" y="94" width="8" height="8" fill="#64B5F6"/>
+      <!-- 땀방울 픽셀 -->
+      <rect x="24"  y="64" width="8" height="8" fill="#90CAF9"/>
+      <rect x="28"  y="72" width="8" height="8" fill="#64B5F6"/>
+      <rect x="156" y="88" width="8" height="8" fill="#90CAF9"/>
+      <rect x="160" y="96" width="8" height="8" fill="#64B5F6"/>
     </g>
 
 
     <!-- ==============================
-         CRISIS PIG — 위기 해골 돼지 (lv 1-2)
+         THIN PIG — 위기 해골 돼지 (lv 2-3)
          몸통 40px (매우 좁음), X눈, 갈비뼈 10개
          ============================== -->
-    <g v-else>
+    <g v-else-if="state === 'thin'">
       <!-- 배경 실루엣 (흐릿하게 원래 크기 표시) -->
       <rect x="4" y="36" width="192" height="212" fill="#CFD8DC" opacity="0.1"/>
 
@@ -324,6 +322,108 @@ const state = computed(() => {
       <rect x="36" y="176" width="8" height="8" fill="#64B5F6"/>
       <rect x="148" y="168" width="8" height="8" fill="#90CAF9"/>
       <rect x="152" y="176" width="8" height="8" fill="#64B5F6"/>
+    </g>
+
+
+    <!-- ==============================
+         GRILL — 삼겹살 구이 (lv 1)
+         불판 위 삼겹살 픽셀 아트
+         ============================== -->
+    <g v-else>
+      <!-- 연기 픽셀 -->
+      <rect x="68"  y="8"  width="8" height="8" fill="#90A4AE" opacity="0.5"/>
+      <rect x="64"  y="2"  width="8" height="6" fill="#B0BEC5" opacity="0.4"/>
+      <rect x="96"  y="12" width="8" height="8" fill="#B0BEC5" opacity="0.55"/>
+      <rect x="100" y="4"  width="8" height="8" fill="#90A4AE" opacity="0.45"/>
+      <rect x="132" y="8"  width="8" height="8" fill="#B0BEC5" opacity="0.5"/>
+      <rect x="136" y="2"  width="8" height="6" fill="#90A4AE" opacity="0.4"/>
+
+      <!-- 삼겹살 슬라이스 1 (왼쪽) -->
+      <rect x="16"  y="88" width="52" height="4"  fill="#3E2723"/>
+      <rect x="16"  y="108" width="52" height="4" fill="#3E2723"/>
+      <rect x="16"  y="88" width="4"  height="24" fill="#3E2723"/>
+      <rect x="64"  y="88" width="4"  height="24" fill="#3E2723"/>
+      <rect x="20"  y="92" width="44" height="4"  fill="#FFECB3"/>
+      <rect x="20"  y="96" width="44" height="5"  fill="#EF5350"/>
+      <rect x="20"  y="101" width="44" height="4" fill="#FFF9C4"/>
+      <rect x="20"  y="105" width="44" height="3" fill="#C62828"/>
+      <rect x="28"  y="92" width="4"  height="16" fill="#3E2723" opacity="0.75"/>
+      <rect x="40"  y="92" width="4"  height="16" fill="#3E2723" opacity="0.75"/>
+      <rect x="52"  y="92" width="4"  height="16" fill="#3E2723" opacity="0.75"/>
+
+      <!-- 삼겹살 슬라이스 2 (중앙, 살짝 앞) -->
+      <rect x="74"  y="84" width="52" height="4"  fill="#3E2723"/>
+      <rect x="74"  y="104" width="52" height="4" fill="#3E2723"/>
+      <rect x="74"  y="84" width="4"  height="24" fill="#3E2723"/>
+      <rect x="122" y="84" width="4"  height="24" fill="#3E2723"/>
+      <rect x="78"  y="88" width="44" height="4"  fill="#FFECB3"/>
+      <rect x="78"  y="92" width="44" height="5"  fill="#F44336"/>
+      <rect x="78"  y="97" width="44" height="4"  fill="#FFF9C4"/>
+      <rect x="78"  y="101" width="44" height="3" fill="#C62828"/>
+      <rect x="86"  y="88" width="4"  height="16" fill="#3E2723" opacity="0.75"/>
+      <rect x="98"  y="88" width="4"  height="16" fill="#3E2723" opacity="0.75"/>
+      <rect x="110" y="88" width="4"  height="16" fill="#3E2723" opacity="0.75"/>
+
+      <!-- 삼겹살 슬라이스 3 (오른쪽) -->
+      <rect x="132" y="88" width="52" height="4"  fill="#3E2723"/>
+      <rect x="132" y="108" width="52" height="4" fill="#3E2723"/>
+      <rect x="132" y="88" width="4"  height="24" fill="#3E2723"/>
+      <rect x="180" y="88" width="4"  height="24" fill="#3E2723"/>
+      <rect x="136" y="92" width="44" height="4"  fill="#FFECB3"/>
+      <rect x="136" y="96" width="44" height="5"  fill="#EF5350"/>
+      <rect x="136" y="101" width="44" height="4" fill="#FFF9C4"/>
+      <rect x="136" y="105" width="44" height="3" fill="#C62828"/>
+      <rect x="144" y="92" width="4"  height="16" fill="#3E2723" opacity="0.75"/>
+      <rect x="156" y="92" width="4"  height="16" fill="#3E2723" opacity="0.75"/>
+      <rect x="168" y="92" width="4"  height="16" fill="#3E2723" opacity="0.75"/>
+
+      <!-- 불판 그레이트 (수평 바 2개) -->
+      <rect x="8"   y="112" width="184" height="4" fill="#795548"/>
+      <rect x="8"   y="120" width="184" height="4" fill="#6D4C41"/>
+      <!-- 불판 그레이트 (수직 바) -->
+      <rect x="20"  y="108" width="4"  height="20" fill="#6D4C41"/>
+      <rect x="40"  y="108" width="4"  height="20" fill="#6D4C41"/>
+      <rect x="60"  y="108" width="4"  height="20" fill="#6D4C41"/>
+      <rect x="80"  y="108" width="4"  height="20" fill="#6D4C41"/>
+      <rect x="100" y="108" width="4"  height="20" fill="#6D4C41"/>
+      <rect x="120" y="108" width="4"  height="20" fill="#6D4C41"/>
+      <rect x="140" y="108" width="4"  height="20" fill="#6D4C41"/>
+      <rect x="160" y="108" width="4"  height="20" fill="#6D4C41"/>
+      <rect x="180" y="108" width="4"  height="20" fill="#6D4C41"/>
+
+      <!-- 불판 몸체 -->
+      <rect x="8"   y="124" width="184" height="48" fill="#5D4037"/>
+      <rect x="12"  y="128" width="176" height="40" fill="#1A1A1A"/>
+
+      <!-- 불꽃 (그릴 안) -->
+      <!-- 빨간 불 베이스 -->
+      <rect x="48"  y="148" width="104" height="16" fill="#B71C1C"/>
+      <!-- 빨간 불꽃 -->
+      <rect x="40"  y="140" width="12"  height="12" fill="#D32F2F"/>
+      <rect x="80"  y="136" width="12"  height="16" fill="#D32F2F"/>
+      <rect x="112" y="136" width="12"  height="16" fill="#D32F2F"/>
+      <rect x="152" y="140" width="12"  height="12" fill="#D32F2F"/>
+      <!-- 주황 불꽃 -->
+      <rect x="52"  y="132" width="12"  height="16" fill="#E65100"/>
+      <rect x="88"  y="128" width="12"  height="12" fill="#E65100"/>
+      <rect x="108" y="128" width="12"  height="12" fill="#E65100"/>
+      <rect x="140" y="132" width="12"  height="16" fill="#E65100"/>
+      <!-- 노란 불꽃 끝 -->
+      <rect x="60"  y="128" width="8"   height="8"  fill="#FDD835"/>
+      <rect x="92"  y="124" width="8"   height="8"  fill="#FDD835"/>
+      <rect x="108" y="124" width="8"   height="8"  fill="#FDD835"/>
+      <rect x="136" y="128" width="8"   height="8"  fill="#FDD835"/>
+      <!-- 가장 밝은 불꽃 -->
+      <rect x="96"  y="120" width="8"   height="8"  fill="#FFEE58"/>
+
+      <!-- 그릴 다리 -->
+      <rect x="36"  y="172" width="16"  height="76" fill="#4E342E"/>
+      <rect x="148" y="172" width="16"  height="76" fill="#4E342E"/>
+      <!-- 하단 연결바 -->
+      <rect x="36"  y="236" width="128" height="8"  fill="#3E2723"/>
+      <!-- 다리 발 -->
+      <rect x="28"  y="244" width="28"  height="8"  fill="#3E2723"/>
+      <rect x="144" y="244" width="28"  height="8"  fill="#3E2723"/>
     </g>
 
   </svg>
