@@ -1,71 +1,86 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
-import { useBudgetStore } from '../stores/useBudgetStore.js'
-import { usePigSystem } from '../composables/usePigSystem.js'
+import { ref, computed, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { useBudgetStore } from '../stores/useBudgetStore.js';
+import { useAuthStore } from '../stores/useAuthStore.js';
+import { usePigSystem } from '../composables/usePigSystem.js';
 
-const store = useBudgetStore()
-const { getHouseInfo, formatCurrency } = usePigSystem()
+const store = useBudgetStore();
+const authStore = useAuthStore();
+const router = useRouter();
+const { getHouseInfo, formatCurrency } = usePigSystem();
 
 const form = ref({
   userName: '',
   monthlyIncome: '',
   targetExpenseRatio: 50,
-})
+});
 
-const saved = ref(false)
-const errorMsg = ref('')
+const saved = ref(false);
+const errorMsg = ref('');
 
-// 프로필이 로드되면 폼 초기화
+// 현재 유저 정보로 폼 초기화
 watch(
-  () => store.profile,
-  (profile) => {
-    if (profile) {
+  () => authStore.currentUser,
+  (user) => {
+    if (user) {
       form.value = {
-        userName: profile.userName,
-        monthlyIncome: profile.monthlyIncome,
-        targetExpenseRatio: profile.targetExpenseRatio,
-      }
+        userName: user.userName,
+        monthlyIncome: user.monthlyIncome,
+        targetExpenseRatio: user.targetExpenseRatio,
+      };
     }
   },
-  { immediate: true }
-)
+  { immediate: true },
+);
 
 const monthlyBudget = computed(() => {
-  const income = Number(form.value.monthlyIncome) || 0
-  const ratio = Number(form.value.targetExpenseRatio) || 0
-  return Math.round((income * ratio) / 100)
-})
+  const income = Number(form.value.monthlyIncome) || 0;
+  const ratio = Number(form.value.targetExpenseRatio) || 0;
+  return Math.round((income * ratio) / 100);
+});
 
-const dailyBudget = computed(() => Math.round(monthlyBudget.value / 30))
+const dailyBudget = computed(() => Math.round(monthlyBudget.value / 30));
 
-const houseInfo = computed(() => getHouseInfo(store.profile?.houseLevel ?? 3))
+const houseInfo = computed(() => getHouseInfo(authStore.currentUser?.houseLevel ?? 3));
 
 async function handleSave() {
-  errorMsg.value = ''
+  errorMsg.value = '';
   if (!form.value.userName.trim()) {
-    errorMsg.value = '이름을 입력해주세요'
-    return
+    errorMsg.value = '이름을 입력해주세요';
+    return;
   }
   if (!form.value.monthlyIncome || Number(form.value.monthlyIncome) <= 0) {
-    errorMsg.value = '월 소득을 올바르게 입력해주세요'
-    return
+    errorMsg.value = '월 소득을 올바르게 입력해주세요';
+    return;
   }
-  if (form.value.targetExpenseRatio < 10 || form.value.targetExpenseRatio > 100) {
-    errorMsg.value = '지출 목표 비율은 10~100% 사이로 설정해주세요'
-    return
+  if (
+    form.value.targetExpenseRatio < 10 ||
+    form.value.targetExpenseRatio > 100
+  ) {
+    errorMsg.value = '지출 목표 비율은 10~100% 사이로 설정해주세요';
+    return;
   }
 
   try {
-    await store.updateProfile({
+    await authStore.updateProfile({
       userName: form.value.userName.trim(),
       monthlyIncome: Number(form.value.monthlyIncome),
       targetExpenseRatio: Number(form.value.targetExpenseRatio),
-    })
-    saved.value = true
-    setTimeout(() => { saved.value = false }, 2000)
+    });
+    saved.value = true;
+    setTimeout(() => {
+      saved.value = false;
+    }, 2000);
   } catch (e) {
-    errorMsg.value = '저장에 실패했어요. 다시 시도해주세요.'
+    errorMsg.value = '저장에 실패했어요. 다시 시도해주세요.';
   }
+}
+
+async function handleLogout() {
+  authStore.logout();
+  store.resetStore();
+  router.push('/login');
 }
 
 const HOUSE_LEVELS = [
@@ -74,7 +89,7 @@ const HOUSE_LEVELS = [
   { level: 3, name: '집', emoji: '🏠' },
   { level: 4, name: '빌라', emoji: '🏢' },
   { level: 5, name: '대저택', emoji: '🏰' },
-]
+];
 </script>
 
 <template>
@@ -95,7 +110,10 @@ const HOUSE_LEVELS = [
           v-for="h in HOUSE_LEVELS"
           :key="h.level"
           class="house-step"
-          :class="{ active: h.level <= (store.profile?.houseLevel ?? 3), current: h.level === (store.profile?.houseLevel ?? 3) }"
+          :class="{
+            active: h.level <= (store.profile?.houseLevel ?? 3),
+            current: h.level === (store.profile?.houseLevel ?? 3),
+          }"
         >
           <span class="step-emoji">{{ h.emoji }}</span>
           <span class="step-name">{{ h.name }}</span>
@@ -177,6 +195,9 @@ const HOUSE_LEVELS = [
         </button>
       </form>
     </div>
+
+    <!-- 로그아웃 -->
+    <button class="btn-logout" @click="handleLogout">로그아웃</button>
 
     <!-- 앱 정보 -->
     <div class="info-card">
@@ -284,7 +305,11 @@ const HOUSE_LEVELS = [
 </template>
 
 <style scoped>
-.setting-page { display: flex; flex-direction: column; gap: 1rem; }
+.setting-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 
 .page-title {
   font-size: 1.4rem;
@@ -307,9 +332,19 @@ const HOUSE_LEVELS = [
   margin-bottom: 1rem;
 }
 
-.showcase-emoji { font-size: 2.5rem; }
-.showcase-name { font-size: 1rem; font-weight: 700; margin: 0; }
-.showcase-desc { font-size: 0.8rem; color: var(--text-muted); margin: 0; }
+.showcase-emoji {
+  font-size: 2.5rem;
+}
+.showcase-name {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+}
+.showcase-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+}
 
 .house-progress {
   display: flex;
@@ -327,15 +362,30 @@ const HOUSE_LEVELS = [
   transition: opacity 0.2s;
 }
 
-.house-step.active { opacity: 0.7; }
-.house-step.current { opacity: 1; }
+.house-step.active {
+  opacity: 0.7;
+}
+.house-step.current {
+  opacity: 1;
+}
 
-.step-emoji { font-size: 1.4rem; }
-.step-name { font-size: 0.62rem; font-weight: 600; color: var(--text-muted); text-align: center; }
-.house-step.current .step-name { color: var(--primary); }
+.step-emoji {
+  font-size: 1.4rem;
+}
+.step-name {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+}
+.house-step.current .step-name {
+  color: var(--primary);
+}
 
 /* Setting Card */
-.setting-card, .info-card, .guide-card {
+.setting-card,
+.info-card,
+.guide-card {
   background: #fff;
   border: 1.5px solid var(--border);
   border-radius: 16px;
@@ -348,9 +398,17 @@ const HOUSE_LEVELS = [
   margin: 0 0 1rem;
 }
 
-.setting-form { display: flex; flex-direction: column; gap: 1rem; }
+.setting-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 
-.form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
 
 .form-group label {
   font-size: 0.82rem;
@@ -381,10 +439,16 @@ const HOUSE_LEVELS = [
   font-family: inherit;
 }
 
-.form-input:focus { border-color: var(--primary); }
+.form-input:focus {
+  border-color: var(--primary);
+}
 
-.input-wrap { position: relative; }
-.input-wrap .form-input { padding-right: 2.5rem; }
+.input-wrap {
+  position: relative;
+}
+.input-wrap .form-input {
+  padding-right: 2.5rem;
+}
 .unit {
   position: absolute;
   right: 0.9rem;
@@ -423,9 +487,15 @@ const HOUSE_LEVELS = [
   font-size: 0.85rem;
 }
 
-.preview-row strong { color: var(--primary); }
+.preview-row strong {
+  color: var(--primary);
+}
 
-.error-msg { color: #E53935; font-size: 0.82rem; margin: 0; }
+.error-msg {
+  color: #e53935;
+  font-size: 0.82rem;
+  margin: 0;
+}
 
 .btn-save {
   background: var(--primary);
@@ -440,10 +510,34 @@ const HOUSE_LEVELS = [
   width: 100%;
 }
 
-.btn-save:disabled { opacity: 0.7; cursor: not-allowed; }
+.btn-save:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-logout {
+  width: 100%;
+  background: none;
+  border: 1.5px solid #EF5350;
+  border-radius: 14px;
+  padding: 0.8rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #EF5350;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-logout:hover {
+  background: #FFEBEE;
+}
 
 /* Info Card */
-.info-list { display: flex; flex-direction: column; gap: 0; }
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
 .info-row {
   display: flex;
   justify-content: space-between;
@@ -452,8 +546,13 @@ const HOUSE_LEVELS = [
   border-bottom: 1px solid var(--border);
   color: var(--text-muted);
 }
-.info-row:last-child { border-bottom: none; }
-.info-row span:last-child { font-weight: 600; color: var(--text); }
+.info-row:last-child {
+  border-bottom: none;
+}
+.info-row span:last-child {
+  font-weight: 600;
+  color: var(--text);
+}
 .info-desc {
   font-size: 0.78rem;
   color: var(--text-muted);
@@ -463,7 +562,11 @@ const HOUSE_LEVELS = [
 }
 
 /* Guide Card */
-.guide-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.guide-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
 .guide-row {
   display: flex;
   align-items: center;
@@ -471,9 +574,22 @@ const HOUSE_LEVELS = [
   padding: 0.4rem 0;
   border-bottom: 1px solid var(--border);
 }
-.guide-row:last-child { border-bottom: none; }
-.g-face { font-size: 1.4rem; }
-.g-info { display: flex; flex-direction: column; }
-.g-label { font-size: 0.82rem; font-weight: 600; }
-.g-range { font-size: 0.73rem; color: var(--text-muted); }
+.guide-row:last-child {
+  border-bottom: none;
+}
+.g-face {
+  font-size: 1.4rem;
+}
+.g-info {
+  display: flex;
+  flex-direction: column;
+}
+.g-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.g-range {
+  font-size: 0.73rem;
+  color: var(--text-muted);
+}
 </style>

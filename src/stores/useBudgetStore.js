@@ -2,15 +2,16 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import axios from 'axios';
 import { usePigSystem } from '../composables/usePigSystem.js';
+import { useAuthStore } from './useAuthStore.js';
 
 const API_BASE = 'http://localhost:3000';
 const INITIAL_HOUSE_LEVEL = 3;
 
 export const useBudgetStore = defineStore('budget', () => {
   const { calcNextHouseLevel } = usePigSystem();
+  const authStore = useAuthStore();
 
   // --- State ---
-  const profile = ref(null);
   const records = ref([]);
   const incomeCategories = ref([]);
   const expenseCategories = ref([]);
@@ -59,9 +60,9 @@ export const useBudgetStore = defineStore('budget', () => {
   const todayNetIncome = computed(() => todayIncome.value - todayExpense.value);
 
   const dailyBudget = computed(() => {
-    if (!profile.value) return 0;
+    if (!authStore.currentUser) return 0;
     const monthlyBudget =
-      (profile.value.monthlyIncome * profile.value.targetExpenseRatio) / 100;
+      (authStore.currentUser.monthlyIncome * authStore.currentUser.targetExpenseRatio) / 100;
     return Math.round(monthlyBudget / 30);
   });
 
@@ -108,10 +109,10 @@ export const useBudgetStore = defineStore('budget', () => {
   }
 
   function calculateHouseLevelFromRecords() {
-    if (!profile.value) return INITIAL_HOUSE_LEVEL;
+    if (!authStore.currentUser) return INITIAL_HOUSE_LEVEL;
 
     const monthlyBudget =
-      (profile.value.monthlyIncome * profile.value.targetExpenseRatio) / 100;
+      (authStore.currentUser.monthlyIncome * authStore.currentUser.targetExpenseRatio) / 100;
     if (monthlyBudget <= 0) return INITIAL_HOUSE_LEVEL;
 
     const firstActiveMonth = getFirstActiveMonth();
@@ -135,44 +136,21 @@ export const useBudgetStore = defineStore('budget', () => {
   }
 
   async function settleHouseLevelForCurrentMonth() {
-    if (!profile.value) return;
+    if (!authStore.currentUser) return;
 
     const calculatedHouseLevel = calculateHouseLevelFromRecords();
-    const updates = {};
+    const currentHouseLevel = authStore.currentUser.houseLevel ?? INITIAL_HOUSE_LEVEL;
 
-    if ((profile.value.houseLevel ?? INITIAL_HOUSE_LEVEL) !== calculatedHouseLevel) {
-      updates.houseLevel = calculatedHouseLevel;
-    }
-
-    if (Object.keys(updates).length === 0) return;
-
-    try {
-      await updateProfile(updates);
-    } catch (e) {
-      console.error('월간 houseLevel 정산 실패', e);
+    if (currentHouseLevel !== calculatedHouseLevel) {
+      try {
+        await authStore.updateProfile({ houseLevel: calculatedHouseLevel });
+      } catch (e) {
+        console.error('월간 houseLevel 정산 실패', e);
+      }
     }
   }
 
   // --- Actions ---
-  async function fetchProfile() {
-    try {
-      const res = await axios.get(`${API_BASE}/profile`);
-      const rawProfile = Array.isArray(res.data) ? res.data[0] : res.data;
-      profile.value = rawProfile
-        ? {
-            ...rawProfile,
-            houseLevel:
-              typeof rawProfile.houseLevel === 'number'
-                ? Math.min(Math.max(rawProfile.houseLevel, 1), 5)
-                : INITIAL_HOUSE_LEVEL,
-          }
-        : rawProfile;
-    } catch (e) {
-      error.value = '프로필 조회 실패';
-      console.error(e);
-    }
-  }
-
   async function fetchIncomeCategories() {
     try {
       const res = await axios.get(`${API_BASE}/incomeCategories`);
@@ -193,8 +171,9 @@ export const useBudgetStore = defineStore('budget', () => {
     }
   }
 
-  async function fetchRecords(userId = '1') {
+  async function fetchRecords() {
     try {
+      const userId = authStore.currentUser?.id;
       const res = await axios.get(`${API_BASE}/records?userId=${userId}`);
       records.value = res.data.sort((a, b) => b.date.localeCompare(a.date));
     } catch (e) {
@@ -208,7 +187,7 @@ export const useBudgetStore = defineStore('budget', () => {
       loading.value = true;
       const res = await axios.post(`${API_BASE}/records`, {
         ...newRecord,
-        userId: '1',
+        userId: authStore.currentUser?.id,
         createdAt: new Date().toISOString(),
       });
       records.value = [res.data, ...records.value].sort((a, b) =>
@@ -257,30 +236,11 @@ export const useBudgetStore = defineStore('budget', () => {
     }
   }
 
-  async function updateProfile(updates) {
-    try {
-      loading.value = true;
-      const res = await axios.put(`${API_BASE}/profile/${profile.value.id}`, {
-        ...profile.value,
-        ...updates,
-      });
-      profile.value = res.data;
-      return res.data;
-    } catch (e) {
-      error.value = '프로필 수정 실패';
-      console.error(e);
-      throw e;
-    } finally {
-      loading.value = false;
-    }
-  }
-
   async function initStore() {
     loading.value = true;
     error.value = null;
     try {
       await Promise.all([
-        fetchProfile(),
         fetchIncomeCategories(),
         fetchExpenseCategories(),
         fetchRecords(),
@@ -291,9 +251,15 @@ export const useBudgetStore = defineStore('budget', () => {
     }
   }
 
+  function resetStore() {
+    records.value = [];
+    incomeCategories.value = [];
+    expenseCategories.value = [];
+    error.value = null;
+  }
+
   return {
     // state
-    profile,
     records,
     incomeCategories,
     expenseCategories,
@@ -313,14 +279,13 @@ export const useBudgetStore = defineStore('budget', () => {
     allCategories,
     settleHouseLevelForCurrentMonth,
     // actions
-    fetchProfile,
     fetchIncomeCategories,
     fetchExpenseCategories,
     fetchRecords,
     addRecord,
     updateRecord,
     deleteRecord,
-    updateProfile,
     initStore,
+    resetStore,
   };
 });
