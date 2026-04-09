@@ -11,19 +11,180 @@
       "currentPigLevel": 5,
       "houseLevel": 5,
       "createdAt": "2026-04-07",
-      "farm": ["1", "2"]
+      "farm": [
+        "1",
+        "2"
+      ]
+    },
+    {
+      "userId": "1",
+      "password": "1",
+      "userName": "1",
+      "age": 1,
+      "monthlyIncome": 1,
+      "targetExpenseRatio": 60,
+      "currentPigLevel": 5,
+      "houseLevel": 3,
+      "createdAt": "2026-04-09",
+      "farm": [
+        "1",
+        "2"
+      ],
+      "id": "U7NsIRb"
+    },
+    {
+      "userId": "22",
+      "password": "22",
+      "userName": "22",
+      "age": null,
+      "monthlyIncome": 0,
+      "targetExpenseRatio": 60,
+      "currentPigLevel": 5,
+      "houseLevel": 3,
+      "createdAt": "2026-04-09",
+      "farm": [
+        "1",
+        "2"
+      ],
+      "id": "va7Y6YP"
+    },
+    {
+      "userId": "222",
+      "password": "222",
+      "userName": "222",
+      "age": null,
+      "monthlyIncome": 0,
+      "targetExpenseRatio": 60,
+      "currentPigLevel": 5,
+      "houseLevel": 3,
+      "createdAt": "2026-04-09",
+      "farm": [
+        "1",
+        "2"
+      ],
+      "id": "6Iv3rs-"
+    },
+    {
+      "userId": "2222",
+      "password": "2222",
+      "userName": "2222",
+      "age": null,
+      "monthlyIncome": 0,
+      "targetExpenseRatio": 60,
+      "currentPigLevel": 5,
+      "houseLevel": 3,
+      "createdAt": "2026-04-09",
+      "farm": [
+        "1",
+        "2"
+      ],
+      "id": "Iei1Jl0"
+    },
+    {
+      "userId": "22222",
+      "password": "22222",
+      "userName": "22222",
+      "age": null,
+      "monthlyIncome": 0,
+      "targetExpenseRatio": 60,
+      "currentPigLevel": 5,
+      "houseLevel": 3,
+      "createdAt": "2026-04-09",
+      "farm": [
+        "1",
+        "2"
+      ],
+      "id": "QY0rFN9"
+    },
+    {
+      "userId": "123",
+      "password": "123",
+      "userName": "123",
+      "age": null,
+      "monthlyIncome": 0,
+      "targetExpenseRatio": 60,
+      "currentPigLevel": 5,
+      "houseLevel": 3,
+      "createdAt": "2026-04-09",
+      "farm": [
+        "1",
+        "2"
+      ],
+      "id": "G7fiAn9"
+    },
+    {
+      "userId": "1234",
+      "password": "123",
+      "userName": "1234",
+      "age": null,
+      "monthlyIncome": 0,
+      "targetExpenseRatio": 60,
+      "currentPigLevel": 5,
+      "houseLevel": 3,
+      "createdAt": "2026-04-09",
+      "farm": [
+        "1",
+        "2"
+      ],
+      "id": "_G5xPRW"
+    },
+    {
+      "userId": "133",
+      "password": "133",
+      "userName": "133",
+      "age": null,
+      "monthlyIncome": 0,
+      "targetExpenseRatio": 60,
+      "currentPigLevel": 5,
+      "houseLevel": 3,
+      "createdAt": "2026-04-09",
+      "farm": [
+        "1",
+        "2"
+      ],
+      "id": "0ZyZhxg"
+    },
+    {
+      "userId": "14",
+      "password": "14",
+      "userName": "14",
+      "age": 14,
+      "monthlyIncome": 14,
+      "targetExpenseRatio": 60,
+      "currentPigLevel": 5,
+      "houseLevel": 3,
+      "createdAt": "2026-04-09",
+      "farm": [
+        "1",
+        "2"
+      ],
+      "id": "5tMAGqb"
     }
   ],
   "farm": [
     {
       "id": "1",
       "name": "kb농장",
-      "members": ["1", "2", "3", "4"]
+      "members": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "123",
+        null,
+        null,
+        "5tMAGqb"
+      ]
     },
     {
       "id": "2",
       "name": "26회차 농장",
-      "members": ["1", "2", "3", "4"]
+      "members": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ]
     }
   ],
   "incomeCategories": [
@@ -254,6 +415,17 @@
       "userId": "1",
       "createdAt": "2026-04-09T04:04:14.276Z",
       "id": "-Q03lb7"
+    },
+    {
+      "type": "expense",
+      "date": "2026-04-09",
+      "category": "식비",
+      "amount": 1,
+      "content": "",
+      "memo": "",
+      "userId": "U7NsIRb",
+      "createdAt": "2026-04-09T15:14:50.403Z",
+      "id": "mkyS3Vc"
     }
   ],
   "dailyStatus": [
