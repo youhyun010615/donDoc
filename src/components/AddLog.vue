@@ -47,11 +47,11 @@ function resolveCategoryIcon(type, categoryName, rawIcon) {
   const iconByName =
     type === 'income'
       ? {
-          월급: 'money',
-          부수입: 'money',
-          투자수익: 'money',
-          용돈: 'money',
-          기타수입: 'money',
+          월급: 'income_salary',
+          부수입: 'income_side',
+          투자수익: 'income_invest',
+          용돈: 'income_allowance',
+          기타수입: 'income_etc',
         }
       : {
           식비: 'food',

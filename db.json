@@ -17,31 +17,31 @@
     {
       "id": "income_001",
       "name": "월급",
-      "icon": "money",
+      "icon": "income_salary",
       "type": "income"
     },
     {
       "id": "income_002",
       "name": "부수입",
-      "icon": "money",
+      "icon": "income_side",
       "type": "income"
     },
     {
       "id": "income_003",
       "name": "투자수익",
-      "icon": "money",
+      "icon": "income_invest",
       "type": "income"
     },
     {
       "id": "income_004",
       "name": "용돈",
-      "icon": "money",
+      "icon": "income_allowance",
       "type": "income"
     },
     {
       "id": "income_005",
       "name": "기타수입",
-      "icon": "money",
+      "icon": "income_etc",
       "type": "income"
     }
   ],

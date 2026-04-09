@@ -21,6 +21,16 @@ import movieIcon from '../assets/pixel-icons/movie.svg';
 import hospitalIcon from '../assets/pixel-icons/hospital.svg';
 import educationIcon from '../assets/pixel-icons/education.svg';
 import houseIcon from '../assets/pixel-icons/house.svg';
+import incomeSalaryIcon from '../assets/pixel-icons/income-salary.svg';
+import incomeSideIcon from '../assets/pixel-icons/income-side.svg';
+import incomeInvestIcon from '../assets/pixel-icons/income-invest.svg';
+import incomeAllowanceIcon from '../assets/pixel-icons/income-allowance.svg';
+import incomeEtcIcon from '../assets/pixel-icons/income-etc.svg';
+import houseRockIcon from '../assets/pixel-icons/house-rock.svg';
+import houseHutIcon from '../assets/pixel-icons/house-hut.svg';
+import houseHomeIcon from '../assets/pixel-icons/house-home.svg';
+import houseVillaIcon from '../assets/pixel-icons/house-villa.svg';
+import houseCastleIcon from '../assets/pixel-icons/house-castle.svg';
 import faceGoodIcon from '../assets/pixel-icons/face-good.svg';
 import faceWarnIcon from '../assets/pixel-icons/face-warn.svg';
 import faceBadIcon from '../assets/pixel-icons/face-bad.svg';
@@ -67,11 +77,16 @@ const ICON_MAP = {
   hospital: hospitalIcon,
   education: educationIcon,
   house: houseIcon,
-  house_rock: houseIcon,
-  house_hut: houseIcon,
-  house_home: houseIcon,
-  house_villa: houseIcon,
-  house_castle: houseIcon,
+  income_salary: incomeSalaryIcon,
+  income_side: incomeSideIcon,
+  income_invest: incomeInvestIcon,
+  income_allowance: incomeAllowanceIcon,
+  income_etc: incomeEtcIcon,
+  house_rock: houseRockIcon,
+  house_hut: houseHutIcon,
+  house_home: houseHomeIcon,
+  house_villa: houseVillaIcon,
+  house_castle: houseCastleIcon,
   face_good: faceGoodIcon,
   face_warn: faceWarnIcon,
   face_bad: faceBadIcon,

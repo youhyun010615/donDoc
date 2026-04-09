@@ -73,7 +73,14 @@ const groupedRecords = computed(() => {
 
 function getCategoryIcon(categoryName, type) {
   if (type === 'income') {
-    return 'money';
+    const incomeIconByName = {
+      월급: 'income_salary',
+      부수입: 'income_side',
+      투자수익: 'income_invest',
+      용돈: 'income_allowance',
+      기타수입: 'income_etc',
+    };
+    return incomeIconByName[categoryName] || 'money';
   }
 
   const iconByName = {
