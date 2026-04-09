@@ -7,14 +7,15 @@ const props = defineProps({
 })
 
 /**
- * level 기준으로 4가지 체형 결정
- * fat(8-10) / normal(5-7) / thin(3-4) / crisis(1-2)
+ * level 기준으로 5가지 체형 결정
+ * fat(9-10) / chubby(6-8) / normal(4-5) / thin(2-3) / grill(1)
  */
 const state = computed(() => {
-  if (props.level >= 8) return 'fat'
-  if (props.level >= 5) return 'normal'
-  if (props.level >= 3) return 'thin'
-  return 'crisis'
+  if (props.level >= 9) return 'fat'
+  if (props.level >= 6) return 'chubby'
+  if (props.level >= 4) return 'normal'
+  if (props.level >= 2) return 'thin'
+  return 'grill'
 })
 </script>
 
