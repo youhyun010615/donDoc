@@ -76,6 +76,7 @@ const months = computed(() => {
       <CalendarLog
         v-else-if="activeTab === 'calendar'"
         :selectedMonth="selectedMonth"
+        @update:selectedMonth="selectedMonth = $event"
       />
       <MonthlyLog
         v-else-if="activeTab === 'monthly'"
