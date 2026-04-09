@@ -29,8 +29,8 @@ export const useAuthStore = defineStore('auth', () => {
     // 2. 새 프로필 생성
     const newUser = {
       ...userData,
-      currentPigLevel: 1,
-      houseLevel: 1,
+      currentPigLevel: 5,
+      houseLevel: 3,
       createdAt: new Date().toISOString().split('T')[0]
     }
 
