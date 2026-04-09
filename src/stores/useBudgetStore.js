@@ -1,10 +1,14 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import axios from 'axios';
+import { usePigSystem } from '../composables/usePigSystem.js';
 
 const API_BASE = 'http://localhost:3000';
+const INITIAL_HOUSE_LEVEL = 3;
 
 export const useBudgetStore = defineStore('budget', () => {
+  const { calcNextHouseLevel } = usePigSystem();
+
   // --- State ---
   const profile = ref(null);
   const records = ref([]);
@@ -66,11 +70,103 @@ export const useBudgetStore = defineStore('budget', () => {
     ...expenseCategories.value,
   ]);
 
+  function getPreviousMonth(yyyymm) {
+    const [year, month] = yyyymm.split('-').map(Number);
+    const prev = new Date(year, month - 2, 1);
+    const y = prev.getFullYear();
+    const m = String(prev.getMonth() + 1).padStart(2, '0');
+    return `${y}-${m}`;
+  }
+
+  function getMonthExpense(yyyymm) {
+    return records.value
+      .filter((r) => r.type === 'expense' && r.date.startsWith(yyyymm))
+      .reduce((sum, r) => sum + r.amount, 0);
+  }
+
+  function hasExpenseRecords(yyyymm) {
+    return records.value.some(
+      (r) => r.type === 'expense' && r.date.startsWith(yyyymm),
+    );
+  }
+
+  function getNextMonth(yyyymm) {
+    const [year, month] = yyyymm.split('-').map(Number);
+    const next = new Date(year, month, 1);
+    const y = next.getFullYear();
+    const m = String(next.getMonth() + 1).padStart(2, '0');
+    return `${y}-${m}`;
+  }
+
+  function getFirstActiveMonth() {
+    const months = records.value
+      .filter((r) => r.type === 'income' || r.type === 'expense')
+      .map((r) => String(r.date).slice(0, 7))
+      .filter((m) => /^\d{4}-\d{2}$/.test(m))
+      .sort();
+    return months[0] ?? null;
+  }
+
+  function calculateHouseLevelFromRecords() {
+    if (!profile.value) return INITIAL_HOUSE_LEVEL;
+
+    const monthlyBudget =
+      (profile.value.monthlyIncome * profile.value.targetExpenseRatio) / 100;
+    if (monthlyBudget <= 0) return INITIAL_HOUSE_LEVEL;
+
+    const firstActiveMonth = getFirstActiveMonth();
+    if (!firstActiveMonth) return INITIAL_HOUSE_LEVEL;
+
+    let level = INITIAL_HOUSE_LEVEL;
+    let settlementMonth = getNextMonth(firstActiveMonth);
+    const endMonth = currentMonth.value;
+
+    while (settlementMonth <= endMonth) {
+      const prevMonth = getPreviousMonth(settlementMonth);
+      if (hasExpenseRecords(prevMonth)) {
+        const prevMonthExpense = getMonthExpense(prevMonth);
+        const prevAvgRatio = Math.round((prevMonthExpense / monthlyBudget) * 100);
+        level = calcNextHouseLevel(prevAvgRatio, level);
+      }
+      settlementMonth = getNextMonth(settlementMonth);
+    }
+
+    return level;
+  }
+
+  async function settleHouseLevelForCurrentMonth() {
+    if (!profile.value) return;
+
+    const calculatedHouseLevel = calculateHouseLevelFromRecords();
+    const updates = {};
+
+    if ((profile.value.houseLevel ?? INITIAL_HOUSE_LEVEL) !== calculatedHouseLevel) {
+      updates.houseLevel = calculatedHouseLevel;
+    }
+
+    if (Object.keys(updates).length === 0) return;
+
+    try {
+      await updateProfile(updates);
+    } catch (e) {
+      console.error('월간 houseLevel 정산 실패', e);
+    }
+  }
+
   // --- Actions ---
   async function fetchProfile() {
     try {
       const res = await axios.get(`${API_BASE}/profile`);
-      profile.value = Array.isArray(res.data) ? res.data[0] : res.data;
+      const rawProfile = Array.isArray(res.data) ? res.data[0] : res.data;
+      profile.value = rawProfile
+        ? {
+            ...rawProfile,
+            houseLevel:
+              typeof rawProfile.houseLevel === 'number'
+                ? Math.min(Math.max(rawProfile.houseLevel, 1), 5)
+                : INITIAL_HOUSE_LEVEL,
+          }
+        : rawProfile;
     } catch (e) {
       error.value = '프로필 조회 실패';
       console.error(e);
@@ -118,6 +214,7 @@ export const useBudgetStore = defineStore('budget', () => {
       records.value = [res.data, ...records.value].sort((a, b) =>
         b.date.localeCompare(a.date),
       );
+      await settleHouseLevelForCurrentMonth();
       return res.data;
     } catch (e) {
       error.value = '거래 추가 실패';
@@ -134,6 +231,7 @@ export const useBudgetStore = defineStore('budget', () => {
       const res = await axios.put(`${API_BASE}/records/${id}`, updatedRecord);
       const idx = records.value.findIndex((r) => r.id === id);
       if (idx !== -1) records.value[idx] = res.data;
+      await settleHouseLevelForCurrentMonth();
       return res.data;
     } catch (e) {
       error.value = '거래 수정 실패';
@@ -149,6 +247,7 @@ export const useBudgetStore = defineStore('budget', () => {
       loading.value = true;
       await axios.delete(`${API_BASE}/records/${id}`);
       records.value = records.value.filter((r) => r.id !== id);
+      await settleHouseLevelForCurrentMonth();
     } catch (e) {
       error.value = '거래 삭제 실패';
       console.error(e);
@@ -186,6 +285,7 @@ export const useBudgetStore = defineStore('budget', () => {
         fetchExpenseCategories(),
         fetchRecords(),
       ]);
+      await settleHouseLevelForCurrentMonth();
     } finally {
       loading.value = false;
     }
@@ -211,6 +311,7 @@ export const useBudgetStore = defineStore('budget', () => {
     todayNetIncome,
     dailyBudget,
     allCategories,
+    settleHouseLevelForCurrentMonth,
     // actions
     fetchProfile,
     fetchIncomeCategories,

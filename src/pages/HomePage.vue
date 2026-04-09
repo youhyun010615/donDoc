@@ -5,9 +5,6 @@ import { useBudgetStore } from '../stores/useBudgetStore.js';
 import { usePigSystem } from '../composables/usePigSystem.js';
 import PigPixelArt from '../components/PigPixelArt.vue';
 import PigBackground from '../components/PigBackground.vue';
-import { ref } from 'vue';
-
-const currentHouseLevel = ref(3);
 
 const store = useBudgetStore();
 const router = useRouter();
@@ -23,7 +20,8 @@ const pigVisualScale = computed(() => {
   return 0.82 + (normalized - 1) * 0.04;
 });
 
-const houseInfo = computed(() => getHouseInfo(store.profile?.houseLevel ?? 1));
+const currentHouseLevel = computed(() => store.profile?.houseLevel ?? 3);
+const houseInfo = computed(() => getHouseInfo(currentHouseLevel.value));
 
 const monthlyBudget = computed(() => {
   if (!store.profile) return 0;

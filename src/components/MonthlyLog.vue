@@ -34,7 +34,7 @@ const avgExpenseRatio = computed(() => {
 
 const avgPigState = computed(() => getPigState(monthExpense.value, monthlyBudget.value))
 
-const currentHouseLevel = computed(() => store.profile?.houseLevel ?? 1)
+const currentHouseLevel = computed(() => store.profile?.houseLevel ?? 3)
 const nextHouseLevel = computed(() =>
   calcNextHouseLevel(avgExpenseRatio.value, currentHouseLevel.value)
 )
