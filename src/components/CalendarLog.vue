@@ -87,20 +87,20 @@ const calendarDays = computed(() => {
 });
 
 const prevMonth = computed(() => {
-  const [year, month] = props.selectedMonth.split('-').map(Number)
-  const d = new Date(year, month - 2, 1) // month-1이 현재달, month-2가 이전달
-  return d.toISOString().slice(0, 7)
-})
+  const [year, month] = props.selectedMonth.split('-').map(Number);
+  const d = new Date(year, month - 2, 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+});
 
 const nextMonth = computed(() => {
-  const [year, month] = props.selectedMonth.split('-').map(Number)
-  const d = new Date(year, month, 1) // month가 다음달 (0-based라서)
-  return d.toISOString().slice(0, 7)
-})
+  const [year, month] = props.selectedMonth.split('-').map(Number);
+  const d = new Date(year, month, 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+});
 
 const isCurrentMonth = computed(() => {
-  return props.selectedMonth === new Date().toISOString().slice(0, 7)
-})
+  return props.selectedMonth === new Date().toISOString().slice(0, 7);
+});
 
 const selectedMonthLabel = computed(() => {
   const [year, month] = props.selectedMonth.split('-');
@@ -111,9 +111,20 @@ const selectedMonthLabel = computed(() => {
 <template>
   <div class="calendar-log">
     <div class="calendar-title">
-      <button class="month-arrow" @click="emit('update:selectedMonth', prevMonth)">◀</button>
+      <button
+        class="month-arrow"
+        @click="emit('update:selectedMonth', prevMonth)"
+      >
+        ◀
+      </button>
       <span>{{ selectedMonthLabel }}</span>
-      <button class="month-arrow" @click="emit('update:selectedMonth', nextMonth)" :disabled="isCurrentMonth">▶</button>
+      <button
+        class="month-arrow"
+        @click="emit('update:selectedMonth', nextMonth)"
+        :disabled="isCurrentMonth"
+      >
+        ▶
+      </button>
     </div>
 
     <!-- 요일 헤더 -->
@@ -226,7 +237,9 @@ const selectedMonthLabel = computed(() => {
   cursor: pointer;
   padding: 2px 6px;
   border-radius: 6px;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .month-arrow:hover:not(:disabled) {
