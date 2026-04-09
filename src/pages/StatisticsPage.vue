@@ -52,7 +52,7 @@ const months = computed(() => {
       ></date-picker>
     </div>
 
-    <!-- 탭 네비게이션 굿 -->
+    <!-- 탭 네비게이션 -->
     <div class="tab-nav">
       <button
         v-for="tab in tabs"
