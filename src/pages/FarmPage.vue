@@ -5,6 +5,7 @@ import { useAuthStore } from "../stores/useAuthStore.js";
 import PigPixelArt from "../components/PigPixelArt.vue";
 import PigBackground from "../components/PigBackground.vue";
 import axios from "axios";
+import PixelIcon from "../components/PixelIcon.vue";
 
 const store = useBudgetStore();
 const authStore = useAuthStore();
@@ -40,7 +41,10 @@ function closeFarm() {
 <template>
   <div class="farm-page">
     <header class="page-header">
-      <h1 class="page-title">🌾 농장</h1>
+      <h1 class="page-title">
+        <PixelIcon icon="nav_farm" size="1.3rem" />
+        <span> 농장</span>
+      </h1>
       <p class="page-subtitle">
         다른 유저 농장을 둘러보고 성장 상태를 확인해요
       </p>
