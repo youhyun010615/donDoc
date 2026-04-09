@@ -7,15 +7,16 @@ import DailyLog from '../components/DailyLog.vue';
 import CalendarLog from '../components/CalendarLog.vue';
 import MonthlyLog from '../components/MonthlyLog.vue';
 import Summary from '../components/Summary.vue';
+import PixelIcon from '../components/PixelIcon.vue';
 
 const selectedMonth = ref(new Date().toISOString().slice(0, 7));
 const activeTab = ref('summary'); // 'summary' | 'daily' | 'calendar' | 'monthly'
 
 const tabs = [
-  { key: 'summary', label: '요약', icon: '📊' },
-  { key: 'daily', label: '일별', icon: '📅' },
-  { key: 'calendar', label: '달력', icon: '🗓️' },
-  { key: 'monthly', label: '월간', icon: '📆' },
+  { key: 'summary', label: '요약', icon: 'nav_stats' },
+  { key: 'daily', label: '일별', icon: 'calendar' },
+  { key: 'calendar', label: '달력', icon: 'calendar' },
+  { key: 'monthly', label: '월간', icon: 'calendar' },
 ];
 
 const months = computed(() => {
@@ -39,7 +40,10 @@ const months = computed(() => {
 <template>
   <div class="statistics-page">
     <div class="page-top">
-      <h1 class="page-title">📊 통계</h1>
+      <h1 class="page-title">
+        <PixelIcon icon="nav_stats" size="1.3rem" />
+        <span>통계</span>
+      </h1>
       <date-picker
         v-model:value="selectedMonth"
         format="YYYY년 MM월"
@@ -61,7 +65,7 @@ const months = computed(() => {
         :class="{ active: activeTab === tab.key }"
         @click="activeTab = tab.key"
       >
-        <span>{{ tab.icon }}</span>
+        <PixelIcon :icon="tab.icon" size="1.1rem" />
         <span>{{ tab.label }}</span>
       </button>
     </div>
@@ -103,6 +107,9 @@ const months = computed(() => {
   font-size: 1.4rem;
   font-weight: 800;
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .month-select {

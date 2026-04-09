@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useBudgetStore } from '../stores/useBudgetStore.js'
 import { usePigSystem } from '../composables/usePigSystem.js'
+import PixelIcon from './PixelIcon.vue'
 
 const props = defineProps({
   selectedMonth: { type: String, required: true },
@@ -36,13 +37,16 @@ const dailyData = computed(() => {
 <template>
   <div class="daily-log">
     <div v-if="dailyData.length === 0" class="empty">
-      <p>📋 이달 데이터가 없어요</p>
+      <p class="empty-title">
+        <PixelIcon icon="clipboard" size="1rem" />
+        <span>이달 데이터가 없어요</span>
+      </p>
     </div>
 
     <div v-else class="daily-list">
       <div v-for="day in dailyData" :key="day.date" class="daily-item">
         <div class="daily-left">
-          <span class="pig-face-sm">{{ day.pigState.face }}</span>
+          <PixelIcon class="pig-face-sm" :icon="day.pigState.face" size="1.4rem" />
           <div>
             <p class="daily-date">{{ formatDate(day.date) }}</p>
             <p class="daily-level" :style="{ color: day.pigState.color }">
@@ -69,6 +73,12 @@ const dailyData = computed(() => {
   font-size: 0.9rem;
 }
 
+.empty-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
 .daily-list {
   display: flex;
   flex-direction: column;
@@ -87,7 +97,7 @@ const dailyData = computed(() => {
 
 .daily-left { display: flex; align-items: center; gap: 0.8rem; }
 
-.pig-face-sm { font-size: 1.8rem; line-height: 1; }
+.pig-face-sm { line-height: 1; }
 
 .daily-date { font-size: 0.88rem; font-weight: 600; margin: 0; }
 .daily-level { font-size: 0.75rem; margin: 0; font-weight: 600; }

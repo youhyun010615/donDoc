@@ -17,31 +17,31 @@
     {
       "id": "income_001",
       "name": "월급",
-      "icon": "💰",
+      "icon": "money",
       "type": "income"
     },
     {
       "id": "income_002",
       "name": "부수입",
-      "icon": "💵",
+      "icon": "money",
       "type": "income"
     },
     {
       "id": "income_003",
       "name": "투자수익",
-      "icon": "📈",
+      "icon": "money",
       "type": "income"
     },
     {
       "id": "income_004",
       "name": "용돈",
-      "icon": "🎁",
+      "icon": "money",
       "type": "income"
     },
     {
       "id": "income_005",
       "name": "기타수입",
-      "icon": "✨",
+      "icon": "money",
       "type": "income"
     }
   ],
@@ -49,49 +49,49 @@
     {
       "id": "expense_001",
       "name": "식비",
-      "icon": "🍔",
+      "icon": "food",
       "type": "expense"
     },
     {
       "id": "expense_002",
       "name": "교통비",
-      "icon": "🚌",
+      "icon": "bus",
       "type": "expense"
     },
     {
       "id": "expense_003",
       "name": "쇼핑",
-      "icon": "🛍️",
+      "icon": "shopping",
       "type": "expense"
     },
     {
       "id": "expense_004",
       "name": "문화생활",
-      "icon": "🎬",
+      "icon": "movie",
       "type": "expense"
     },
     {
       "id": "expense_005",
       "name": "의료/건강",
-      "icon": "🏥",
+      "icon": "hospital",
       "type": "expense"
     },
     {
       "id": "expense_006",
       "name": "교육",
-      "icon": "📚",
+      "icon": "education",
       "type": "expense"
     },
     {
       "id": "expense_007",
       "name": "주거/통신",
-      "icon": "🏠",
+      "icon": "house",
       "type": "expense"
     },
     {
       "id": "expense_008",
       "name": "기타지출",
-      "icon": "💸",
+      "icon": "expense",
       "type": "expense"
     }
   ],

@@ -4,6 +4,7 @@ import { useBudgetStore } from '../stores/useBudgetStore.js';
 import { usePigSystem } from '../composables/usePigSystem.js';
 import AccountHeaderBar from '../components/AccountHeaderBar.vue';
 import AddLog from '../components/AddLog.vue';
+import PixelIcon from '../components/PixelIcon.vue';
 
 const store = useBudgetStore();
 const { formatCurrency, formatDate } = usePigSystem();
@@ -71,15 +72,31 @@ const groupedRecords = computed(() => {
 });
 
 function getCategoryIcon(categoryName, type) {
-  const cats =
-    type === 'income' ? store.incomeCategories : store.expenseCategories;
-  return cats.find((c) => c.name === categoryName)?.icon ?? '💰';
+  if (type === 'income') {
+    return 'money';
+  }
+
+  const iconByName = {
+    식비: 'food',
+    교통비: 'bus',
+    쇼핑: 'shopping',
+    문화생활: 'movie',
+    '의료/건강': 'hospital',
+    교육: 'education',
+    '주거/통신': 'house',
+    기타지출: 'expense',
+  };
+
+  return iconByName[categoryName] || 'expense';
 }
 </script>
 
 <template>
   <div class="account-page">
-    <h1 class="page-title">📒 가계부</h1>
+    <h1 class="page-title">
+      <PixelIcon icon="nav_account" size="1.4rem" />
+      <span>가계부</span>
+    </h1>
 
     <AccountHeaderBar
       v-model:selectedMonth="selectedMonth"
@@ -89,7 +106,7 @@ function getCategoryIcon(categoryName, type) {
 
     <!-- 거래 목록 -->
     <div v-if="filteredRecords.length === 0" class="empty-state">
-      <div class="empty-icon">📋</div>
+      <div class="empty-icon"><PixelIcon icon="clipboard" size="1.4rem" /></div>
       <p>거래 내역이 없어요</p>
       <button class="btn-primary" @click="openAdd">+ 거래 추가하기</button>
     </div>
@@ -122,7 +139,10 @@ function getCategoryIcon(categoryName, type) {
           >
             <div class="record-left">
               <div class="record-icon" :class="record.type">
-                {{ getCategoryIcon(record.category, record.type) }}
+                <PixelIcon
+                  :icon="getCategoryIcon(record.category, record.type)"
+                  size="1.4rem"
+                />
               </div>
               <div class="record-info">
                 <p class="record-category">{{ record.category }}</p>
@@ -146,14 +166,14 @@ function getCategoryIcon(categoryName, type) {
                   @click="openEdit(record)"
                   title="수정"
                 >
-                  ✏️
+                  <PixelIcon icon="edit" size="1.4rem" />
                 </button>
                 <button
                   class="action-btn delete"
                   @click="deleteTarget = record"
                   title="삭제"
                 >
-                  🗑️
+                  <PixelIcon icon="trash" size="1.4rem" />
                 </button>
               </div>
             </div>
@@ -177,7 +197,7 @@ function getCategoryIcon(categoryName, type) {
       @click.self="deleteTarget = null"
     >
       <div class="confirm-modal">
-        <p class="confirm-icon">🗑️</p>
+        <p class="confirm-icon"><PixelIcon icon="trash" size="1.4rem" /></p>
         <p class="confirm-title">삭제할까요?</p>
         <p class="confirm-desc">
           <strong>{{ deleteTarget.category }}</strong> -
@@ -205,6 +225,9 @@ function getCategoryIcon(categoryName, type) {
   font-weight: 800;
   margin: 0 0 1rem;
   color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 /* Record Groups */

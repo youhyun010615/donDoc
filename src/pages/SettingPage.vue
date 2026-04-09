@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import { useBudgetStore } from '../stores/useBudgetStore.js';
 import { useAuthStore } from '../stores/useAuthStore.js';
 import { usePigSystem } from '../composables/usePigSystem.js';
+import PixelIcon from '../components/PixelIcon.vue';
 
 const store = useBudgetStore();
 const authStore = useAuthStore();
@@ -84,22 +85,25 @@ async function handleLogout() {
 }
 
 const HOUSE_LEVELS = [
-  { level: 1, name: '흙바닥', emoji: '🪨' },
-  { level: 2, name: '오두막', emoji: '🛖' },
-  { level: 3, name: '집', emoji: '🏠' },
-  { level: 4, name: '빌라', emoji: '🏢' },
-  { level: 5, name: '대저택', emoji: '🏰' },
+  { level: 1, name: '흙바닥', emoji: 'house_rock' },
+  { level: 2, name: '오두막', emoji: 'house_hut' },
+  { level: 3, name: '집', emoji: 'house_home' },
+  { level: 4, name: '빌라', emoji: 'house_villa' },
+  { level: 5, name: '대저택', emoji: 'house_castle' },
 ];
 </script>
 
 <template>
   <div class="setting-page">
-    <h1 class="page-title">⚙️ 설정</h1>
+    <h1 class="page-title">
+      <PixelIcon icon="nav_settings" size="1.3rem" />
+      <span>설정</span>
+    </h1>
 
     <!-- 현재 집 상태 -->
     <div class="house-showcase">
       <div class="house-display">
-        <span class="showcase-emoji">{{ houseInfo.emoji }}</span>
+        <PixelIcon class="showcase-emoji" :icon="houseInfo.emoji" size="2.3rem" />
         <div>
           <p class="showcase-name">{{ houseInfo.name }}</p>
           <p class="showcase-desc">{{ houseInfo.description }}</p>
@@ -115,7 +119,7 @@ const HOUSE_LEVELS = [
             current: h.level === (store.profile?.houseLevel ?? 3),
           }"
         >
-          <span class="step-emoji">{{ h.emoji }}</span>
+          <PixelIcon class="step-emoji" :icon="h.emoji" size="1.1rem" />
           <span class="step-name">{{ h.name }}</span>
         </div>
       </div>
@@ -123,7 +127,10 @@ const HOUSE_LEVELS = [
 
     <!-- 프로필 설정 폼 -->
     <div class="setting-card">
-      <h2 class="card-title">👤 프로필 설정</h2>
+      <h2 class="card-title">
+        <PixelIcon icon="profile" size="1rem" />
+        <span>프로필 설정</span>
+      </h2>
 
       <form @submit.prevent="handleSave" class="setting-form">
         <!-- 이름 -->
@@ -177,19 +184,28 @@ const HOUSE_LEVELS = [
         <!-- 예산 미리보기 -->
         <div class="budget-preview">
           <div class="preview-row">
-            <span>📅 월 목표 지출</span>
+            <span class="with-icon">
+              <PixelIcon icon="calendar" size="0.9rem" />
+              <span>월 목표 지출</span>
+            </span>
             <strong>{{ formatCurrency(monthlyBudget) }}</strong>
           </div>
           <div class="preview-row">
-            <span>📆 일일 권장 지출</span>
+            <span class="with-icon">
+              <PixelIcon icon="calendar" size="0.9rem" />
+              <span>일일 권장 지출</span>
+            </span>
             <strong>{{ formatCurrency(dailyBudget) }}</strong>
           </div>
         </div>
 
-        <p v-if="errorMsg" class="error-msg">⚠️ {{ errorMsg }}</p>
+        <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
 
         <button type="submit" class="btn-save" :disabled="store.loading">
-          <span v-if="saved">✅ 저장완료!</span>
+          <span v-if="saved" class="with-icon">
+            <PixelIcon icon="check" size="0.9rem" />
+            <span>저장완료!</span>
+          </span>
           <span v-else-if="store.loading">저장 중...</span>
           <span v-else>저장하기</span>
         </button>
@@ -201,11 +217,14 @@ const HOUSE_LEVELS = [
 
     <!-- 앱 정보 -->
     <div class="info-card">
-      <h2 class="card-title">ℹ️ 앱 정보</h2>
+      <h2 class="card-title">앱 정보</h2>
       <div class="info-list">
         <div class="info-row">
           <span>앱 이름</span>
-          <span>🐷 돈독 (Don-Doc)</span>
+          <span class="with-icon">
+            <PixelIcon icon="pig" size="0.9rem" />
+            <span>돈독 (Don-Doc)</span>
+          </span>
         </div>
         <div class="info-row">
           <span>버전</span>
@@ -227,73 +246,76 @@ const HOUSE_LEVELS = [
 
     <!-- 돼지 상태 가이드 -->
     <div class="guide-card">
-      <h2 class="card-title">🐷 돼지 상태 가이드</h2>
+      <h2 class="card-title">
+        <PixelIcon icon="pig" size="1rem" />
+        <span>돼지 상태 가이드</span>
+      </h2>
       <div class="guide-list">
         <div class="guide-row">
-          <span class="g-face">😄</span>
+          <PixelIcon class="g-face" icon="face_good" size="1.2rem" />
           <div class="g-info">
             <span class="g-label">완벽 (Lv.10)</span>
             <span class="g-range">일일 지출 0~70%</span>
           </div>
         </div>
         <div class="guide-row">
-          <span class="g-face">😊</span>
+          <PixelIcon class="g-face" icon="face_good" size="1.2rem" />
           <div class="g-info">
             <span class="g-label">우수 (Lv.9)</span>
             <span class="g-range">70~80%</span>
           </div>
         </div>
         <div class="guide-row">
-          <span class="g-face">🙂</span>
+          <PixelIcon class="g-face" icon="face_good" size="1.2rem" />
           <div class="g-info">
             <span class="g-label">좋음 (Lv.8)</span>
             <span class="g-range">80~90%</span>
           </div>
         </div>
         <div class="guide-row">
-          <span class="g-face">😐</span>
+          <PixelIcon class="g-face" icon="face_warn" size="1.2rem" />
           <div class="g-info">
             <span class="g-label">평범 (Lv.7)</span>
             <span class="g-range">90~100%</span>
           </div>
         </div>
         <div class="guide-row">
-          <span class="g-face">😕</span>
+          <PixelIcon class="g-face" icon="face_warn" size="1.2rem" />
           <div class="g-info">
             <span class="g-label">주의 (Lv.6)</span>
             <span class="g-range">100~120%</span>
           </div>
         </div>
         <div class="guide-row">
-          <span class="g-face">😟</span>
+          <PixelIcon class="g-face" icon="face_warn" size="1.2rem" />
           <div class="g-info">
             <span class="g-label">경고 (Lv.5)</span>
             <span class="g-range">120~150%</span>
           </div>
         </div>
         <div class="guide-row">
-          <span class="g-face">😰</span>
+          <PixelIcon class="g-face" icon="face_bad" size="1.2rem" />
           <div class="g-info">
             <span class="g-label">위험 (Lv.4)</span>
             <span class="g-range">150~180%</span>
           </div>
         </div>
         <div class="guide-row">
-          <span class="g-face">🤒</span>
+          <PixelIcon class="g-face" icon="face_bad" size="1.2rem" />
           <div class="g-info">
             <span class="g-label">심각 (Lv.3)</span>
             <span class="g-range">180~200%</span>
           </div>
         </div>
         <div class="guide-row">
-          <span class="g-face">🤢</span>
+          <PixelIcon class="g-face" icon="face_bad" size="1.2rem" />
           <div class="g-info">
             <span class="g-label">매우위험 (Lv.2)</span>
             <span class="g-range">200~250%</span>
           </div>
         </div>
         <div class="guide-row">
-          <span class="g-face">💀</span>
+          <PixelIcon class="g-face" icon="skull" size="1.2rem" />
           <div class="g-info">
             <span class="g-label">위기 (Lv.1)</span>
             <span class="g-range">250% 이상</span>
@@ -315,6 +337,9 @@ const HOUSE_LEVELS = [
   font-size: 1.4rem;
   font-weight: 800;
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 /* House Showcase */
@@ -333,7 +358,7 @@ const HOUSE_LEVELS = [
 }
 
 .showcase-emoji {
-  font-size: 2.5rem;
+  flex-shrink: 0;
 }
 .showcase-name {
   font-size: 1rem;
@@ -370,7 +395,7 @@ const HOUSE_LEVELS = [
 }
 
 .step-emoji {
-  font-size: 1.4rem;
+  flex-shrink: 0;
 }
 .step-name {
   font-size: 0.62rem;
@@ -396,6 +421,9 @@ const HOUSE_LEVELS = [
   font-size: 0.95rem;
   font-weight: 700;
   margin: 0 0 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .setting-form {
@@ -578,7 +606,13 @@ const HOUSE_LEVELS = [
   border-bottom: none;
 }
 .g-face {
-  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 .g-info {
   display: flex;

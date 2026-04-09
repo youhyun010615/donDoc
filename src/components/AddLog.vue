@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
 import { useBudgetStore } from '../stores/useBudgetStore.js';
+import PixelIcon from './PixelIcon.vue';
 
 const props = defineProps({
   editRecord: { type: Object, default: null },
@@ -41,6 +42,30 @@ const categories = computed(() =>
     ? store.incomeCategories
     : store.expenseCategories,
 );
+
+function resolveCategoryIcon(type, categoryName, rawIcon) {
+  const iconByName =
+    type === 'income'
+      ? {
+          월급: 'money',
+          부수입: 'money',
+          투자수익: 'money',
+          용돈: 'money',
+          기타수입: 'money',
+        }
+      : {
+          식비: 'food',
+          교통비: 'bus',
+          쇼핑: 'shopping',
+          문화생활: 'movie',
+          '의료/건강': 'hospital',
+          교육: 'education',
+          '주거/통신': 'house',
+          기타지출: 'expense',
+        };
+
+  return iconByName[categoryName] || rawIcon || 'expense';
+}
 
 // 타입 변경 시 카테고리 초기화
 watch(
@@ -140,7 +165,10 @@ async function handleSubmit() {
               :class="{ selected: form.category === cat.name }"
               @click="form.category = cat.name"
             >
-              <span>{{ cat.icon }}</span>
+              <PixelIcon
+                :icon="resolveCategoryIcon(form.type, cat.name, cat.icon)"
+                size="1.4rem"
+              />
               <span>{{ cat.name }}</span>
             </button>
           </div>
@@ -186,7 +214,10 @@ async function handleSubmit() {
           />
         </div>
 
-        <p v-if="errorMsg" class="error-msg">⚠️ {{ errorMsg }}</p>
+        <p v-if="errorMsg" class="error-msg">
+          <PixelIcon icon="alert" size="1.4rem" />
+          <span>{{ errorMsg }}</span>
+        </p>
 
         <!-- 버튼 -->
         <div class="form-actions">
@@ -380,6 +411,9 @@ async function handleSubmit() {
   color: #e53935;
   font-size: 0.82rem;
   margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 
 .form-actions {

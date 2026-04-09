@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/useAuthStore.js'
 import { useBudgetStore } from '../stores/useBudgetStore.js'
+import PixelIcon from '../components/PixelIcon.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -37,7 +38,7 @@ async function handleLogin() {
   <div class="login-page">
     <div class="login-card">
       <div class="login-header">
-        <div class="pig-icon">🐷</div>
+        <div class="pig-icon"><PixelIcon icon="pig" size="3.6rem" /></div>
         <h1 class="app-title">돈독</h1>
         <p class="app-subtitle">내 소비의 주치의</p>
       </div>
@@ -65,7 +66,7 @@ async function handleLogin() {
           />
         </div>
 
-        <p v-if="errorMsg" class="error-msg">⚠️ {{ errorMsg }}</p>
+        <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
 
         <button type="submit" class="btn-login" :disabled="loading">
           <span v-if="loading">로그인 중...</span>

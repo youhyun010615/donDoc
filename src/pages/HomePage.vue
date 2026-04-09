@@ -6,6 +6,7 @@ import { useAuthStore } from '../stores/useAuthStore.js';
 import { usePigSystem } from '../composables/usePigSystem.js';
 import PigPixelArt from '../components/PigPixelArt.vue';
 import PigBackground from '../components/PigBackground.vue';
+import PixelIcon from '../components/PixelIcon.vue';
 
 const store = useBudgetStore();
 const authStore = useAuthStore();
@@ -60,26 +61,32 @@ const todayRecordsSorted = computed(() =>
     <!-- ─── 상단 헤더 ─── -->
     <header class="page-header">
       <div>
-        <h1 class="page-title">🐷 돈독</h1>
+        <h1 class="page-title">
+          <PixelIcon icon="pig" size="1.4rem" />
+          <span>돈독</span>
+        </h1>
         <p class="page-subtitle">
           {{ authStore.currentUser?.userName ?? '...' }}님의 재정
         </p>
       </div>
       <div class="house-badge" :title="houseInfo.description">
-        <span class="house-emoji">{{ houseInfo.emoji }}</span>
+        <PixelIcon class="house-emoji" :icon="houseInfo.emoji" size="1.5rem" />
         <span class="house-name">{{ houseInfo.name }}</span>
       </div>
     </header>
 
     <!-- ─── 로딩 ─── -->
     <div v-if="store.loading" class="loading-state">
-      <div class="loading-pig">🐷</div>
+      <div class="loading-pig"><PixelIcon icon="pig" size="3.2rem" /></div>
       <p>데이터 불러오는 중...</p>
     </div>
 
     <!-- ─── 에러 ─── -->
     <div v-else-if="store.error" class="error-card">
-      <p>⚠️ {{ store.error }}</p>
+      <p class="title-with-icon">
+        <PixelIcon icon="alert" size="1rem" />
+        <span>{{ store.error }}</span>
+      </p>
       <p class="error-hint">json-server가 실행 중인지 확인해주세요</p>
       <code>npm run server</code>
     </div>
@@ -164,7 +171,10 @@ const todayRecordsSorted = computed(() =>
       <!-- ─── 월간 예산 현황 ─── -->
       <div class="card">
         <div class="card-header">
-          <span>📅 {{ store.currentMonth }} 예산 현황</span>
+          <span class="title-with-icon">
+            <PixelIcon icon="calendar" size="1rem" />
+            <span>{{ store.currentMonth }} 예산 현황</span>
+          </span>
           <span
             class="budget-pct"
             :style="{ color: monthlyProgress > 100 ? '#EF5350' : '#66BB6A' }"
@@ -205,7 +215,10 @@ const todayRecordsSorted = computed(() =>
       <!-- ─── 오늘의 거래 ─── -->
       <div class="card">
         <div class="card-header">
-          <span>📋 오늘의 거래</span>
+          <span class="title-with-icon">
+            <PixelIcon icon="clipboard" size="1rem" />
+            <span>오늘의 거래</span>
+          </span>
           <button class="link-btn" @click="router.push('/account')">
             전체보기 →
           </button>
@@ -262,6 +275,9 @@ const todayRecordsSorted = computed(() =>
   font-weight: 800;
   color: var(--primary);
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .page-subtitle {
@@ -283,7 +299,6 @@ const todayRecordsSorted = computed(() =>
 }
 
 .house-emoji {
-  font-size: 1.5rem;
   line-height: 1;
 }
 .house-name {
@@ -484,6 +499,12 @@ const todayRecordsSorted = computed(() =>
   font-size: 0.9rem;
   font-weight: 600;
   margin-bottom: 0.75rem;
+}
+
+.title-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .budget-pct {
