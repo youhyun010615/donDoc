@@ -1,19 +1,25 @@
 <script setup>
 import { onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import NavBar from './components/NavBar.vue'
+import { useAuthStore } from './stores/useAuthStore.js'
 import { useBudgetStore } from './stores/useBudgetStore.js'
 
-const store = useBudgetStore()
+const route = useRoute()
+const authStore = useAuthStore()
+const budgetStore = useBudgetStore()
 
 onMounted(async () => {
-  await store.initStore()
+  if (authStore.isLoggedIn) {
+    await budgetStore.initStore()
+  }
 })
 </script>
 
 <template>
   <div id="app-wrapper">
-    <NavBar />
-    <main class="main-content">
+    <NavBar v-if="authStore.isLoggedIn && route.name !== 'Login'" />
+    <main class="main-content" :class="{ 'no-nav': !authStore.isLoggedIn }">
       <RouterView />
     </main>
   </div>
@@ -33,5 +39,10 @@ onMounted(async () => {
   max-width: 480px;
   width: 100%;
   margin: 0 auto;
+}
+
+.main-content.no-nav {
+  padding: 0;
+  max-width: 100%;
 }
 </style>

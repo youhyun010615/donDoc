@@ -2,11 +2,13 @@
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useBudgetStore } from '../stores/useBudgetStore.js';
+import { useAuthStore } from '../stores/useAuthStore.js';
 import { usePigSystem } from '../composables/usePigSystem.js';
 import PigPixelArt from '../components/PigPixelArt.vue';
 import PigBackground from '../components/PigBackground.vue';
 
 const store = useBudgetStore();
+const authStore = useAuthStore();
 const router = useRouter();
 const { getPigState, getHouseInfo, formatCurrency } = usePigSystem();
 
@@ -20,13 +22,13 @@ const pigVisualScale = computed(() => {
   return 0.82 + (normalized - 1) * 0.04;
 });
 
-const currentHouseLevel = computed(() => store.profile?.houseLevel ?? 3);
+const currentHouseLevel = computed(() => authStore.currentUser?.houseLevel ?? 3);
 const houseInfo = computed(() => getHouseInfo(currentHouseLevel.value));
 
 const monthlyBudget = computed(() => {
-  if (!store.profile) return 0;
+  if (!authStore.currentUser) return 0;
   return Math.round(
-    (store.profile.monthlyIncome * store.profile.targetExpenseRatio) / 100
+    (authStore.currentUser.monthlyIncome * authStore.currentUser.targetExpenseRatio) / 100
   );
 });
 
@@ -60,7 +62,7 @@ const todayRecordsSorted = computed(() =>
       <div>
         <h1 class="page-title">🐷 돈독</h1>
         <p class="page-subtitle">
-          {{ store.profile?.userName ?? '...' }}님의 재정
+          {{ authStore.currentUser?.userName ?? '...' }}님의 재정
         </p>
       </div>
       <div class="house-badge" :title="houseInfo.description">

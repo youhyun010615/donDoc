@@ -260,6 +260,7 @@ const avgDailyExpense = computed(() => {
             <span
               class="center-value"
               :class="netIncome >= 0 ? 'income' : 'expense'"
+              style="z-index: 3"
             >
               {{ netIncome >= 0 ? '+' : '' }}{{ formatCurrency(netIncome) }}
             </span>
@@ -299,7 +300,11 @@ const avgDailyExpense = computed(() => {
           </div>
         </div>
         <div class="custom-legend">
-          <div v-for="cat in incomeByCat" :key="cat.category" class="legend-row">
+          <div
+            v-for="cat in incomeByCat"
+            :key="cat.category"
+            class="legend-row"
+          >
             <span class="legend-label" :title="`${cat.icon} ${cat.category}`"
               >{{ cat.icon }} {{ cat.category }}</span
             >
@@ -329,7 +334,11 @@ const avgDailyExpense = computed(() => {
           </div>
         </div>
         <div class="custom-legend">
-          <div v-for="cat in expenseByCat" :key="cat.category" class="legend-row">
+          <div
+            v-for="cat in expenseByCat"
+            :key="cat.category"
+            class="legend-row"
+          >
             <span class="legend-label" :title="`${cat.icon} ${cat.category}`"
               >{{ cat.icon }} {{ cat.category }}</span
             >

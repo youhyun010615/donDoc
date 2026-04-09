@@ -2,11 +2,14 @@
   "profile": [
     {
       "id": "1",
-      "userName": "강태규",
+      "userId": "songtan",
+      "password": "songtan1",
+      "userName": "기본사용자",
+      "age": 26,
       "monthlyIncome": 3000000,
-      "targetExpenseRatio": 40,
+      "targetExpenseRatio": 60,
       "currentPigLevel": 5,
-      "houseLevel": 1,
+      "houseLevel": 5,
       "createdAt": "2026-04-07"
     }
   ],
@@ -94,17 +97,6 @@
   ],
   "records": [
     {
-      "id": "rec_001",
-      "userId": "1",
-      "date": "2026-04-07",
-      "type": "income",
-      "category": "월급",
-      "amount": 3000000,
-      "memo": "",
-      "content": "4월 월급",
-      "createdAt": "2026-04-07T09:00:00Z"
-    },
-    {
       "id": "rec_002",
       "userId": "1",
       "date": "2026-04-07",
@@ -112,7 +104,6 @@
       "category": "식비",
       "amount": 15000,
       "memo": "점심 김밥",
-      "content": "점심 김밥",
       "createdAt": "2026-04-07T12:30:00Z"
     },
     {
@@ -122,8 +113,7 @@
       "type": "expense",
       "category": "교통비",
       "amount": 1500,
-      "memo": "",
-      "content": "버스",
+      "memo": "버스",
       "createdAt": "2026-04-07T08:20:00Z"
     },
     {
@@ -134,7 +124,6 @@
       "category": "식비",
       "amount": 32000,
       "memo": "저녁 삼겹살",
-      "content": "저녁 삼겹살",
       "createdAt": "2026-04-06T19:00:00Z"
     },
     {
@@ -145,7 +134,6 @@
       "category": "쇼핑",
       "amount": 45000,
       "memo": "옷 구매",
-      "content": "옷 구매",
       "createdAt": "2026-04-06T14:00:00Z"
     },
     {
@@ -156,19 +144,7 @@
       "category": "문화생활",
       "amount": 13000,
       "memo": "영화",
-      "content": "영화",
       "createdAt": "2026-04-05T15:00:00Z"
-    },
-    {
-      "id": "rec_007",
-      "userId": "1",
-      "date": "2026-04-05",
-      "type": "income",
-      "category": "부수입",
-      "amount": 50000,
-      "memo": "",
-      "content": "중고거래",
-      "createdAt": "2026-04-05T11:00:00Z"
     },
     {
       "id": "rec_008",
@@ -178,40 +154,93 @@
       "category": "식비",
       "amount": 8500,
       "memo": "편의점",
-      "content": "편의점",
       "createdAt": "2026-04-04T18:30:00Z"
     },
     {
       "type": "expense",
       "date": "2026-04-08",
-      "category": "문화생활",
-      "amount": 90000,
+      "category": "식비",
+      "amount": 11555,
       "memo": "",
       "userId": "1",
-      "createdAt": "2026-04-08T00:34:00.511Z",
-      "id": "4e3Tb0y"
+      "createdAt": "2026-04-08T00:24:31.638Z",
+      "id": "Wl_n3rp"
     },
     {
       "type": "expense",
-      "date": "2026-03-31",
-      "category": "교통비",
-      "amount": 299999,
-      "content": "버스",
-      "memo": "유현이가 수정",
+      "date": "2026-02-04",
+      "category": "식비",
+      "amount": 11,
+      "memo": "",
       "userId": "1",
-      "createdAt": "2026-04-08T04:19:45.123Z",
-      "id": "80exGos"
+      "createdAt": "2026-04-08T04:54:36.826Z",
+      "id": "L9EHYEX"
+    },
+    {
+      "type": "expense",
+      "date": "2026-04-09",
+      "category": "식비",
+      "amount": 20000,
+      "content": "",
+      "memo": "",
+      "userId": "1",
+      "createdAt": "2026-04-09T02:02:48.586Z",
+      "id": "6uL5ak_"
+    },
+    {
+      "type": "expense",
+      "date": "2026-04-09",
+      "category": "식비",
+      "amount": 5000,
+      "content": "",
+      "memo": "",
+      "userId": "1",
+      "createdAt": "2026-04-09T02:03:05.284Z",
+      "id": "0b0zCwQ"
+    },
+    {
+      "type": "expense",
+      "date": "2026-03-10",
+      "category": "식비",
+      "amount": 111111,
+      "content": "",
+      "memo": "",
+      "userId": "1",
+      "createdAt": "2026-04-09T02:21:13.090Z",
+      "id": "d7rXvKg"
+    },
+    {
+      "type": "income",
+      "date": "2026-03-09",
+      "category": "월급",
+      "amount": 1,
+      "content": "",
+      "memo": "",
+      "userId": "1",
+      "createdAt": "2026-04-09T02:21:44.994Z",
+      "id": "LgPYDTo"
     },
     {
       "type": "expense",
       "date": "2026-04-08",
       "category": "식비",
-      "amount": 1234,
-      "content": "간식",
-      "memo": "테스트",
+      "amount": 1111111,
+      "content": "",
+      "memo": "",
       "userId": "1",
-      "createdAt": "2026-04-08T04:58:10.284Z",
-      "id": "UXvzn6j"
+      "createdAt": "2026-04-09T02:24:25.523Z",
+      "id": "amNUE6J"
+    },
+    {
+      "type": "expense",
+      "date": "2026-04-09",
+      "category": "교육",
+      "amount": 1000000,
+      "content": "",
+      "memo": "",
+      "userId": "1",
+      "createdAt": "2026-04-09T04:04:14.276Z",
+      "id": "-Q03lb7"
     }
   ],
   "dailyStatus": [
