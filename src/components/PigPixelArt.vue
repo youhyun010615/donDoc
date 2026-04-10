@@ -327,103 +327,123 @@ const state = computed(() => {
 
     <!-- ==============================
          GRILL — 삼겹살 구이 (lv 1)
-         불판 위 삼겹살 픽셀 아트
+         마인크래프트 raw porkchop 스타일 2조각 + 숯불 그릴
          ============================== -->
     <g v-else>
       <!-- 연기 픽셀 -->
-      <rect x="68"  y="8"  width="8" height="8" fill="#90A4AE" opacity="0.5"/>
-      <rect x="64"  y="2"  width="8" height="6" fill="#B0BEC5" opacity="0.4"/>
-      <rect x="96"  y="12" width="8" height="8" fill="#B0BEC5" opacity="0.55"/>
-      <rect x="100" y="4"  width="8" height="8" fill="#90A4AE" opacity="0.45"/>
-      <rect x="132" y="8"  width="8" height="8" fill="#B0BEC5" opacity="0.5"/>
-      <rect x="136" y="2"  width="8" height="6" fill="#90A4AE" opacity="0.4"/>
+      <rect x="44"  y="14" width="8" height="8" fill="#B0BEC5" opacity="0.55"/>
+      <rect x="40"  y="6"  width="8" height="8" fill="#90A4AE" opacity="0.4"/>
+      <rect x="96"  y="10" width="8" height="8" fill="#B0BEC5" opacity="0.6"/>
+      <rect x="100" y="2"  width="8" height="8" fill="#90A4AE" opacity="0.4"/>
+      <rect x="152" y="14" width="8" height="8" fill="#B0BEC5" opacity="0.55"/>
+      <rect x="156" y="6"  width="8" height="8" fill="#90A4AE" opacity="0.4"/>
 
-      <!-- 삼겹살 슬라이스 1 (왼쪽) -->
-      <rect x="16"  y="88" width="52" height="4"  fill="#3E2723"/>
-      <rect x="16"  y="108" width="52" height="4" fill="#3E2723"/>
-      <rect x="16"  y="88" width="4"  height="24" fill="#3E2723"/>
-      <rect x="64"  y="88" width="4"  height="24" fill="#3E2723"/>
-      <rect x="20"  y="92" width="44" height="4"  fill="#FFECB3"/>
-      <rect x="20"  y="96" width="44" height="5"  fill="#EF5350"/>
-      <rect x="20"  y="101" width="44" height="4" fill="#FFF9C4"/>
-      <rect x="20"  y="105" width="44" height="3" fill="#C62828"/>
-      <rect x="28"  y="92" width="4"  height="16" fill="#3E2723" opacity="0.75"/>
-      <rect x="40"  y="92" width="4"  height="16" fill="#3E2723" opacity="0.75"/>
-      <rect x="52"  y="92" width="4"  height="16" fill="#3E2723" opacity="0.75"/>
+      <!-- =============================================
+           고기 조각 1 — 마인크래프트 날삼겹살 스타일
+           4px 픽셀 그리드, 계단형 모서리
+           ============================================= -->
+      <!-- 윤곽선 (계단 모서리) -->
+      <rect x="16"  y="52" width="64" height="4"  fill="#7B1515"/>
+      <rect x="12"  y="56" width="4"  height="4"  fill="#7B1515"/>
+      <rect x="80"  y="56" width="4"  height="4"  fill="#7B1515"/>
+      <rect x="8"   y="60" width="4"  height="36" fill="#7B1515"/>
+      <rect x="84"  y="60" width="4"  height="36" fill="#7B1515"/>
+      <rect x="12"  y="96" width="4"  height="4"  fill="#7B1515"/>
+      <rect x="80"  y="96" width="4"  height="4"  fill="#7B1515"/>
+      <rect x="16"  y="100" width="64" height="4" fill="#5A0D0D"/>
 
-      <!-- 삼겹살 슬라이스 2 (중앙, 살짝 앞) -->
-      <rect x="74"  y="84" width="52" height="4"  fill="#3E2723"/>
-      <rect x="74"  y="104" width="52" height="4" fill="#3E2723"/>
-      <rect x="74"  y="84" width="4"  height="24" fill="#3E2723"/>
-      <rect x="122" y="84" width="4"  height="24" fill="#3E2723"/>
-      <rect x="78"  y="88" width="44" height="4"  fill="#FFECB3"/>
-      <rect x="78"  y="92" width="44" height="5"  fill="#F44336"/>
-      <rect x="78"  y="97" width="44" height="4"  fill="#FFF9C4"/>
-      <rect x="78"  y="101" width="44" height="3" fill="#C62828"/>
-      <rect x="86"  y="88" width="4"  height="16" fill="#3E2723" opacity="0.75"/>
-      <rect x="98"  y="88" width="4"  height="16" fill="#3E2723" opacity="0.75"/>
-      <rect x="110" y="88" width="4"  height="16" fill="#3E2723" opacity="0.75"/>
+      <!-- 본체 베이스 (살코기 중간톤) -->
+      <rect x="12"  y="56" width="68" height="44" fill="#D06878"/>
+      <!-- 상단 하이라이트 (살코기 밝은 부분) -->
+      <rect x="12"  y="56" width="68" height="16" fill="#EE9FAE"/>
+      <!-- 하단 그림자 -->
+      <rect x="12"  y="88" width="68" height="12" fill="#A84058"/>
 
-      <!-- 삼겹살 슬라이스 3 (오른쪽) -->
-      <rect x="132" y="88" width="52" height="4"  fill="#3E2723"/>
-      <rect x="132" y="108" width="52" height="4" fill="#3E2723"/>
-      <rect x="132" y="88" width="4"  height="24" fill="#3E2723"/>
-      <rect x="180" y="88" width="4"  height="24" fill="#3E2723"/>
-      <rect x="136" y="92" width="44" height="4"  fill="#FFECB3"/>
-      <rect x="136" y="96" width="44" height="5"  fill="#EF5350"/>
-      <rect x="136" y="101" width="44" height="4" fill="#FFF9C4"/>
-      <rect x="136" y="105" width="44" height="3" fill="#C62828"/>
-      <rect x="144" y="92" width="4"  height="16" fill="#3E2723" opacity="0.75"/>
-      <rect x="156" y="92" width="4"  height="16" fill="#3E2723" opacity="0.75"/>
-      <rect x="168" y="92" width="4"  height="16" fill="#3E2723" opacity="0.75"/>
+      <!-- 지방 영역 (왼쪽 상단 — 이미지의 크림/흰색 덩어리) -->
+      <!-- 지방 1단계: 따뜻한 크림 -->
+      <rect x="12"  y="56" width="44" height="30" fill="#F5D4B8"/>
+      <!-- 지방 2단계: 밝은 크림 -->
+      <rect x="12"  y="56" width="32" height="22" fill="#FDEEDD"/>
+      <!-- 지방 3단계: 거의 흰색 (하이라이트 중심) -->
+      <rect x="12"  y="56" width="20" height="14" fill="#FFF8F0"/>
+      <!-- 지방 4단계: 순백 광택 -->
+      <rect x="14"  y="58" width="10" height="6"  fill="#FFFFFF" opacity="0.6"/>
+      <!-- 지방 테두리 (오른쪽/아래 경계 — 어두운 핑크) -->
+      <rect x="56"  y="56" width="4"  height="30" fill="#C8A090" opacity="0.5"/>
+      <rect x="12"  y="86" width="44" height="4"  fill="#C8A090" opacity="0.4"/>
+      <!-- 살코기에 섞인 작은 지방 반점 -->
+      <rect x="64"  y="64" width="10" height="8"  fill="#FDEEDD"/>
+      <rect x="60"  y="74" width="14" height="6"  fill="#F5D4C0"/>
 
-      <!-- 불판 그레이트 (수평 바 2개) -->
-      <rect x="8"   y="112" width="184" height="4" fill="#795548"/>
-      <rect x="8"   y="120" width="184" height="4" fill="#6D4C41"/>
-      <!-- 불판 그레이트 (수직 바) -->
-      <rect x="20"  y="108" width="4"  height="20" fill="#6D4C41"/>
-      <rect x="40"  y="108" width="4"  height="20" fill="#6D4C41"/>
-      <rect x="60"  y="108" width="4"  height="20" fill="#6D4C41"/>
-      <rect x="80"  y="108" width="4"  height="20" fill="#6D4C41"/>
-      <rect x="100" y="108" width="4"  height="20" fill="#6D4C41"/>
-      <rect x="120" y="108" width="4"  height="20" fill="#6D4C41"/>
-      <rect x="140" y="108" width="4"  height="20" fill="#6D4C41"/>
-      <rect x="160" y="108" width="4"  height="20" fill="#6D4C41"/>
-      <rect x="180" y="108" width="4"  height="20" fill="#6D4C41"/>
+      <!-- =============================================
+           고기 조각 2 — 살짝 앞쪽/위쪽 (깊이감)
+           ============================================= -->
+      <!-- 윤곽선 -->
+      <rect x="116" y="48" width="64" height="4"  fill="#7B1515"/>
+      <rect x="112" y="52" width="4"  height="4"  fill="#7B1515"/>
+      <rect x="180" y="52" width="4"  height="4"  fill="#7B1515"/>
+      <rect x="108" y="56" width="4"  height="36" fill="#7B1515"/>
+      <rect x="184" y="56" width="4"  height="36" fill="#7B1515"/>
+      <rect x="112" y="92" width="4"  height="4"  fill="#7B1515"/>
+      <rect x="180" y="92" width="4"  height="4"  fill="#7B1515"/>
+      <rect x="116" y="96" width="64" height="4"  fill="#5A0D0D"/>
 
-      <!-- 불판 몸체 -->
-      <rect x="8"   y="124" width="184" height="48" fill="#5D4037"/>
-      <rect x="12"  y="128" width="176" height="40" fill="#1A1A1A"/>
+      <!-- 본체 베이스 -->
+      <rect x="112" y="52" width="68" height="44" fill="#D06878"/>
+      <!-- 상단 하이라이트 -->
+      <rect x="112" y="52" width="68" height="16" fill="#EE9FAE"/>
+      <!-- 하단 그림자 -->
+      <rect x="112" y="84" width="68" height="12" fill="#A84058"/>
 
-      <!-- 불꽃 (그릴 안) -->
-      <!-- 빨간 불 베이스 -->
-      <rect x="48"  y="148" width="104" height="16" fill="#B71C1C"/>
-      <!-- 빨간 불꽃 -->
-      <rect x="40"  y="140" width="12"  height="12" fill="#D32F2F"/>
-      <rect x="80"  y="136" width="12"  height="16" fill="#D32F2F"/>
-      <rect x="112" y="136" width="12"  height="16" fill="#D32F2F"/>
-      <rect x="152" y="140" width="12"  height="12" fill="#D32F2F"/>
-      <!-- 주황 불꽃 -->
-      <rect x="52"  y="132" width="12"  height="16" fill="#E65100"/>
-      <rect x="88"  y="128" width="12"  height="12" fill="#E65100"/>
-      <rect x="108" y="128" width="12"  height="12" fill="#E65100"/>
-      <rect x="140" y="132" width="12"  height="16" fill="#E65100"/>
-      <!-- 노란 불꽃 끝 -->
-      <rect x="60"  y="128" width="8"   height="8"  fill="#FDD835"/>
-      <rect x="92"  y="124" width="8"   height="8"  fill="#FDD835"/>
-      <rect x="108" y="124" width="8"   height="8"  fill="#FDD835"/>
-      <rect x="136" y="128" width="8"   height="8"  fill="#FDD835"/>
-      <!-- 가장 밝은 불꽃 -->
-      <rect x="96"  y="120" width="8"   height="8"  fill="#FFEE58"/>
+      <!-- 지방 영역 (왼쪽 상단) -->
+      <rect x="112" y="52" width="44" height="30" fill="#F5D4B8"/>
+      <rect x="112" y="52" width="32" height="22" fill="#FDEEDD"/>
+      <rect x="112" y="52" width="20" height="14" fill="#FFF8F0"/>
+      <rect x="114" y="54" width="10" height="6"  fill="#FFFFFF" opacity="0.6"/>
+      <rect x="156" y="52" width="4"  height="30" fill="#C8A090" opacity="0.5"/>
+      <rect x="112" y="82" width="44" height="4"  fill="#C8A090" opacity="0.4"/>
+      <!-- 살코기 지방 반점 -->
+      <rect x="164" y="60" width="10" height="8"  fill="#FDEEDD"/>
+      <rect x="160" y="70" width="14" height="6"  fill="#F5D4C0"/>
 
-      <!-- 그릴 다리 -->
-      <rect x="36"  y="172" width="16"  height="76" fill="#4E342E"/>
-      <rect x="148" y="172" width="16"  height="76" fill="#4E342E"/>
-      <!-- 하단 연결바 -->
-      <rect x="36"  y="236" width="128" height="8"  fill="#3E2723"/>
-      <!-- 다리 발 -->
-      <rect x="28"  y="244" width="28"  height="8"  fill="#3E2723"/>
-      <rect x="144" y="244" width="28"  height="8"  fill="#3E2723"/>
+      <!-- ===== 불판 그레이트 ===== -->
+      <rect x="8"   y="108" width="184" height="5" fill="#5D4037"/>
+      <rect x="8"   y="118" width="184" height="5" fill="#6D4C41"/>
+      <rect x="20"  y="104" width="4"  height="24" fill="#4E342E"/>
+      <rect x="44"  y="104" width="4"  height="24" fill="#4E342E"/>
+      <rect x="68"  y="104" width="4"  height="24" fill="#4E342E"/>
+      <rect x="92"  y="104" width="4"  height="24" fill="#4E342E"/>
+      <rect x="116" y="104" width="4"  height="24" fill="#4E342E"/>
+      <rect x="140" y="104" width="4"  height="24" fill="#4E342E"/>
+      <rect x="164" y="104" width="4"  height="24" fill="#4E342E"/>
+      <rect x="184" y="104" width="4"  height="24" fill="#4E342E"/>
+
+      <!-- ===== 불판 몸체 ===== -->
+      <rect x="8"   y="128" width="184" height="44" fill="#5D4037"/>
+      <rect x="12"  y="132" width="176" height="36" fill="#1A1A1A"/>
+
+      <!-- ===== 불꽃 ===== -->
+      <rect x="44"  y="152" width="112" height="12" fill="#B71C1C"/>
+      <rect x="36"  y="144" width="12"  height="12" fill="#D32F2F"/>
+      <rect x="76"  y="140" width="12"  height="16" fill="#D32F2F"/>
+      <rect x="116" y="140" width="12"  height="16" fill="#D32F2F"/>
+      <rect x="152" y="144" width="12"  height="12" fill="#D32F2F"/>
+      <rect x="52"  y="136" width="12"  height="16" fill="#E65100"/>
+      <rect x="88"  y="132" width="12"  height="12" fill="#E65100"/>
+      <rect x="108" y="132" width="12"  height="12" fill="#E65100"/>
+      <rect x="140" y="136" width="12"  height="16" fill="#E65100"/>
+      <rect x="60"  y="132" width="8"   height="8"  fill="#FDD835"/>
+      <rect x="92"  y="128" width="8"   height="8"  fill="#FDD835"/>
+      <rect x="112" y="128" width="8"   height="8"  fill="#FDD835"/>
+      <rect x="140" y="132" width="8"   height="8"  fill="#FDD835"/>
+      <rect x="96"  y="124" width="8"   height="8"  fill="#FFEE58"/>
+
+      <!-- ===== 그릴 다리 ===== -->
+      <rect x="36"  y="172" width="16"  height="72" fill="#4E342E"/>
+      <rect x="148" y="172" width="16"  height="72" fill="#4E342E"/>
+      <rect x="36"  y="232" width="128" height="8"  fill="#3E2723"/>
+      <rect x="28"  y="240" width="28"  height="8"  fill="#3E2723"/>
+      <rect x="144" y="240" width="28"  height="8"  fill="#3E2723"/>
     </g>
 
   </svg>
