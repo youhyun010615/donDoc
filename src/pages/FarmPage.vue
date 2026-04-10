@@ -15,7 +15,7 @@ import farmThumb5 from '../assets/farms/farm-thumb-5.svg';
 
 const authStore = useAuthStore();
 const { getHouseInfo, getPigState } = usePigSystem();
-const API_BASE = 'http://localhost:3000';
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 const selectedFarmId = ref(null);
 const farms = ref([]);
