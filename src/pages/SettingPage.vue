@@ -75,6 +75,7 @@ async function handleSave() {
       monthlyIncome: Number(form.value.monthlyIncome),
       targetExpenseRatio: Number(form.value.targetExpenseRatio),
     });
+    await store.settleProfileState();
     saved.value = true;
     setTimeout(() => {
       saved.value = false;
@@ -121,8 +122,8 @@ const HOUSE_LEVELS = [
           :key="h.level"
           class="house-step"
           :class="{
-            active: h.level <= (store.profile?.houseLevel ?? 3),
-            current: h.level === (store.profile?.houseLevel ?? 3),
+            active: h.level <= (authStore.currentUser?.houseLevel ?? 3),
+            current: h.level === (authStore.currentUser?.houseLevel ?? 3),
           }"
         >
           <PixelIcon class="step-emoji" :icon="h.emoji" size="1.1rem" />
