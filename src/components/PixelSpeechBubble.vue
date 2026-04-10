@@ -57,14 +57,16 @@ onUnmounted(() => clearInterval(timer))
 /* 말풍선 본체 */
 .bubble {
   position: relative;
-  background: #1a1a2e;
+  background: rgba(26, 26, 46, 0.82);
   color: #e8f4e8;
   font-family: 'DungGeunMo', 'Galmuri11', 'Courier New', monospace;
-  font-size: 0.78rem;
-  line-height: 1.7;
-  padding: 12px 14px 10px;
-  min-width: 200px;
-  max-width: 260px;
+  font-size: 0.72rem;
+  line-height: 1.6;
+  padding: 10px 12px 8px;
+  min-width: 140px;
+  max-width: 190px;
+  max-height: 130px;
+  overflow-y: auto;
 
   /* 픽셀 테두리 — box-shadow로 계단 표현 */
   box-shadow:

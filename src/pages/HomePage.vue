@@ -196,6 +196,7 @@ const todayRecordsSorted = computed(() =>
             :src="character.image"
             :alt="character.name"
             class="character-overlay"
+            :class="{ active: activeBubble === 'character' }"
             @click="toggleCharacterBubble"
           />
         </div>
@@ -481,6 +482,13 @@ const todayRecordsSorted = computed(() =>
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
   animation: characterFloat 3.4s ease-in-out infinite;
   cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+  border-radius: 4px;
+}
+
+.character-overlay.active {
+  animation: characterFloatActive 3.4s ease-in-out infinite;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2)) drop-shadow(0 0 6px rgba(255, 215, 0, 0.8));
 }
 
 .pig-pixel {
@@ -490,23 +498,28 @@ const todayRecordsSorted = computed(() =>
 /* 돼지 말풍선 — 돼지 위 중앙 */
 .pig-bubble {
   position: absolute;
-  bottom: 100px;
+  bottom: 110px;
   left: 50%;
-  transform: translateX(-20%);
+  transform: translateX(-30%);
   z-index: 10;
 }
 
-/* 캐릭터 말풍선 — 캐릭터 위 왼쪽 */
+/* 캐릭터 말풍선 — 캐릭터 머리 위 */
 .character-bubble {
   position: absolute;
-  bottom: 90px;
-  left: 0;
+  bottom: 95px;
+  left: 4px;
   z-index: 10;
 }
 
 @keyframes characterFloat {
   0%, 100% { transform: translateY(0px); }
   50%       { transform: translateY(-10px); }
+}
+
+@keyframes characterFloatActive {
+  0%, 100% { transform: translateY(0px) scale(1.12); }
+  50%       { transform: translateY(-10px) scale(1.12); }
 }
 
 @keyframes pigFloatScale {
