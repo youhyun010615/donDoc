@@ -16,9 +16,15 @@ const activeTab = ref('pig');
 const topAnchor = ref(null);
 const bottomAnchor = ref(null);
 
-const pigLevels = computed(() => [...PIG_LEVELS].sort((a, b) => b.level - a.level));
-const houseLevels = computed(() => [...HOUSE_LEVELS].sort((a, b) => a.level - b.level));
-const characterStages = computed(() => [...CHARACTER_STAGES].sort((a, b) => a.stage - b.stage));
+const pigLevels = computed(() =>
+  [...PIG_LEVELS].sort((a, b) => b.level - a.level),
+);
+const houseLevels = computed(() =>
+  [...HOUSE_LEVELS].sort((a, b) => a.level - b.level),
+);
+const characterStages = computed(() =>
+  [...CHARACTER_STAGES].sort((a, b) => a.stage - b.stage),
+);
 const isFromLogin = computed(() => route.query.source === 'login');
 
 function getPigRangeLabel(index) {
@@ -37,16 +43,20 @@ function getPigRangeLabel(index) {
 
 function getCharacterRangeLabel(index) {
   const current = characterStages.value[index];
+  const next = characterStages.value[index + 1];
   const previous = characterStages.value[index - 1];
 
   if (!current) return '';
   if (current.maxPace === Infinity) {
-    return previous ? `${Math.round(previous.maxPace * 100)}%+` : '전체 구간';
+    return previous ? `${previous.maxPace}x+` : '1.4x 초과';
+  }
+  if (current.stage === 5) {
+    return `${current.maxPace}x 이하`;
   }
   if (!previous) {
-    return `0~${Math.round(current.maxPace * 100)}%`;
+    return `0~${current.maxPace}x`;
   }
-  return `${Math.round(previous.maxPace * 100)}~${Math.round(current.maxPace * 100)}%`;
+  return `${next.maxPace}x~${current.maxPace}x`;
 }
 
 function goNext() {
@@ -153,7 +163,10 @@ function scrollToBottom() {
     <section v-else-if="activeTab === 'character'" class="guide-section">
       <div class="section-head">
         <h2>감독관 5단계</h2>
-        <p>이번 달 소비 페이스가 예산 대비 어느 정도인지에 따라 감독관이 달라져요.</p>
+        <p>
+          이번 달 소비 페이스가 예산 대비 어느 정도인지에 따라 감독관이
+          달라져요.
+        </p>
       </div>
 
       <div class="character-grid">
@@ -173,7 +186,9 @@ function scrollToBottom() {
           <div class="character-copy">
             <div class="character-topline">
               <span class="character-stage">STEP {{ character.stage }}</span>
-              <span class="character-range">{{ getCharacterRangeLabel(index) }}</span>
+              <span class="character-range">{{
+                getCharacterRangeLabel(index)
+              }}</span>
             </div>
             <strong class="character-name">{{ character.name }}</strong>
             <p class="character-message">{{ character.message }}</p>
@@ -192,17 +207,23 @@ function scrollToBottom() {
         <div class="house-rule-row upgrade">
           <span class="rule-label">업그레이드</span>
           <span class="rule-range">100% 이하</span>
-          <span class="rule-desc">이번 달 소비가 예산 안이면 다음 집 단계로 올라가요.</span>
+          <span class="rule-desc"
+            >이번 달 소비가 예산 안이면 다음 집 단계로 올라가요.</span
+          >
         </div>
         <div class="house-rule-row maintain">
           <span class="rule-label">유지</span>
-          <span class="rule-range">100% 초과 ~ 150% 이하</span>
-          <span class="rule-desc">예산을 조금 넘겨도 현재 집 단계는 유지돼요.</span>
+          <span class="rule-range">100% 초과 ~ 130% 이하</span>
+          <span class="rule-desc"
+            >예산을 조금 넘겨도 현재 집 단계는 유지돼요.</span
+          >
         </div>
         <div class="house-rule-row downgrade">
           <span class="rule-label">다운그레이드</span>
-          <span class="rule-range">150% 초과</span>
-          <span class="rule-desc">소비가 많이 커지면 집 단계가 한 단계 내려가요.</span>
+          <span class="rule-range">130% 초과</span>
+          <span class="rule-desc"
+            >소비가 많이 커지면 집 단계가 한 단계 내려가요.</span
+          >
         </div>
       </div>
 
@@ -316,8 +337,7 @@ function scrollToBottom() {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 0.5rem;
-  background:
-    linear-gradient(180deg, #fff8fb 0%, #fff 100%);
+  background: linear-gradient(180deg, #fff8fb 0%, #fff 100%);
 }
 
 .tab-btn {
@@ -666,14 +686,6 @@ function scrollToBottom() {
   }
 
   .guide-tabs {
-    grid-template-columns: 1fr;
-  }
-
-  .pig-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .character-grid {
     grid-template-columns: 1fr;
   }
 

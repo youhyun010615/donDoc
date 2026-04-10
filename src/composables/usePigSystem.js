@@ -1,18 +1,19 @@
-
 // 캐릭터 단계 정의 (지출 페이스 기반)
 const CHARACTER_STAGES = [
   {
-    stage: 1,
+    stage: 5,
     name: '집사',
-    image: new URL('../assets/characters/step1_Butler.png', import.meta.url).href,
+    image: new URL('../assets/characters/step1_Butler.png', import.meta.url)
+      .href,
     maxPace: 0.6,
     effect: 'good',
     message: '완벽하게 절약 중이에요! 돼지가 행복해해요.',
   },
   {
-    stage: 2,
+    stage: 4,
     name: '농부',
-    image: new URL('../assets/characters/step2_farmer.png', import.meta.url).href,
+    image: new URL('../assets/characters/step2_farmer.png', import.meta.url)
+      .href,
     maxPace: 0.85,
     effect: 'good',
     message: '잘 관리하고 있어요! 돼지가 건강해요.',
@@ -20,28 +21,33 @@ const CHARACTER_STAGES = [
   {
     stage: 3,
     name: '평민',
-    image: new URL('../assets/characters/step3_common.png', import.meta.url).href,
+    image: new URL('../assets/characters/step3_common.png', import.meta.url)
+      .href,
     maxPace: 1.1,
     effect: 'neutral',
     message: '무난하게 쓰고 있어요. 조금만 더 아껴봐요.',
   },
   {
-    stage: 4,
+    stage: 2,
     name: '도둑',
-    image: new URL('../assets/characters/Step4_theif.png', import.meta.url).href,
+    image: new URL('../assets/characters/Step4_theif.png', import.meta.url)
+      .href,
     maxPace: 1.4,
     effect: 'bad',
     message: '과소비 위험! 지출 속도를 줄여야 해요.',
   },
   {
-    stage: 5,
+    stage: 1,
     name: '도축사',
-    image: new URL('../assets/characters/step5_pig_Slaughter.png', import.meta.url).href,
+    image: new URL(
+      '../assets/characters/step5_pig_Slaughter.png',
+      import.meta.url,
+    ).href,
     maxPace: Infinity,
     effect: 'bad',
     message: '돼지가 위험해요! 지금 당장 지출을 멈춰요.',
   },
-]
+];
 
 // 돼지 상태 10단계 정의
 const PIG_LEVELS = [
@@ -155,21 +161,41 @@ const PIG_LEVELS = [
     borderColor: '#212121',
     message: '위기 상황! 돼지가 위험에 처했어요. 소비를 즉시 중단해요.',
   },
-]
+];
 
 // 집 업그레이드 단계
 const HOUSE_LEVELS = [
-  { level: 1, name: '흙바닥', emoji: 'house_rock', description: '아직 집이 없어요...' },
-  { level: 2, name: '오두막', emoji: 'house_hut', description: '작은 오두막이 생겼어요!' },
-  { level: 3, name: '집', emoji: 'house_home', description: '편안한 집이 생겼어요!' },
-  { level: 4, name: '빌라', emoji: 'house_villa', description: '멋진 빌라로 이사했어요!' },
+  {
+    level: 1,
+    name: '흙바닥',
+    emoji: 'house_rock',
+    description: '아직 집이 없어요...',
+  },
+  {
+    level: 2,
+    name: '오두막',
+    emoji: 'house_hut',
+    description: '작은 오두막이 생겼어요!',
+  },
+  {
+    level: 3,
+    name: '집',
+    emoji: 'house_home',
+    description: '편안한 집이 생겼어요!',
+  },
+  {
+    level: 4,
+    name: '빌라',
+    emoji: 'house_villa',
+    description: '멋진 빌라로 이사했어요!',
+  },
   {
     level: 5,
     name: '대저택',
     emoji: 'house_castle',
     description: '꿈의 대저택에 살고 있어요!',
   },
-]
+];
 
 export function usePigSystem() {
   /**
@@ -180,27 +206,27 @@ export function usePigSystem() {
    */
   function getPigState(todayExpense, dailyBudget) {
     if (dailyBudget <= 0) {
-      return PIG_LEVELS[6] // 기본: 위험 단계
+      return PIG_LEVELS[6]; // 기본: 위험 단계
     }
 
-    const ratio = (todayExpense / dailyBudget) * 100
+    const ratio = (todayExpense / dailyBudget) * 100;
 
-    const state = PIG_LEVELS.find((p) => ratio <= p.maxRatio) || PIG_LEVELS[9]
-    return { ...state, ratio: Math.round(ratio) }
+    const state = PIG_LEVELS.find((p) => ratio <= p.maxRatio) || PIG_LEVELS[9];
+    return { ...state, ratio: Math.round(ratio) };
   }
 
   /**
    * 레벨 번호로 돼지 상태 직접 가져오기
    */
   function getPigStateByLevel(level) {
-    return PIG_LEVELS.find((p) => p.level === level) || PIG_LEVELS[6]
+    return PIG_LEVELS.find((p) => p.level === level) || PIG_LEVELS[6];
   }
 
   /**
    * 집 레벨 정보 가져오기
    */
   function getHouseInfo(level) {
-    return HOUSE_LEVELS.find((h) => h.level === level) || HOUSE_LEVELS[0]
+    return HOUSE_LEVELS.find((h) => h.level === level) || HOUSE_LEVELS[0];
   }
 
   /**
@@ -210,27 +236,27 @@ export function usePigSystem() {
    */
   function calcNextHouseLevel(avgRatio, currentHouseLevel) {
     if (avgRatio <= 100 && currentHouseLevel < 5) {
-      return currentHouseLevel + 1
+      return currentHouseLevel + 1;
     }
     if (avgRatio > 150 && currentHouseLevel > 1) {
-      return currentHouseLevel - 1
+      return currentHouseLevel - 1;
     }
-    return currentHouseLevel
+    return currentHouseLevel;
   }
 
   /**
    * 숫자를 원화 형식으로 포맷
    */
   function formatCurrency(amount) {
-    return new Intl.NumberFormat('ko-KR').format(amount) + '원'
+    return new Intl.NumberFormat('ko-KR').format(amount) + '원';
   }
 
   /**
    * 날짜 포맷 (YYYY-MM-DD → MM월 DD일)
    */
   function formatDate(dateStr) {
-    const [, month, day] = dateStr.split('-')
-    return `${parseInt(month)}월 ${parseInt(day)}일`
+    const [, month, day] = dateStr.split('-');
+    return `${parseInt(month)}월 ${parseInt(day)}일`;
   }
 
   /**
@@ -241,45 +267,46 @@ export function usePigSystem() {
    * @returns {object} 캐릭터 정보
    */
   function getCharacterStage(monthlyExpense, dailyBudget, selectedMonth) {
-    if (!dailyBudget || dailyBudget <= 0) return null
+    if (!dailyBudget || dailyBudget <= 0) return null;
 
-    const [year, month] = selectedMonth.split('-').map(Number)
-    const totalDays = new Date(year, month, 0).getDate()
-    const today = new Date()
+    const [year, month] = selectedMonth.split('-').map(Number);
+    const totalDays = new Date(year, month, 0).getDate();
+    const today = new Date();
     const isCurrentMonth =
-      today.getFullYear() === year && today.getMonth() + 1 === month
-    const elapsedDays = isCurrentMonth ? today.getDate() : totalDays
+      today.getFullYear() === year && today.getMonth() + 1 === month;
+    const elapsedDays = isCurrentMonth ? today.getDate() : totalDays;
 
-    const monthlyBudget = dailyBudget * totalDays
-    const spendRatio = monthlyExpense / monthlyBudget
-    const elapsedRatio = elapsedDays / totalDays
+    const monthlyBudget = dailyBudget * totalDays;
+    const spendRatio = monthlyExpense / monthlyBudget;
+    const elapsedRatio = elapsedDays / totalDays;
 
-    const pace = elapsedRatio > 0 ? spendRatio / elapsedRatio : 0
+    const pace = elapsedRatio > 0 ? spendRatio / elapsedRatio : 0;
 
-    const stage = CHARACTER_STAGES.find((c) => pace <= c.maxPace) || CHARACTER_STAGES[4]
-    return { ...stage, pace: Math.round(pace * 100) / 100 }
+    const stage =
+      CHARACTER_STAGES.find((c) => pace <= c.maxPace) || CHARACTER_STAGES[4];
+    return { ...stage, pace: Math.round(pace * 100) / 100 };
   }
 
   // 돼지 레벨별 귀여운 멘트
   const PIG_MESSAGES = {
     10: '꿀꿀~ 나 요즘 너무 행복해!\n밥도 많이 먹고 살도 찌고\n이게 바로 황금 돼지야!',
-    9:  '꿀꿀! 오늘도 든든해~\n이 기세라면 곧 황금이 될 거야!',
-    8:  '음냐~ 배불러.\n요즘 잘 먹고 잘 살고 있어!',
-    7:  '꿀꿀... 평범하게 살고 있어.\n그냥 그런 하루야.',
-    6:  '흠... 요즘 좀 걱정돼.\n밥은 먹고 있는데 뭔가 불안해.',
-    5:  '꿀꿀... 배가 좀 고픈 것 같기도 하고.\n지갑이 얇아지는 느낌이야...',
-    4:  '으으... 요즘 힘들어.\n밥을 줄여야 하나 봐.',
-    3:  '꿀꿀... 갈비뼈가 보여.\n나 지금 많이 힘들거든?',
-    2:  '살려줘... 너무 배고파.\n이러다가 진짜 쓰러질 것 같아...',
-    1:  '...\n나... 이제 삼겹살이 되는 건가.',
-  }
+    9: '꿀꿀! 오늘도 든든해~\n이 기세라면 곧 황금이 될 거야!',
+    8: '음냐~ 배불러.\n요즘 잘 먹고 잘 살고 있어!',
+    7: '꿀꿀... 평범하게 살고 있어.\n그냥 그런 하루야.',
+    6: '흠... 요즘 좀 걱정돼.\n밥은 먹고 있는데 뭔가 불안해.',
+    5: '꿀꿀... 배가 좀 고픈 것 같기도 하고.\n지갑이 얇아지는 느낌이야...',
+    4: '으으... 요즘 힘들어.\n밥을 줄여야 하나 봐.',
+    3: '꿀꿀... 갈비뼈가 보여.\n나 지금 많이 힘들거든?',
+    2: '살려줘... 너무 배고파.\n이러다가 진짜 쓰러질 것 같아...',
+    1: '...\n나... 이제 삼겹살이 되는 건가.',
+  };
 
   /**
    * 돼지 클릭 시 레벨별 귀여운 멘트 반환
    * @param {number} level - 돼지 레벨 (1~10)
    */
   function getPigMessage(level) {
-    return PIG_MESSAGES[level] ?? PIG_MESSAGES[5]
+    return PIG_MESSAGES[level] ?? PIG_MESSAGES[5];
   }
 
   /**
@@ -289,28 +316,34 @@ export function usePigSystem() {
    * @param {string} currentMonth - 'YYYY-MM'
    */
   function getCharacterGuideMessage(monthlyExpense, dailyBudget, currentMonth) {
-    if (!dailyBudget || dailyBudget <= 0) return '예산을 설정하면\n가이드를 드릴게요!'
+    if (!dailyBudget || dailyBudget <= 0)
+      return '예산을 설정하면\n가이드를 드릴게요!';
 
-    const character = getCharacterStage(monthlyExpense, dailyBudget, currentMonth)
-    if (!character) return '데이터가 없어요.'
+    const character = getCharacterStage(
+      monthlyExpense,
+      dailyBudget,
+      currentMonth,
+    );
+    if (!character) return '데이터가 없어요.';
 
-    const [year, month] = currentMonth.split('-').map(Number)
-    const totalDays = new Date(year, month, 0).getDate()
-    const today = new Date()
-    const remainDays = totalDays - today.getDate()
-    const monthlyBudget = dailyBudget * totalDays
-    const remainBudget = monthlyBudget - monthlyExpense
-    const recommendPerDay = remainDays > 0 ? Math.floor(remainBudget / remainDays) : 0
+    const [year, month] = currentMonth.split('-').map(Number);
+    const totalDays = new Date(year, month, 0).getDate();
+    const today = new Date();
+    const remainDays = totalDays - today.getDate();
+    const monthlyBudget = dailyBudget * totalDays;
+    const remainBudget = monthlyBudget - monthlyExpense;
+    const recommendPerDay =
+      remainDays > 0 ? Math.floor(remainBudget / remainDays) : 0;
 
-    const fmt = (n) => new Intl.NumberFormat('ko-KR').format(n)
+    const fmt = (n) => new Intl.NumberFormat('ko-KR').format(n);
 
     const stageGuides = {
       good: `지금 페이스면 이번 달\n예산 안에서 끝낼 수 있어요!`,
       neutral: `조금만 더 아끼면\n다음 달 집이 업그레이드돼요.`,
       bad: `지출 속도가 너무 빨라요!\n하루 ${fmt(Math.max(recommendPerDay, 0))}원 이하로 줄여야 해요.`,
-    }
+    };
 
-    return `${character.name}\n페이스: ${character.pace}x\n\n${stageGuides[character.effect]}`
+    return `${character.name}\n페이스: ${character.pace}x\n\n${stageGuides[character.effect]}`;
   }
 
   return {
@@ -326,5 +359,5 @@ export function usePigSystem() {
     getCharacterStage,
     getPigMessage,
     getCharacterGuideMessage,
-  }
+  };
 }

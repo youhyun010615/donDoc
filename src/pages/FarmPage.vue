@@ -665,7 +665,7 @@ onMounted(fetchFarms);
 
 .member-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
 }
 
@@ -811,9 +811,4 @@ onMounted(fetchFarms);
   cursor: not-allowed;
 }
 
-@media (min-width: 430px) {
-  .member-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
 </style>
