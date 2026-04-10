@@ -251,46 +251,6 @@
         "In7Wtca",
         "OR6-VGL"
       ]
-    },
-    {
-      "name": "121",
-      "members": [
-        "OR6-VGL"
-      ],
-      "id": "3Uu4bcv"
-    },
-    {
-      "name": "123",
-      "members": [
-        "OR6-VGL"
-      ],
-      "id": "HAOFu41"
-    },
-    {
-      "name": "asdjfjlkasdjfasdf",
-      "members": [
-        "OR6-VGL"
-      ],
-      "id": "gHoJt_t"
-    },
-    {
-      "name": "fasdfasdfasdfasdfadsf",
-      "members": [],
-      "id": "QJb5FGg"
-    },
-    {
-      "name": "동물농장 33",
-      "members": [
-        "OR6-VGL"
-      ],
-      "id": "vRSAc36"
-    },
-    {
-      "name": "동물농장",
-      "members": [
-        "OR6-VGL"
-      ],
-      "id": "Rc9WrM2"
     }
   ],
   "incomeCategories": [
@@ -565,6 +525,73 @@
       "newHouseLevel": 2,
       "totalExpense": 720000,
       "completedAt": "2026-04-01"
+    }
+  ],
+  "farmIn": [
+    {
+      "id": "fi_1_U7NsIRb",
+      "targetFarm": "1",
+      "userId": "U7NsIRb"
+    },
+    {
+      "id": "fi_1_va7Y6YP",
+      "targetFarm": "1",
+      "userId": "va7Y6YP"
+    },
+    {
+      "id": "fi_1_6Iv3rs-",
+      "targetFarm": "1",
+      "userId": "6Iv3rs-"
+    },
+    {
+      "id": "fi_1_Iei1Jl0",
+      "targetFarm": "1",
+      "userId": "Iei1Jl0"
+    },
+    {
+      "id": "fi_1_QY0rFN9",
+      "targetFarm": "1",
+      "userId": "QY0rFN9"
+    },
+    {
+      "id": "fi_1_G7fiAn9",
+      "targetFarm": "1",
+      "userId": "G7fiAn9"
+    },
+    {
+      "id": "fi_1__G5xPRW",
+      "targetFarm": "1",
+      "userId": "_G5xPRW"
+    },
+    {
+      "id": "fi_1_0ZyZhxg",
+      "targetFarm": "1",
+      "userId": "0ZyZhxg"
+    },
+    {
+      "id": "fi_1_5tMAGqb",
+      "targetFarm": "1",
+      "userId": "5tMAGqb"
+    },
+    {
+      "id": "fi_1_xKcQF8o",
+      "targetFarm": "1",
+      "userId": "xKcQF8o"
+    },
+    {
+      "id": "fi_1_Fy1kG2A",
+      "targetFarm": "1",
+      "userId": "Fy1kG2A"
+    },
+    {
+      "id": "fi_1_In7Wtca",
+      "targetFarm": "1",
+      "userId": "In7Wtca"
+    },
+    {
+      "id": "fi_1_OR6-VGL",
+      "targetFarm": "1",
+      "userId": "OR6-VGL"
     }
   ]
 }

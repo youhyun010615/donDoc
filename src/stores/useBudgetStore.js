@@ -235,7 +235,14 @@ export const useBudgetStore = defineStore('budget', () => {
   async function updateRecord(id, updatedRecord) {
     try {
       loading.value = true;
-      const res = await axios.put(`${API_BASE}/records/${id}`, updatedRecord);
+      const currentRes = await axios.get(`${API_BASE}/records/${id}`);
+      const merged = {
+        ...(currentRes.data ?? {}),
+        ...updatedRecord,
+        id,
+      };
+      await axios.delete(`${API_BASE}/records/${id}`);
+      const res = await axios.post(`${API_BASE}/records`, merged);
       const idx = records.value.findIndex((r) => r.id === id);
       if (idx !== -1) records.value[idx] = res.data;
       await settleProfileState();
