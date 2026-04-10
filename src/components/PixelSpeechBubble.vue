@@ -108,23 +108,6 @@ onUnmounted(() => clearInterval(timer))
   padding-right: 12px;
   white-space: pre-wrap;
   word-break: keep-all;
-  max-height: 90px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #90caf9 transparent;
-}
-
-.bubble-text::-webkit-scrollbar {
-  width: 4px;
-}
-
-.bubble-text::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.bubble-text::-webkit-scrollbar-thumb {
-  background: #90caf9;
-  border-radius: 2px;
 }
 
 /* 커서 깜빡임 */

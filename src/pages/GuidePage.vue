@@ -5,18 +5,26 @@ import { useAuthStore } from '../stores/useAuthStore.js';
 import { usePigSystem } from '../composables/usePigSystem.js';
 import PigPixelArt from '../components/PigPixelArt.vue';
 import PigBackground from '../components/PigBackground.vue';
+import PixelIcon from '../components/PixelIcon.vue';
 
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
-const { PIG_LEVELS, HOUSE_LEVELS } = usePigSystem();
+const { PIG_LEVELS, HOUSE_LEVELS, CHARACTER_STAGES } = usePigSystem();
 
 const activeTab = ref('pig');
 const topAnchor = ref(null);
 const bottomAnchor = ref(null);
 
-const pigLevels = computed(() => [...PIG_LEVELS].sort((a, b) => b.level - a.level));
-const houseLevels = computed(() => [...HOUSE_LEVELS].sort((a, b) => a.level - b.level));
+const pigLevels = computed(() =>
+  [...PIG_LEVELS].sort((a, b) => b.level - a.level),
+);
+const houseLevels = computed(() =>
+  [...HOUSE_LEVELS].sort((a, b) => a.level - b.level),
+);
+const characterStages = computed(() =>
+  [...CHARACTER_STAGES].sort((a, b) => a.stage - b.stage),
+);
 const isFromLogin = computed(() => route.query.source === 'login');
 
 function getPigRangeLabel(index) {
@@ -31,6 +39,24 @@ function getPigRangeLabel(index) {
     return `0~${current.maxRatio}%`;
   }
   return `${previous.maxRatio}~${current.maxRatio}%`;
+}
+
+function getCharacterRangeLabel(index) {
+  const current = characterStages.value[index];
+  const next = characterStages.value[index + 1];
+  const previous = characterStages.value[index - 1];
+
+  if (!current) return '';
+  if (current.maxPace === Infinity) {
+    return previous ? `${previous.maxPace}x+` : '1.4x 초과';
+  }
+  if (current.stage === 5) {
+    return `${current.maxPace}x 이하`;
+  }
+  if (!previous) {
+    return `0~${current.maxPace}x`;
+  }
+  return `${next.maxPace}x~${current.maxPace}x`;
 }
 
 function goNext() {
@@ -87,6 +113,14 @@ function scrollToBottom() {
       <button
         type="button"
         class="tab-btn"
+        :class="{ active: activeTab === 'character' }"
+        @click="activeTab = 'character'"
+      >
+        감독관 가이드
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
         :class="{ active: activeTab === 'house' }"
         @click="activeTab = 'house'"
       >
@@ -126,10 +160,71 @@ function scrollToBottom() {
       </div>
     </section>
 
+    <section v-else-if="activeTab === 'character'" class="guide-section">
+      <div class="section-head">
+        <h2>감독관 5단계</h2>
+        <p>
+          이번 달 소비 페이스가 예산 대비 어느 정도인지에 따라 감독관이
+          달라져요.
+        </p>
+      </div>
+
+      <div class="character-grid">
+        <article
+          v-for="(character, index) in characterStages"
+          :key="character.stage"
+          class="character-card"
+          :class="character.effect"
+        >
+          <div class="character-visual">
+            <img
+              :src="character.image"
+              :alt="character.name"
+              class="character-art"
+            />
+          </div>
+          <div class="character-copy">
+            <div class="character-topline">
+              <span class="character-stage">STEP {{ character.stage }}</span>
+              <span class="character-range">{{
+                getCharacterRangeLabel(index)
+              }}</span>
+            </div>
+            <strong class="character-name">{{ character.name }}</strong>
+            <p class="character-message">{{ character.message }}</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
     <section v-else class="guide-section">
       <div class="section-head">
         <h2>집 성장 5단계</h2>
         <p>월 평균 소비를 안정적으로 관리하면 집도 점점 좋아져요.</p>
+      </div>
+
+      <div class="house-rule-card">
+        <div class="house-rule-row upgrade">
+          <span class="rule-label">업그레이드</span>
+          <span class="rule-range">100% 이하</span>
+          <span class="rule-desc"
+            >이번 달 소비가 예산 안이면 다음 집 단계로 올라가요.</span
+          >
+        </div>
+        <div class="house-rule-row maintain">
+          <span class="rule-label">유지</span>
+          <span class="rule-range">100% 초과 ~ 130% 이하</span>
+          <span class="rule-desc"
+            >예산을 조금 넘겨도 현재 집 단계는 유지돼요.</span
+          >
+        </div>
+        <div class="house-rule-row downgrade">
+          <span class="rule-label">다운그레이드</span>
+          <span class="rule-range">130% 초과</span>
+          <span class="rule-desc"
+            >소비가 많이 커지면 집 단계가 한 단계 내려가요.</span
+          >
+        </div>
       </div>
 
       <div class="house-list">
@@ -142,12 +237,11 @@ function scrollToBottom() {
             <PigBackground :house-level="house.level" class="house-bg" />
             <div class="house-overlay">
               <span class="house-level">STEP {{ house.level }}</span>
-              <span class="house-emoji">{{ house.emoji }}</span>
+              <PixelIcon :icon="house.emoji" size="1.8rem" class="house-icon" />
             </div>
           </div>
           <div class="house-copy">
             <strong>{{ house.name }}</strong>
-            <p>{{ house.description }}</p>
           </div>
         </article>
       </div>
@@ -241,10 +335,9 @@ function scrollToBottom() {
 .guide-tabs {
   padding: 0.55rem;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 0.5rem;
-  background:
-    linear-gradient(180deg, #fff8fb 0%, #fff 100%);
+  background: linear-gradient(180deg, #fff8fb 0%, #fff 100%);
 }
 
 .tab-btn {
@@ -368,6 +461,147 @@ function scrollToBottom() {
   gap: 0.85rem;
 }
 
+.house-rule-card {
+  display: grid;
+  gap: 0.65rem;
+  margin-bottom: 0.95rem;
+}
+
+.house-rule-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  border-radius: 16px;
+  padding: 0.85rem 0.95rem;
+  border: 1.5px solid var(--border);
+  background: #fff;
+}
+
+.house-rule-row.upgrade {
+  background: linear-gradient(180deg, #f6fff7 0%, #ffffff 100%);
+  border-color: #b9dfc2;
+}
+
+.house-rule-row.maintain {
+  background: linear-gradient(180deg, #fffdf7 0%, #ffffff 100%);
+  border-color: #ead8ac;
+}
+
+.house-rule-row.downgrade {
+  background: linear-gradient(180deg, #fff7f5 0%, #ffffff 100%);
+  border-color: #f0c1b8;
+}
+
+.rule-label {
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.rule-range {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  background: rgba(0, 0, 0, 0.06);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.rule-desc {
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.character-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.character-card {
+  border: 1.5px solid var(--border);
+  border-radius: 18px;
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: #fff;
+}
+
+.character-card.good {
+  background: linear-gradient(180deg, #f6fff7 0%, #ffffff 100%);
+  border-color: #b9dfc2;
+}
+
+.character-card.neutral {
+  background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
+  border-color: #d9d9d9;
+}
+
+.character-card.bad {
+  background: linear-gradient(180deg, #fff7f5 0%, #ffffff 100%);
+  border-color: #f0c1b8;
+}
+
+.character-visual {
+  min-height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 14px;
+}
+
+.character-art {
+  width: min(110px, 52%);
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.character-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.character-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.character-stage {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: #6d4c41;
+  color: #fff;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.character-range {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #6d4c41;
+}
+
+.character-name {
+  font-size: 0.92rem;
+}
+
+.character-message {
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
 .house-card {
   border: 1.5px solid var(--border);
   border-radius: 18px;
@@ -406,9 +640,8 @@ function scrollToBottom() {
   color: #795548;
 }
 
-.house-emoji {
+.house-icon {
   align-self: flex-end;
-  font-size: 2rem;
 }
 
 .house-copy {
@@ -418,14 +651,6 @@ function scrollToBottom() {
 .house-copy strong {
   display: block;
   font-size: 0.95rem;
-  margin-bottom: 0.25rem;
-}
-
-.house-copy p {
-  margin: 0;
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  line-height: 1.5;
 }
 
 .scroll-fab-group {
@@ -464,8 +689,9 @@ function scrollToBottom() {
     grid-template-columns: 1fr;
   }
 
-  .pig-grid {
+  .house-rule-row {
     grid-template-columns: 1fr;
+    align-items: flex-start;
   }
 
   .scroll-fab-group {

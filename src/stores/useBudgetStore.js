@@ -4,7 +4,7 @@ import axios from 'axios';
 import { usePigSystem } from '../composables/usePigSystem.js';
 import { useAuthStore } from './useAuthStore.js';
 
-const API_BASE = 'http://localhost:3000';
+const API_BASE = import.meta.env.VITE_API_BASE;
 const INITIAL_HOUSE_LEVEL = 3;
 
 export const useBudgetStore = defineStore('budget', () => {
