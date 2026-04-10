@@ -7,11 +7,16 @@ import { usePigSystem } from '../composables/usePigSystem.js';
 import PigPixelArt from '../components/PigPixelArt.vue';
 import PigBackground from '../components/PigBackground.vue';
 import PixelIcon from '../components/PixelIcon.vue';
+import CharacterBadge from '../components/CharacterBadge.vue';
 
 const store = useBudgetStore();
 const authStore = useAuthStore();
 const router = useRouter();
-const { getPigState, getHouseInfo, formatCurrency } = usePigSystem();
+const { getPigState, getHouseInfo, formatCurrency, getCharacterStage } = usePigSystem();
+
+const character = computed(() =>
+  getCharacterStage(store.totalExpenseThisMonth, store.dailyBudget, store.currentMonth),
+);
 
 const pigState = computed(() => getPigState(store.todayExpense, store.dailyBudget));
 
@@ -126,6 +131,12 @@ const todayRecordsSorted = computed(() =>
             class="pig-bg-layer"
           />
           <PigPixelArt :level="pigState.level" class="pig-pixel" />
+          <img
+            v-if="character"
+            :src="character.image"
+            :alt="character.name"
+            class="character-overlay"
+          />
         </div>
 
         <p class="pig-message">{{ pigState.message }}</p>
@@ -163,6 +174,8 @@ const todayRecordsSorted = computed(() =>
           <p class="s-value">-{{ formatCurrency(store.totalExpenseThisMonth) }}</p>
         </div>
       </div>
+
+      <CharacterBadge :selected-month="store.currentMonth" />
 
       <div class="card">
         <div class="card-header">
