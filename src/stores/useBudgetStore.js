@@ -4,11 +4,11 @@ import axios from 'axios';
 import { usePigSystem } from '../composables/usePigSystem.js';
 import { useAuthStore } from './useAuthStore.js';
 
-const API_BASE = 'http://localhost:3000';
+const API_BASE = import.meta.env.VITE_API_BASE;
 const INITIAL_HOUSE_LEVEL = 3;
 
 export const useBudgetStore = defineStore('budget', () => {
-  const { calcNextHouseLevel } = usePigSystem();
+  const { calcNextHouseLevel, getPigState } = usePigSystem();
   const authStore = useAuthStore();
 
   // --- State ---
@@ -135,6 +135,14 @@ export const useBudgetStore = defineStore('budget', () => {
     return level;
   }
 
+  function calculateCurrentPigLevel() {
+    if (!authStore.currentUser || dailyBudget.value <= 0) {
+      return authStore.currentUser?.currentPigLevel ?? 5;
+    }
+
+    return getPigState(todayExpense.value, dailyBudget.value).level;
+  }
+
   async function settleHouseLevelForCurrentMonth() {
     if (!authStore.currentUser) return;
 
@@ -148,6 +156,26 @@ export const useBudgetStore = defineStore('budget', () => {
         console.error('월간 houseLevel 정산 실패', e);
       }
     }
+  }
+
+  async function settleCurrentPigLevel() {
+    if (!authStore.currentUser) return;
+
+    const calculatedPigLevel = calculateCurrentPigLevel();
+    const currentPigLevel = authStore.currentUser.currentPigLevel ?? 5;
+
+    if (currentPigLevel !== calculatedPigLevel) {
+      try {
+        await authStore.updateProfile({ currentPigLevel: calculatedPigLevel });
+      } catch (e) {
+        console.error('현재 currentPigLevel 정산 실패', e);
+      }
+    }
+  }
+
+  async function settleProfileState() {
+    await settleHouseLevelForCurrentMonth();
+    await settleCurrentPigLevel();
   }
 
   // --- Actions ---
@@ -193,7 +221,7 @@ export const useBudgetStore = defineStore('budget', () => {
       records.value = [res.data, ...records.value].sort((a, b) =>
         b.date.localeCompare(a.date),
       );
-      await settleHouseLevelForCurrentMonth();
+      await settleProfileState();
       return res.data;
     } catch (e) {
       error.value = '거래 추가 실패';
@@ -210,7 +238,7 @@ export const useBudgetStore = defineStore('budget', () => {
       const res = await axios.put(`${API_BASE}/records/${id}`, updatedRecord);
       const idx = records.value.findIndex((r) => r.id === id);
       if (idx !== -1) records.value[idx] = res.data;
-      await settleHouseLevelForCurrentMonth();
+      await settleProfileState();
       return res.data;
     } catch (e) {
       error.value = '거래 수정 실패';
@@ -226,7 +254,7 @@ export const useBudgetStore = defineStore('budget', () => {
       loading.value = true;
       await axios.delete(`${API_BASE}/records/${id}`);
       records.value = records.value.filter((r) => r.id !== id);
-      await settleHouseLevelForCurrentMonth();
+      await settleProfileState();
     } catch (e) {
       error.value = '거래 삭제 실패';
       console.error(e);
@@ -245,7 +273,7 @@ export const useBudgetStore = defineStore('budget', () => {
         fetchExpenseCategories(),
         fetchRecords(),
       ]);
-      await settleHouseLevelForCurrentMonth();
+      await settleProfileState();
     } finally {
       loading.value = false;
     }
@@ -278,6 +306,8 @@ export const useBudgetStore = defineStore('budget', () => {
     dailyBudget,
     allCategories,
     settleHouseLevelForCurrentMonth,
+    settleCurrentPigLevel,
+    settleProfileState,
     // actions
     fetchIncomeCategories,
     fetchExpenseCategories,

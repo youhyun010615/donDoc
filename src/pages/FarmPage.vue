@@ -1,62 +1,155 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue';
-import { useBudgetStore } from '../stores/useBudgetStore.js';
+import axios from 'axios';
 import { useAuthStore } from '../stores/useAuthStore.js';
+import { usePigSystem } from '../composables/usePigSystem.js';
 import PigPixelArt from '../components/PigPixelArt.vue';
 import PigBackground from '../components/PigBackground.vue';
-import axios from 'axios';
 import PixelIcon from '../components/PixelIcon.vue';
+import farmImage from '../assets/farm.jpeg';
+import farmThumb1 from '../assets/farms/farm-thumb-1.svg';
+import farmThumb2 from '../assets/farms/farm-thumb-2.svg';
+import farmThumb3 from '../assets/farms/farm-thumb-3.svg';
+import farmThumb4 from '../assets/farms/farm-thumb-4.svg';
+import farmThumb5 from '../assets/farms/farm-thumb-5.svg';
 
-const store = useBudgetStore();
 const authStore = useAuthStore();
+const { getHouseInfo, getPigState } = usePigSystem();
+const API_BASE = 'http://localhost:3000';
 
 const selectedFarmId = ref(null);
-const isLoading = ref(true);
-
-const farms = ref({});
-const farmsMine = ref({});
-const farmsNotMine = ref({});
-
-onMounted(async () => {
-  const farmsRes = await authStore.fetchAllFarms();
-  farms.value = farmsRes;
-
-  farmsMine.value = farms.value.filter((farm) =>
-    authStore.currentUser.farm.includes(farm.id),
-  );
-  farmsNotMine.value = farms.value.filter(
-    (farm) => !authStore.currentUser.farm.includes(farm.id),
-  );
-
-  isLoading.value = false;
-});
-
-const selectedFarm = computed(() => {
-  if (isLoading.value) return null;
-
-  return farms.value.find((farm) => farm.id === selectedFarmId.value) ?? null;
-});
-
+const farms = ref([]);
 const farmMembers = ref([]);
+const isLoading = ref(true);
+const isMemberLoading = ref(false);
+const errorMessage = ref('');
+const memberPigLevelById = ref({});
+const showCreateModal = ref(false);
+const newFarmName = ref('');
 
-const isMyFarm = ref(false);
+const farmList = computed(() =>
+  Array.isArray(farms.value) ? farms.value : [],
+);
+const myFarmIds = computed(() =>
+  Array.isArray(authStore.currentUser?.farm) ? authStore.currentUser.farm : [],
+);
+const farmsMine = computed(() =>
+  farmList.value.filter((farm) => myFarmIds.value.includes(farm.id)),
+);
+const farmsNotMine = computed(() =>
+  farmList.value.filter((farm) => !myFarmIds.value.includes(farm.id)),
+);
+
+const selectedFarm = computed(
+  () => farmList.value.find((farm) => farm.id === selectedFarmId.value) ?? null,
+);
+const isMyFarm = computed(
+  () => !!selectedFarm.value && myFarmIds.value.includes(selectedFarm.value.id),
+);
+
+const FARM_THUMBS = [
+  farmThumb1,
+  farmThumb2,
+  farmThumb3,
+  farmThumb4,
+  farmThumb5,
+];
+
+function getHouseIconByLevel(level) {
+  const houseLevel = Number(level) || 3;
+  if (houseLevel <= 1) return 'house_rock';
+  if (houseLevel === 2) return 'house_hut';
+  if (houseLevel === 3) return 'house_home';
+  if (houseLevel === 4) return 'house_villa';
+  return 'house_castle';
+}
+
+function getPigLevel(level) {
+  const parsed = Number(level);
+  return Number.isFinite(parsed) ? Math.min(Math.max(parsed, 1), 10) : 5;
+}
+
+function resolveMemberPigLevel(member) {
+  const calculatedLevel = memberPigLevelById.value[String(member.id)];
+  if (Number.isFinite(calculatedLevel)) return getPigLevel(calculatedLevel);
+  return getPigLevel(member.currentPigLevel);
+}
+
+function getFarmCardImage(farmId) {
+  const numberPart = Number(String(farmId).replace(/\D/g, ''));
+  const fallbackSeed = String(farmId)
+    .split('')
+    .reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+  const seed =
+    Number.isFinite(numberPart) && numberPart > 0 ? numberPart : fallbackSeed;
+  return FARM_THUMBS[seed % FARM_THUMBS.length];
+}
+
+async function fetchFarms() {
+  isLoading.value = true;
+  errorMessage.value = '';
+  try {
+    const farmRes = await axios.get(`${API_BASE}/farm`);
+    farms.value = Array.isArray(farmRes.data) ? farmRes.data : [];
+  } catch (error) {
+    errorMessage.value = '농장 목록을 불러오지 못했어요.';
+  } finally {
+    isLoading.value = false;
+  }
+}
 
 async function openFarm(farmId) {
   selectedFarmId.value = farmId;
+  isMemberLoading.value = true;
+  try {
+    const farm = farmList.value.find((item) => item.id === farmId);
+    const memberIds = Array.isArray(farm?.members)
+      ? farm.members.filter(Boolean)
+      : [];
+    const [members, recordsRes] = await Promise.all([
+      authStore.fetchFarmMembers(memberIds),
+      axios.get(`${API_BASE}/records`),
+    ]);
 
-  if (farmsMine.value.find((f) => f.id === farmId)) isMyFarm.value = true;
-  else isMyFarm.value = false;
+    const sortedMembers = (Array.isArray(members) ? members : []).sort((a, b) =>
+      String(a.userName ?? '').localeCompare(String(b.userName ?? ''), 'ko'),
+    );
 
-  const farm = farms.value.find((f) => f.id === farmId);
-  farmMembers.value = await authStore.fetchFarmMembers(farm.members);
+    const records = Array.isArray(recordsRes.data) ? recordsRes.data : [];
+    const today = new Date().toISOString().slice(0, 10);
+    const nextPigLevels = {};
+
+    sortedMembers.forEach((member) => {
+      const memberId = String(member.id);
+      const todayExpense = records
+        .filter(
+          (record) =>
+            String(record.userId) === memberId &&
+            record.type === 'expense' &&
+            record.date === today,
+        )
+        .reduce((sum, record) => sum + Number(record.amount || 0), 0);
+
+      const monthlyIncome = Number(member.monthlyIncome || 0);
+      const targetExpenseRatio = Number(member.targetExpenseRatio || 0);
+      const monthlyBudget = (monthlyIncome * targetExpenseRatio) / 100;
+      const dailyBudget = Math.round(monthlyBudget / 30);
+
+      nextPigLevels[memberId] = getPigState(todayExpense, dailyBudget).level;
+    });
+
+    farmMembers.value = sortedMembers;
+    memberPigLevelById.value = nextPigLevels;
+  } finally {
+    isMemberLoading.value = false;
+  }
 }
 
 function closeFarm() {
   selectedFarmId.value = null;
+  farmMembers.value = [];
+  memberPigLevelById.value = {};
 }
-
-const showCreateModal = ref(false);
-const newFarmName = ref('');
 
 function openCreateModal() {
   newFarmName.value = '';
@@ -68,50 +161,65 @@ function closeCreateModal() {
 }
 
 async function submitCreateModal() {
-  showCreateModal.value = false;
-  const createdFarm = await authStore.createFarm(newFarmName.value);
-  await authStore.updateProfile({
-    farm: [...authStore.currentUser.farm, createdFarm.id],
+  const farmName = newFarmName.value.trim();
+  if (!farmName || !authStore.currentUser) return;
+
+  const createdFarmRes = await axios.post(`${API_BASE}/farm`, {
+    name: farmName,
+    members: [authStore.currentUser.id],
   });
-  farms.value = await authStore.fetchAllFarms();
-  farmsMine.value = farms.value.filter((farm) =>
-    authStore.currentUser.farm.includes(farm.id),
+
+  const nextFarmIds = Array.from(
+    new Set([...myFarmIds.value, createdFarmRes.data.id]),
   );
+  await authStore.updateProfile({ farm: nextFarmIds });
+
+  showCreateModal.value = false;
+  await fetchFarms();
 }
 
 async function enterFarm() {
-  await authStore.updateProfile({
-    farm: [...authStore.currentUser.farm, selectedFarm.value.id],
-  });
-  await authStore.registerCurrentUsertoFarm(selectedFarm.value);
-  selectedFarmId.value = false;
+  if (!selectedFarm.value || !authStore.currentUser || isMyFarm.value) return;
 
-  farms.value = await authStore.fetchAllFarms();
-  farmsMine.value = farms.value.filter((farm) =>
-    authStore.currentUser.farm.includes(farm.id),
+  const nextFarmIds = Array.from(
+    new Set([...myFarmIds.value, selectedFarm.value.id]),
   );
-  farmsNotMine.value = farms.value.filter(
-    (farm) => !authStore.currentUser.farm.includes(farm.id),
+  await authStore.updateProfile({ farm: nextFarmIds });
+
+  const nextMembers = Array.from(
+    new Set([
+      ...(selectedFarm.value.members ?? []).filter(Boolean),
+      authStore.currentUser.id,
+    ]),
   );
+  await axios.patch(`${API_BASE}/farm/${selectedFarm.value.id}`, {
+    members: nextMembers,
+  });
+
+  await fetchFarms();
+  await openFarm(selectedFarm.value.id);
 }
 
 async function exitFarm() {
-  await authStore.updateProfile({
-    farm: authStore.currentUser.farm.filter(
-      (id) => id !== selectedFarm.value.id,
-    ),
-  });
-  await authStore.unregisterCurrentUserFromFarm(selectedFarm.value);
-  selectedFarmId.value = false;
+  if (!selectedFarm.value || !authStore.currentUser || !isMyFarm.value) return;
 
-  farms.value = await authStore.fetchAllFarms();
-  farmsMine.value = farms.value.filter((farm) =>
-    authStore.currentUser.farm.includes(farm.id),
+  const nextFarmIds = myFarmIds.value.filter(
+    (id) => id !== selectedFarm.value.id,
   );
-  farmsNotMine.value = farms.value.filter(
-    (farm) => !authStore.currentUser.farm.includes(farm.id),
+  await authStore.updateProfile({ farm: nextFarmIds });
+
+  const nextMembers = (selectedFarm.value.members ?? []).filter(
+    (memberId) => String(memberId) !== String(authStore.currentUser.id),
   );
+  await axios.patch(`${API_BASE}/farm/${selectedFarm.value.id}`, {
+    members: nextMembers,
+  });
+
+  closeFarm();
+  await fetchFarms();
 }
+
+onMounted(fetchFarms);
 </script>
 
 <template>
@@ -119,69 +227,201 @@ async function exitFarm() {
     <header class="page-header">
       <h1 class="page-title">
         <PixelIcon icon="nav_farm" size="1.3rem" />
-        <span> 농장</span>
+        <span>농장</span>
       </h1>
       <p class="page-subtitle">
         다른 유저 농장을 둘러보고 성장 상태를 확인해요
       </p>
     </header>
 
-    <button v-if="!selectedFarm" @click="openCreateModal">농장 만들기</button>
-    <div v-if="showCreateModal || !selectedFarm" @click.self="closeCreateModal">
-      <div>
-        <h3>농장 만들기</h3>
-        <input
-          type="text"
-          v-model="newFarmName"
-          placeholder="농장 이름을 입력하세요"
-        />
-      </div>
-      <div>
-        <button @click="closeCreateModal">취소</button>
-        <button :disabled="!newFarmName.trim()" @click="submitCreateModal">
-          만들기
-        </button>
-      </div>
+    <div class="farm-hero">
+      <img :src="farmImage" alt="농장" class="farm-hero-image" />
     </div>
 
-    <section v-if="!selectedFarm">
-      <h2>내 농장</h2>
-      <button
-        v-for="farm in farmsMine"
-        :key="farm.id"
-        @click="openFarm(farm.id)"
-      >
-        <img src="/src/assets/farm.jpeg" alt="" width="100px" />
-        {{ farm.name }}
-      </button>
-      <h2>모든 농장</h2>
-      <button
-        v-for="farm in farmsNotMine"
-        :key="farm.id"
-        @click="openFarm(farm.id)"
-      >
-        <img src="/src/assets/farm.jpeg" alt="" width="100px" />
-        {{ farm.name }}
-      </button>
-    </section>
+    <div v-if="isLoading" class="state-card">
+      <PixelIcon icon="nav_farm" size="1.6rem" />
+      <p>농장 목록을 불러오는 중...</p>
+    </div>
 
-    <section v-else>
-      <button @click="closeFarm">← 목록으로</button>
-      <button @click="enterFarm" v-if="!isMyFarm">농장 가입하기</button>
-      <button @click="exitFarm" v-else>농장 탈퇴하기</button>
-      <h1>여기는 {{ selectedFarm.name }} 입니다!!</h1>
-      <hr />
-      <div v-for="farmMember in farmMembers" :key="farmMember.id">
-        <PigPixelArt
-          :level="farmMember.currentPigLevel"
-          class="farm-pig"
-          style="width: 100px"
-        />
-        <br />
-        <h2>{{ farmMember.userName }}님의 돼지</h2>
-        <hr />
+    <div v-else-if="errorMessage" class="state-card error">
+      <PixelIcon icon="alert" size="1.3rem" />
+      <p>{{ errorMessage }}</p>
+    </div>
+
+    <section v-else-if="!selectedFarm" class="farm-list">
+      <button class="create-farm-btn" type="button" @click="openCreateModal">
+        + 농장 만들기
+      </button>
+
+      <div class="farm-section">
+        <h2 class="farm-section-title">내 농장</h2>
+        <button
+          v-for="farm in farmsMine"
+          :key="`mine-${farm.id}`"
+          class="farm-card"
+          type="button"
+          @click="openFarm(farm.id)"
+        >
+          <div class="farm-illust">
+            <img :src="getFarmCardImage(farm.id)" alt="" class="farm-thumb" />
+          </div>
+          <div class="farm-card-main">
+            <p class="farm-name">{{ farm.name }}</p>
+            <p class="farm-meta">
+              <PixelIcon icon="pig" size="0.9rem" />
+              <span
+                >멤버 {{ farm.members?.filter(Boolean).length ?? 0 }}명</span
+              >
+            </p>
+          </div>
+          <span class="enter-chip">
+            입장
+            <PixelIcon icon="arrow_right" size="0.8rem" />
+          </span>
+        </button>
+      </div>
+
+      <div class="farm-section">
+        <h2 class="farm-section-title">모든 농장</h2>
+        <button
+          v-for="farm in farmsNotMine"
+          :key="`public-${farm.id}`"
+          class="farm-card"
+          type="button"
+          @click="openFarm(farm.id)"
+        >
+          <div class="farm-illust">
+            <img :src="getFarmCardImage(farm.id)" alt="" class="farm-thumb" />
+          </div>
+          <div class="farm-card-main">
+            <p class="farm-name">{{ farm.name }}</p>
+            <p class="farm-meta">
+              <PixelIcon icon="pig" size="0.9rem" />
+              <span
+                >멤버 {{ farm.members?.filter(Boolean).length ?? 0 }}명</span
+              >
+            </p>
+          </div>
+          <span class="enter-chip">
+            입장
+            <PixelIcon icon="arrow_right" size="0.8rem" />
+          </span>
+        </button>
+      </div>
+
+      <div v-if="farmList.length === 0" class="state-card">
+        <PixelIcon icon="clipboard" size="1.4rem" />
+        <p>참여 중인 농장이 없어요.</p>
       </div>
     </section>
+
+    <section v-else class="farm-detail">
+      <div class="detail-top">
+        <button class="back-btn" type="button" @click="closeFarm">
+          <PixelIcon icon="arrow_right" size="0.8rem" class="back-arrow" />
+          <span>목록으로</span>
+        </button>
+        <div class="detail-actions">
+          <button
+            v-if="!isMyFarm"
+            class="farm-action-btn join"
+            type="button"
+            @click="enterFarm"
+          >
+            농장 가입하기
+          </button>
+          <button
+            v-else
+            class="farm-action-btn leave"
+            type="button"
+            @click="exitFarm"
+          >
+            농장 탈퇴하기
+          </button>
+          <div class="farm-badge">
+            <PixelIcon icon="nav_farm" size="1rem" />
+            <span>{{ selectedFarm.name }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="isMemberLoading" class="state-card">
+        <PixelIcon icon="pig" size="1.6rem" />
+        <p>농장 멤버를 불러오는 중...</p>
+      </div>
+
+      <div v-else class="member-grid">
+        <article
+          v-for="member in farmMembers"
+          :key="member.id"
+          class="member-card"
+        >
+          <div class="member-visual">
+            <PigBackground :house-level="member.houseLevel ?? 3" :scale="1.1" />
+            <PigPixelArt
+              :level="resolveMemberPigLevel(member)"
+              class="member-pig"
+            />
+          </div>
+
+          <div class="member-info">
+            <p class="member-name">{{ member.userName }}</p>
+            <div class="member-badges">
+              <span class="badge">
+                <PixelIcon icon="pig" size="0.85rem" />
+                <span>돼지 Lv.{{ resolveMemberPigLevel(member) }}</span>
+              </span>
+              <span class="badge">
+                <PixelIcon
+                  :icon="getHouseIconByLevel(member.houseLevel)"
+                  size="0.85rem"
+                />
+                <span>{{ getHouseInfo(member.houseLevel ?? 3).name }}</span>
+              </span>
+            </div>
+          </div>
+        </article>
+
+        <div v-if="farmMembers.length === 0" class="state-card">
+          <PixelIcon icon="clipboard" size="1.4rem" />
+          <p>아직 등록된 농장 멤버가 없어요.</p>
+        </div>
+      </div>
+    </section>
+
+    <div
+      v-if="showCreateModal && !selectedFarm"
+      class="farm-modal-overlay"
+      @click.self="closeCreateModal"
+    >
+      <div class="farm-modal">
+        <h3 class="farm-modal-title">농장 만들기</h3>
+        <input
+          v-model="newFarmName"
+          class="farm-modal-input"
+          type="text"
+          maxlength="20"
+          placeholder="농장 이름을 입력하세요"
+        />
+        <div class="farm-modal-actions">
+          <button
+            class="farm-modal-btn cancel"
+            type="button"
+            @click="closeCreateModal"
+          >
+            취소
+          </button>
+          <button
+            class="farm-modal-btn create"
+            type="button"
+            :disabled="!newFarmName.trim()"
+            @click="submitCreateModal"
+          >
+            만들기
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -202,11 +442,378 @@ async function exitFarm() {
   margin: 0;
   font-size: 1.35rem;
   font-weight: 800;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .page-subtitle {
   margin: 0;
   color: var(--text-muted);
   font-size: 0.82rem;
+}
+
+.farm-list,
+.farm-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.create-farm-btn {
+  border: 1.5px dashed #ffb4cf;
+  background: #fff2f8;
+  color: var(--primary);
+  border-radius: 14px;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.farm-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.farm-section-title {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin: 0 0.1rem;
+}
+
+.farm-hero {
+  width: 100%;
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.farm-hero-image {
+  display: block;
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+}
+
+.state-card {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 1.15rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.state-card.error {
+  border-color: #ffd5d5;
+  background: #fff7f7;
+  color: #dc5b5b;
+}
+
+.farm-card {
+  width: 100%;
+  border: 1.5px solid var(--border);
+  background: linear-gradient(145deg, #ffffff 0%, #fff8ea 100%);
+  border-radius: 18px;
+  padding: 0.8rem 0.9rem;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.65rem;
+  text-align: left;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    border-color 0.16s ease;
+}
+
+.farm-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 14px rgba(255, 179, 71, 0.15);
+  border-color: #ffd7a5;
+}
+
+.farm-illust {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  border: 1px solid #ffe0bb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.farm-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.farm-card-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.farm-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.farm-meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.enter-chip {
+  border: 1px solid #ffd6e5;
+  background: #fff4f9;
+  color: var(--primary);
+  border-radius: 999px;
+  padding: 0.22rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.detail-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+.detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.farm-action-btn {
+  border-radius: 10px;
+  border: 1.5px solid transparent;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.farm-action-btn.join {
+  background: #ecfff0;
+  border-color: #bce8c5;
+  color: #2e7d32;
+}
+
+.farm-action-btn.leave {
+  background: #fff3f3;
+  border-color: #ffd2d2;
+  color: #c62828;
+}
+
+.back-btn {
+  border: 1.5px solid var(--border);
+  background: #fff;
+  border-radius: 10px;
+  height: 32px;
+  padding: 0 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.back-arrow {
+  transform: rotate(180deg);
+}
+
+.farm-badge {
+  border: 1.5px solid #ffd7a5;
+  background: #fff3df;
+  border-radius: 10px;
+  padding: 0.38rem 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #b96915;
+}
+
+.member-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.member-card {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.member-visual {
+  position: relative;
+  height: 152px;
+  background: #fff8ed;
+}
+
+.member-visual :deep(.pig-background) {
+  position: absolute;
+  inset: 0;
+}
+
+.member-pig {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  width: 62px;
+  transform: translateX(-50%) translateY(0);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.16));
+  animation: farmPigFloat 3s ease-in-out infinite;
+}
+
+.member-card:nth-child(2n) .member-pig {
+  animation-delay: 0.35s;
+}
+
+.member-card:nth-child(3n) .member-pig {
+  animation-delay: 0.7s;
+}
+
+@keyframes farmPigFloat {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-8px) scale(1.03);
+  }
+}
+
+.member-info {
+  padding: 0.8rem 0.85rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.48rem;
+}
+
+.member-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.member-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.38rem;
+  flex-wrap: wrap;
+}
+
+.badge {
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-main);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.44rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.23rem;
+}
+
+.farm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 220;
+  padding: 1rem;
+}
+
+.farm-modal {
+  width: min(100%, 340px);
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.farm-modal-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.farm-modal-input {
+  width: 100%;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  height: 38px;
+  padding: 0 0.75rem;
+  font-size: 0.82rem;
+}
+
+.farm-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+.farm-modal-btn {
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  height: 34px;
+  padding: 0 0.8rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: #fff;
+}
+
+.farm-modal-btn.create {
+  border-color: #ffbed7;
+  background: #fff1f7;
+  color: var(--primary);
+}
+
+.farm-modal-btn.create:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (min-width: 430px) {
+  .member-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 </style>
