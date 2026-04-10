@@ -31,7 +31,8 @@ async function handleSetup() {
       targetExpenseRatio: Number(form.targetExpenseRatio)
     })
     alert('설정이 완료되었습니다!')
-    router.push('/')
+    // 설정 완료 후 가이드 페이지로 이동
+    router.push({ name: 'Guide', query: { source: 'login' } })
   } catch (e) {
     errorMsg.value = '설정 저장 중 오류가 발생했습니다'
   } finally {

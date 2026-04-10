@@ -1,12 +1,14 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useAuthStore } from '../stores/useAuthStore.js';
 import { usePigSystem } from '../composables/usePigSystem.js';
 import PigPixelArt from '../components/PigPixelArt.vue';
 import PigBackground from '../components/PigBackground.vue';
 
 const route = useRoute();
 const router = useRouter();
+const authStore = useAuthStore();
 const { PIG_LEVELS, HOUSE_LEVELS } = usePigSystem();
 const topAnchor = ref(null);
 const bottomAnchor = ref(null);
@@ -35,6 +37,7 @@ function goNext() {
     return;
   }
 
+  // 온보딩(Setup -> Guide) 완료 후 홈으로 이동
   router.push('/');
 }
 

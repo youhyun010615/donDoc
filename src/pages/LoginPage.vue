@@ -25,7 +25,13 @@ async function handleLogin() {
     loading.value = true
     await authStore.login(userId.value.trim(), password.value)
     await budgetStore.initStore()
-    router.push({ name: 'Guide', query: { source: 'login' } })
+
+    // 수입 정보가 없으면 설정으로, 있으면 홈으로
+    if (!authStore.currentUser.monthlyIncome) {
+      router.push({ name: 'Setup' })
+    } else {
+      router.push({ name: 'Home' })
+    }
   } catch (e) {
     errorMsg.value = e.message
   } finally {
