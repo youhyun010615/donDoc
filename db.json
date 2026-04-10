@@ -149,9 +149,9 @@
       "password": "14",
       "userName": "14",
       "age": 14,
-      "monthlyIncome": 250000,
-      "targetExpenseRatio": 35,
-      "currentPigLevel": 10,
+      "monthlyIncome": 14,
+      "targetExpenseRatio": 60,
+      "currentPigLevel": 5,
       "houseLevel": 3,
       "createdAt": "2026-04-09",
       "farm": [
@@ -161,20 +161,79 @@
       "id": "5tMAGqb"
     },
     {
-      "userId": "098",
-      "password": "098",
-      "userName": "098",
-      "age": 11,
-      "monthlyIncome": 1111111,
+      "userId": "afasdf",
+      "password": "a",
+      "userName": "asdf",
+      "age": null,
+      "monthlyIncome": 0,
       "targetExpenseRatio": 60,
-      "currentPigLevel": 10,
+      "currentPigLevel": 5,
       "houseLevel": 3,
       "createdAt": "2026-04-10",
       "farm": [
         "1",
         "2"
       ],
-      "id": "Th6HyBV"
+      "id": "xKcQF8o"
+    },
+    {
+      "userId": "asdfg",
+      "password": "asdfg",
+      "userName": "asdfg",
+      "age": 1,
+      "monthlyIncome": 1,
+      "targetExpenseRatio": 60,
+      "currentPigLevel": 5,
+      "houseLevel": 3,
+      "createdAt": "2026-04-10",
+      "farm": [
+        "1",
+        "2"
+      ],
+      "id": "Fy1kG2A"
+    },
+    {
+      "userId": "4321",
+      "password": "123",
+      "userName": "4321",
+      "age": 123,
+      "monthlyIncome": 12,
+      "targetExpenseRatio": 60,
+      "currentPigLevel": 5,
+      "houseLevel": 3,
+      "createdAt": "2026-04-10",
+      "farm": [
+        "1",
+        "2"
+      ],
+      "id": "In7Wtca"
+    },
+    {
+      "userId": "zzz",
+      "password": "zzz",
+      "userName": "zzz",
+      "age": 1,
+      "monthlyIncome": 12222,
+      "targetExpenseRatio": 75,
+      "currentPigLevel": 1,
+      "houseLevel": 3,
+      "createdAt": "2026-04-10",
+      "farm": [
+        "5woRPmo",
+        "sWsRdwJ",
+        "TXgFi6E",
+        "uQQjwHz",
+        "B2MOtU-",
+        "c_PDcFa",
+        "NISmFUT",
+        "C-d-znt",
+        "1",
+        "vRSAc36",
+        "gHoJt_t",
+        "3Uu4bcv",
+        "Rc9WrM2"
+      ],
+      "id": "OR6-VGL"
     }
   ],
   "farm": [
@@ -190,18 +249,49 @@
         null,
         null,
         "5tMAGqb",
-        "Th6HyBV"
+        "xKcQF8o",
+        "Fy1kG2A",
+        "In7Wtca",
+        "OR6-VGL"
       ]
     },
     {
-      "id": "2",
-      "name": "26회차 농장",
+      "name": "121",
       "members": [
-        "1",
-        "2",
-        "3",
-        "4"
-      ]
+        "OR6-VGL"
+      ],
+      "id": "3Uu4bcv"
+    },
+    {
+      "name": "123",
+      "members": [],
+      "id": "HAOFu41"
+    },
+    {
+      "name": "asdjfjlkasdjfasdf",
+      "members": [
+        "OR6-VGL"
+      ],
+      "id": "gHoJt_t"
+    },
+    {
+      "name": "fasdfasdfasdfasdfadsf",
+      "members": [],
+      "id": "QJb5FGg"
+    },
+    {
+      "name": "동물농장 33",
+      "members": [
+        "OR6-VGL"
+      ],
+      "id": "vRSAc36"
+    },
+    {
+      "name": "동물농장",
+      "members": [
+        "OR6-VGL"
+      ],
+      "id": "Rc9WrM2"
     }
   ],
   "incomeCategories": [
@@ -443,6 +533,17 @@
       "userId": "U7NsIRb",
       "createdAt": "2026-04-09T15:14:50.403Z",
       "id": "mkyS3Vc"
+    },
+    {
+      "type": "expense",
+      "date": "2026-04-10",
+      "category": "의료/건강",
+      "amount": 1333,
+      "content": "",
+      "memo": "",
+      "userId": "OR6-VGL",
+      "createdAt": "2026-04-10T05:21:46.162Z",
+      "id": "qjwh_bF"
     }
   ],
   "dailyStatus": [

@@ -1,11 +1,11 @@
-import { defineStore } from "pinia";
-import { ref, computed } from "vue";
-import axios from "axios";
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+import axios from 'axios';
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
 export const useAuthStore = defineStore(
-  "auth",
+  'auth',
   () => {
     const currentUser = ref(null);
     const isLoggedIn = computed(() => !!currentUser.value);
@@ -17,7 +17,7 @@ export const useAuthStore = defineStore(
       const user = users.find(
         (u) => u.userId === userId && u.password === password,
       );
-      if (!user) throw new Error("아이디 또는 비밀번호가 올바르지 않아요");
+      if (!user) throw new Error('아이디 또는 비밀번호가 올바르지 않아요');
       currentUser.value = user;
     }
 
@@ -34,7 +34,7 @@ export const useAuthStore = defineStore(
         existingUsers.length > 0 &&
         existingUsers[0].userId === userData.userId
       ) {
-        throw new Error("이미 사용 중인 아이디예요");
+        throw new Error('이미 사용 중인 아이디예요');
       }
 
       // 2. 새 프로필 생성
@@ -42,8 +42,8 @@ export const useAuthStore = defineStore(
         ...userData,
         currentPigLevel: 5,
         houseLevel: 3,
-        createdAt: new Date().toISOString().split("T")[0],
-        farm: ["1", "2"],
+        createdAt: new Date().toISOString().split('T')[0],
+        farm: ['1'],
       };
 
       const userRes = await axios.post(`${API_BASE}/profile`, newUser);
@@ -73,6 +73,11 @@ export const useAuthStore = defineStore(
       return res.data;
     }
 
+    async function fetchAllFarms() {
+      const farmRes = await axios.get(`${API_BASE}/farm`);
+      return farmRes.data;
+    }
+
     async function fetchCurrentUserFarms() {
       const farmRes = await axios.get(`${API_BASE}/farm`);
       const farms = farmRes.data;
@@ -85,6 +90,34 @@ export const useAuthStore = defineStore(
       return res.data.filter((user) => membersId.includes(user.id));
     }
 
+    async function createFarm(name) {
+      const farm = {
+        name: name,
+        members: [currentUser.value.id],
+      };
+      const res = await axios.post(`${API_BASE}/farm`, farm);
+      return res.data;
+    }
+
+    async function registerCurrentUsertoFarm(farm) {
+      console.log(farm.members.includes(currentUser.value.id));
+      const updatedFarm = {
+        ...farm,
+        members: farm.members.includes(currentUser.value.id)
+          ? farm.members
+          : [...farm.members, currentUser.value.id],
+      };
+      await axios.put(`${API_BASE}/farm/${farm.id}`, updatedFarm);
+    }
+
+    async function unregisterCurrentUserFromFarm(farm) {
+      const updatedFarm = {
+        ...farm,
+        members: farm.members.filter((id) => id !== currentUser.value.id),
+      };
+      await axios.put(`${API_BASE}/farm/${farm.id}`, updatedFarm);
+    }
+
     return {
       currentUser,
       isLoggedIn,
@@ -94,11 +127,15 @@ export const useAuthStore = defineStore(
       updateProfile,
       fetchCurrentUserFarms,
       fetchFarmMembers,
+      fetchAllFarms,
+      createFarm,
+      registerCurrentUsertoFarm,
+      unregisterCurrentUserFromFarm,
     };
   },
   {
     persist: {
-      pick: ["currentUser"],
+      pick: ['currentUser'],
     },
   },
 );
