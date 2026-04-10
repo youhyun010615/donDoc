@@ -1,5 +1,49 @@
 import { computed } from 'vue'
 
+// 캐릭터 단계 정의 (지출 페이스 기반)
+const CHARACTER_STAGES = [
+  {
+    stage: 1,
+    name: '집사',
+    image: new URL('../assets/characters/step1_Butler.png', import.meta.url).href,
+    maxPace: 0.6,
+    effect: 'good',
+    message: '완벽하게 절약 중이에요! 돼지가 행복해해요.',
+  },
+  {
+    stage: 2,
+    name: '농부',
+    image: new URL('../assets/characters/step2_farmer.png', import.meta.url).href,
+    maxPace: 0.85,
+    effect: 'good',
+    message: '잘 관리하고 있어요! 돼지가 건강해요.',
+  },
+  {
+    stage: 3,
+    name: '평민',
+    image: new URL('../assets/characters/step3_common.png', import.meta.url).href,
+    maxPace: 1.1,
+    effect: 'neutral',
+    message: '무난하게 쓰고 있어요. 조금만 더 아껴봐요.',
+  },
+  {
+    stage: 4,
+    name: '도둑',
+    image: new URL('../assets/characters/Step4_theif.png', import.meta.url).href,
+    maxPace: 1.4,
+    effect: 'bad',
+    message: '과소비 위험! 지출 속도를 줄여야 해요.',
+  },
+  {
+    stage: 5,
+    name: '도축사',
+    image: new URL('../assets/characters/step5_pig_Slaughter.png', import.meta.url).href,
+    maxPace: Infinity,
+    effect: 'bad',
+    message: '돼지가 위험해요! 지금 당장 지출을 멈춰요.',
+  },
+]
+
 // 돼지 상태 10단계 정의
 const PIG_LEVELS = [
   {
