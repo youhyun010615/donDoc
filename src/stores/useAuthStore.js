@@ -10,6 +10,8 @@ import {
 } from '../services/farmInService.js';
 
 const API_BASE = import.meta.env.VITE_API_BASE;
+const DEFAULT_FARM_ID = '1';
+const DEFAULT_FARM_NAME = 'kb농장';
 
 export const useAuthStore = defineStore(
   'auth',
@@ -17,6 +19,35 @@ export const useAuthStore = defineStore(
     const currentUser = ref(null);
     const isLoggedIn = computed(() => !!currentUser.value);
     let farmMutationChain = Promise.resolve();
+
+    async function ensureDefaultFarm() {
+      const res = await axios.get(`${API_BASE}/farm?id=${DEFAULT_FARM_ID}`);
+      const existing = Array.isArray(res.data) ? res.data[0] : null;
+      if (existing) return existing;
+
+      const created = await axios.post(`${API_BASE}/farm`, {
+        id: DEFAULT_FARM_ID,
+        name: DEFAULT_FARM_NAME,
+      });
+      return created.data;
+    }
+
+    async function cleanupEmptyFarms() {
+      const [farmRes, counts] = await Promise.all([
+        axios.get(`${API_BASE}/farm`),
+        fetchFarmMemberCounts(),
+      ]);
+      const farms = Array.isArray(farmRes.data) ? farmRes.data : [];
+      const deleteTargets = farms.filter((farm) => {
+        const farmId = String(farm.id);
+        if (farmId === DEFAULT_FARM_ID) return false;
+        return (counts?.[farmId] ?? 0) <= 0;
+      });
+
+      await Promise.all(
+        deleteTargets.map((farm) => axios.delete(`${API_BASE}/farm/${farm.id}`)),
+      );
+    }
 
     // 로그인: userId + password로 profile 조회
     async function login(userId, password) {
@@ -54,7 +85,9 @@ export const useAuthStore = defineStore(
         farm: ['1'],
       };
 
-      await axios.post(`${API_BASE}/profile`, newUser);
+      await ensureDefaultFarm();
+      const userRes = await axios.post(`${API_BASE}/profile`, newUser);
+      await joinFarmIn(DEFAULT_FARM_ID, userRes.data.id);
     }
 
     function logout() {
@@ -100,6 +133,8 @@ export const useAuthStore = defineStore(
     }
 
     async function fetchAllFarms() {
+      await ensureDefaultFarm();
+      await cleanupEmptyFarms();
       const farmRes = await axios.get(`${API_BASE}/farm`);
       return farmRes.data;
     }
@@ -116,8 +151,19 @@ export const useAuthStore = defineStore(
     }
 
     async function createFarm(name) {
+      const trimmedName = String(name ?? '').trim();
+      if (!trimmedName) throw new Error('농장 이름을 입력해주세요');
+
+      const farms = await fetchAllFarms();
+      const duplicated = farms.some(
+        (farm) =>
+          String(farm.name ?? '').trim().toLowerCase() ===
+          trimmedName.toLowerCase(),
+      );
+      if (duplicated) throw new Error('이미 존재하는 농장 이름이에요');
+
       const farm = {
-        name: name,
+        name: trimmedName,
       };
       const res = await axios.post(`${API_BASE}/farm`, farm);
       return res.data;
@@ -148,6 +194,7 @@ export const useAuthStore = defineStore(
         if (!currentUser.value) return null;
         const targetFarmId = String(farmId);
         await leaveFarmIn(targetFarmId, currentUser.value.id);
+        await cleanupEmptyFarms();
         return currentUser.value;
       });
     }

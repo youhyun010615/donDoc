@@ -166,6 +166,7 @@ async function closeFarm() {
   selectedFarmId.value = null;
   farmMembers.value = [];
   memberPigLevelById.value = {};
+  await fetchFarms();
 }
 
 function openCreateModal() {
@@ -173,8 +174,10 @@ function openCreateModal() {
   showCreateModal.value = true;
 }
 
-function closeCreateModal() {
+async function closeCreateModal() {
   showCreateModal.value = false;
+  errorMessage.value = '';
+  await fetchFarms();
 }
 
 async function submitCreateModal() {
@@ -194,8 +197,10 @@ async function submitCreateModal() {
     await openFarm(createdFarmId);
   } catch (error) {
     const status = error?.response?.status;
-    errorMessage.value =
-      status != null
+    const message = String(error?.message ?? '').trim();
+    errorMessage.value = message
+      ? message
+      : status != null
         ? `농장 만들기에 실패했어요. (HTTP ${status})`
         : '농장 만들기에 실패했어요. 잠시 후 다시 시도해주세요.';
   } finally {
@@ -234,8 +239,7 @@ async function exitFarm() {
   try {
     const farmId = String(selectedFarm.value.id);
     await authStore.leaveFarm(farmId);
-    closeFarm();
-    await fetchFarms();
+    await closeFarm();
   } finally {
     isMutatingMembership.value = false;
   }
