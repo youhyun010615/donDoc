@@ -1,22 +1,34 @@
 <script setup>
-import { computed, onMounted, ref } from "vue";
-import { useBudgetStore } from "../stores/useBudgetStore.js";
-import { useAuthStore } from "../stores/useAuthStore.js";
-import PigPixelArt from "../components/PigPixelArt.vue";
-import PigBackground from "../components/PigBackground.vue";
-import axios from "axios";
-import PixelIcon from "../components/PixelIcon.vue";
+import { computed, onMounted, ref } from 'vue';
+import { useBudgetStore } from '../stores/useBudgetStore.js';
+import { useAuthStore } from '../stores/useAuthStore.js';
+import PigPixelArt from '../components/PigPixelArt.vue';
+import PigBackground from '../components/PigBackground.vue';
+import axios from 'axios';
+import PixelIcon from '../components/PixelIcon.vue';
 
 const store = useBudgetStore();
 const authStore = useAuthStore();
 
 const selectedFarmId = ref(null);
-const farms = ref({});
 const isLoading = ref(true);
 
+const farms = ref({});
+const farmsMine = ref({});
+const farmsNotMine = ref({});
+
 onMounted(async () => {
-  const farmRes = await authStore.fetchCurrentUserFarms();
-  farms.value = farmRes;
+  const farmsRes = await authStore.fetchAllFarms();
+  farms.value = farmsRes;
+
+  farmsMine.value = farms.value.filter((farm) =>
+    authStore.currentUser.farm.includes(farm.id),
+  );
+  farmsNotMine.value = farms.value.filter(
+    (farm) => !authStore.currentUser.farm.includes(farm.id),
+  );
+  console.log(farmsMine.value, farmsNotMine.value);
+
   isLoading.value = false;
 });
 
@@ -27,6 +39,7 @@ const selectedFarm = computed(() => {
 });
 
 const farmMembers = ref([]);
+
 async function openFarm(farmId) {
   selectedFarmId.value = farmId;
   const farm = farms.value.find((f) => f.id === farmId);
@@ -51,7 +64,21 @@ function closeFarm() {
     </header>
 
     <section v-if="!selectedFarm">
-      <button v-for="farm in farms" :key="farm.id" @click="openFarm(farm.id)">
+      <h2>내 농장</h2>
+      <button
+        v-for="farm in farmsMine"
+        :key="farm.id"
+        @click="openFarm(farm.id)"
+      >
+        <img src="/src/assets/farm.jpeg" alt="" width="100px" />
+        {{ farm.name }}
+      </button>
+      <h2>모든 농장</h2>
+      <button
+        v-for="farm in farmsNotMine"
+        :key="farm.id"
+        @click="openFarm(farm.id)"
+      >
         <img src="/src/assets/farm.jpeg" alt="" width="100px" />
         {{ farm.name }}
       </button>
