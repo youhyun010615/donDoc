@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useBudgetStore } from '../stores/useBudgetStore.js';
 import { useAuthStore } from '../stores/useAuthStore.js';
@@ -7,11 +7,46 @@ import { usePigSystem } from '../composables/usePigSystem.js';
 import PigPixelArt from '../components/PigPixelArt.vue';
 import PigBackground from '../components/PigBackground.vue';
 import PixelIcon from '../components/PixelIcon.vue';
+import PixelSpeechBubble from '../components/PixelSpeechBubble.vue';
 
 const store = useBudgetStore();
 const authStore = useAuthStore();
 const router = useRouter();
-const { getPigState, getHouseInfo, formatCurrency, getCharacterStage } = usePigSystem();
+const { getPigState, getHouseInfo, formatCurrency, getCharacterStage, getPigMessage, getCharacterGuideMessage } = usePigSystem();
+
+// 말풍선 상태
+const activeBubble = ref(null) // 'pig' | 'character' | null
+
+const pigBubbleText = computed(() => getPigMessage(pigState.value.level))
+
+const characterBubbleText = computed(() =>
+  getCharacterGuideMessage(store.totalExpenseThisMonth, store.dailyBudget, store.currentMonth)
+)
+
+function togglePigBubble() {
+  activeBubble.value = activeBubble.value === 'pig' ? null : 'pig'
+}
+
+function toggleCharacterBubble() {
+  activeBubble.value = activeBubble.value === 'character' ? null : 'character'
+}
+
+function handleOutsideClick(e) {
+  if (!activeBubble.value) return
+  const bubble = document.querySelector('.pig-bubble, .character-bubble')
+  const pigEl = document.querySelector('.pig-pixel')
+  const charEl = document.querySelector('.character-overlay')
+  if (
+    bubble && !bubble.contains(e.target) &&
+    pigEl && !pigEl.contains(e.target) &&
+    charEl && !charEl.contains(e.target)
+  ) {
+    activeBubble.value = null
+  }
+}
+
+onMounted(() => document.addEventListener('click', handleOutsideClick))
+onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
 
 const character = computed(() =>
   getCharacterStage(store.totalExpenseThisMonth, store.dailyBudget, store.currentMonth),
@@ -129,12 +164,40 @@ const todayRecordsSorted = computed(() =>
             :scale="pigVisualScale"
             class="pig-bg-layer"
           />
-          <PigPixelArt :level="pigState.level" class="pig-pixel" />
+
+          <!-- 돼지 말풍선 -->
+          <PixelSpeechBubble
+            v-if="activeBubble === 'pig'"
+            :text="pigBubbleText"
+            tail="left"
+            class="pig-bubble"
+            @close="activeBubble = null"
+          />
+
+          <!-- 돼지 (클릭 가능) -->
+          <PigPixelArt
+            :level="pigState.level"
+            class="pig-pixel"
+            @click="togglePigBubble"
+          />
+
+          <!-- 캐릭터 말풍선 -->
+          <PixelSpeechBubble
+            v-if="activeBubble === 'character'"
+            :text="characterBubbleText"
+            tail="right"
+            class="character-bubble"
+            @close="activeBubble = null"
+          />
+
+          <!-- 캐릭터 이미지 (클릭 가능) -->
           <img
             v-if="character"
             :src="character.image"
             :alt="character.name"
             class="character-overlay"
+            :class="{ active: activeBubble === 'character' }"
+            @click="toggleCharacterBubble"
           />
         </div>
 
@@ -418,11 +481,45 @@ const todayRecordsSorted = computed(() =>
   image-rendering: pixelated;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
   animation: characterFloat 3.4s ease-in-out infinite;
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+  border-radius: 4px;
+}
+
+.character-overlay.active {
+  animation: characterFloatActive 3.4s ease-in-out infinite;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2)) drop-shadow(0 0 6px rgba(255, 215, 0, 0.8));
+}
+
+.pig-pixel {
+  cursor: pointer;
+}
+
+/* 돼지 말풍선 — 돼지 위 중앙 */
+.pig-bubble {
+  position: absolute;
+  bottom: 110px;
+  left: 50%;
+  transform: translateX(-30%);
+  z-index: 10;
+}
+
+/* 캐릭터 말풍선 — 캐릭터 머리 위 */
+.character-bubble {
+  position: absolute;
+  bottom: 95px;
+  left: 4px;
+  z-index: 10;
 }
 
 @keyframes characterFloat {
   0%, 100% { transform: translateY(0px); }
   50%       { transform: translateY(-10px); }
+}
+
+@keyframes characterFloatActive {
+  0%, 100% { transform: translateY(0px) scale(1.12); }
+  50%       { transform: translateY(-10px) scale(1.12); }
 }
 
 @keyframes pigFloatScale {
