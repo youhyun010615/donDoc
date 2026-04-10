@@ -7,7 +7,6 @@ import { usePigSystem } from '../composables/usePigSystem.js';
 import PigPixelArt from '../components/PigPixelArt.vue';
 import PigBackground from '../components/PigBackground.vue';
 import PixelIcon from '../components/PixelIcon.vue';
-import CharacterBadge from '../components/CharacterBadge.vue';
 
 const store = useBudgetStore();
 const authStore = useAuthStore();
@@ -175,7 +174,6 @@ const todayRecordsSorted = computed(() =>
         </div>
       </div>
 
-      <CharacterBadge :selected-month="store.currentMonth" />
 
       <div class="card">
         <div class="card-header">
@@ -407,6 +405,24 @@ const todayRecordsSorted = computed(() =>
   transform-origin: center bottom;
   filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.15));
   animation: pigFloatScale 3s ease-in-out infinite;
+}
+
+.character-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 12px;
+  z-index: 3;
+  width: min(80px, 30%);
+  height: auto;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  animation: characterFloat 3.4s ease-in-out infinite;
+}
+
+@keyframes characterFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
 }
 
 @keyframes pigFloatScale {
