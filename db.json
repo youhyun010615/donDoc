@@ -149,9 +149,9 @@
       "password": "14",
       "userName": "14",
       "age": 14,
-      "monthlyIncome": 14,
-      "targetExpenseRatio": 60,
-      "currentPigLevel": 5,
+      "monthlyIncome": 250000,
+      "targetExpenseRatio": 35,
+      "currentPigLevel": 10,
       "houseLevel": 3,
       "createdAt": "2026-04-09",
       "farm": [
@@ -159,6 +159,22 @@
         "2"
       ],
       "id": "5tMAGqb"
+    },
+    {
+      "userId": "098",
+      "password": "098",
+      "userName": "098",
+      "age": 11,
+      "monthlyIncome": 1111111,
+      "targetExpenseRatio": 60,
+      "currentPigLevel": 10,
+      "houseLevel": 3,
+      "createdAt": "2026-04-10",
+      "farm": [
+        "1",
+        "2"
+      ],
+      "id": "Th6HyBV"
     }
   ],
   "farm": [
@@ -173,7 +189,8 @@
         "123",
         null,
         null,
-        "5tMAGqb"
+        "5tMAGqb",
+        "Th6HyBV"
       ]
     },
     {

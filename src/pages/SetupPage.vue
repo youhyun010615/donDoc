@@ -20,7 +20,7 @@ const loading = ref(false);
 async function handleSetup() {
   errorMsg.value = '';
 
-  if (form.age > 100 || form.age < 0) {
+  if (form.age > 130 || form.age < 0) {
     errorMsg.value = '올바른 나이를 입력해주세요';
     return;
   }
@@ -72,6 +72,8 @@ async function handleSetup() {
             type="number"
             class="form-input"
             placeholder="25"
+            min="0"
+            max="130"
             required
           />
         </div>
