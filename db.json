@@ -11,10 +11,7 @@
       "currentPigLevel": 5,
       "houseLevel": 5,
       "createdAt": "2026-04-07",
-      "farm": [
-        "1",
-        "2"
-      ]
+      "farm": ["1", "2"]
     },
     {
       "userId": "1",
@@ -26,10 +23,7 @@
       "currentPigLevel": 5,
       "houseLevel": 3,
       "createdAt": "2026-04-09",
-      "farm": [
-        "1",
-        "2"
-      ],
+      "farm": ["1", "2"],
       "id": "U7NsIRb"
     },
     {
@@ -42,10 +36,7 @@
       "currentPigLevel": 5,
       "houseLevel": 3,
       "createdAt": "2026-04-09",
-      "farm": [
-        "1",
-        "2"
-      ],
+      "farm": ["1", "2"],
       "id": "va7Y6YP"
     },
     {
@@ -58,10 +49,7 @@
       "currentPigLevel": 5,
       "houseLevel": 3,
       "createdAt": "2026-04-09",
-      "farm": [
-        "1",
-        "2"
-      ],
+      "farm": ["1", "2"],
       "id": "6Iv3rs-"
     },
     {
@@ -74,10 +62,7 @@
       "currentPigLevel": 5,
       "houseLevel": 3,
       "createdAt": "2026-04-09",
-      "farm": [
-        "1",
-        "2"
-      ],
+      "farm": ["1", "2"],
       "id": "Iei1Jl0"
     },
     {
@@ -90,10 +75,7 @@
       "currentPigLevel": 5,
       "houseLevel": 3,
       "createdAt": "2026-04-09",
-      "farm": [
-        "1",
-        "2"
-      ],
+      "farm": ["1", "2"],
       "id": "QY0rFN9"
     },
     {
@@ -106,10 +88,7 @@
       "currentPigLevel": 5,
       "houseLevel": 3,
       "createdAt": "2026-04-09",
-      "farm": [
-        "1",
-        "2"
-      ],
+      "farm": ["1", "2"],
       "id": "G7fiAn9"
     },
     {
@@ -122,10 +101,7 @@
       "currentPigLevel": 5,
       "houseLevel": 3,
       "createdAt": "2026-04-09",
-      "farm": [
-        "1",
-        "2"
-      ],
+      "farm": ["1", "2"],
       "id": "_G5xPRW"
     },
     {
@@ -138,10 +114,7 @@
       "currentPigLevel": 5,
       "houseLevel": 3,
       "createdAt": "2026-04-09",
-      "farm": [
-        "1",
-        "2"
-      ],
+      "farm": ["1", "2"],
       "id": "0ZyZhxg"
     },
     {
@@ -154,10 +127,7 @@
       "currentPigLevel": 5,
       "houseLevel": 3,
       "createdAt": "2026-04-09",
-      "farm": [
-        "1",
-        "2"
-      ],
+      "farm": ["1", "2"],
       "id": "5tMAGqb"
     },
     {
@@ -170,10 +140,7 @@
       "currentPigLevel": 5,
       "houseLevel": 3,
       "createdAt": "2026-04-10",
-      "farm": [
-        "1",
-        "2"
-      ],
+      "farm": ["1", "2"],
       "id": "xKcQF8o"
     },
     {
@@ -186,10 +153,7 @@
       "currentPigLevel": 5,
       "houseLevel": 3,
       "createdAt": "2026-04-10",
-      "farm": [
-        "1",
-        "2"
-      ],
+      "farm": ["1", "2"],
       "id": "Fy1kG2A"
     },
     {
@@ -202,10 +166,7 @@
       "currentPigLevel": 5,
       "houseLevel": 3,
       "createdAt": "2026-04-10",
-      "farm": [
-        "1",
-        "2"
-      ],
+      "farm": ["1", "2"],
       "id": "In7Wtca"
     },
     {
@@ -213,9 +174,9 @@
       "password": "zzz",
       "userName": "zzz",
       "age": 1,
-      "monthlyIncome": 12222,
-      "targetExpenseRatio": 75,
-      "currentPigLevel": 1,
+      "monthlyIncome": 12222222,
+      "targetExpenseRatio": 10,
+      "currentPigLevel": 10,
       "houseLevel": 3,
       "createdAt": "2026-04-10",
       "farm": [
@@ -231,7 +192,8 @@
         "vRSAc36",
         "gHoJt_t",
         "3Uu4bcv",
-        "Rc9WrM2"
+        "Rc9WrM2",
+        "HAOFu41"
       ],
       "id": "OR6-VGL"
     }
@@ -257,21 +219,17 @@
     },
     {
       "name": "121",
-      "members": [
-        "OR6-VGL"
-      ],
+      "members": ["OR6-VGL"],
       "id": "3Uu4bcv"
     },
     {
       "name": "123",
-      "members": [],
+      "members": ["OR6-VGL"],
       "id": "HAOFu41"
     },
     {
       "name": "asdjfjlkasdjfasdf",
-      "members": [
-        "OR6-VGL"
-      ],
+      "members": ["OR6-VGL"],
       "id": "gHoJt_t"
     },
     {
@@ -281,16 +239,12 @@
     },
     {
       "name": "동물농장 33",
-      "members": [
-        "OR6-VGL"
-      ],
+      "members": ["OR6-VGL"],
       "id": "vRSAc36"
     },
     {
       "name": "동물농장",
-      "members": [
-        "OR6-VGL"
-      ],
+      "members": ["OR6-VGL"],
       "id": "Rc9WrM2"
     }
   ],
