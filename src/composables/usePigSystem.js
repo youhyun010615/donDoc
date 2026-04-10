@@ -1,4 +1,3 @@
-import { computed } from 'vue'
 
 // 캐릭터 단계 정의 (지출 페이스 기반)
 const CHARACTER_STAGES = [
@@ -234,14 +233,43 @@ export function usePigSystem() {
     return `${parseInt(month)}월 ${parseInt(day)}일`
   }
 
+  /**
+   * 이번 달 지출 페이스 기반 캐릭터 단계 계산
+   * @param {number} monthlyExpense - 이번 달 지출 합계
+   * @param {number} dailyBudget - 일일 예산
+   * @param {string} selectedMonth - 'YYYY-MM' 형식
+   * @returns {object} 캐릭터 정보
+   */
+  function getCharacterStage(monthlyExpense, dailyBudget, selectedMonth) {
+    if (!dailyBudget || dailyBudget <= 0) return null
+
+    const [year, month] = selectedMonth.split('-').map(Number)
+    const totalDays = new Date(year, month, 0).getDate()
+    const today = new Date()
+    const isCurrentMonth =
+      today.getFullYear() === year && today.getMonth() + 1 === month
+    const elapsedDays = isCurrentMonth ? today.getDate() : totalDays
+
+    const monthlyBudget = dailyBudget * totalDays
+    const spendRatio = monthlyExpense / monthlyBudget
+    const elapsedRatio = elapsedDays / totalDays
+
+    const pace = elapsedRatio > 0 ? spendRatio / elapsedRatio : 0
+
+    const stage = CHARACTER_STAGES.find((c) => pace <= c.maxPace) || CHARACTER_STAGES[4]
+    return { ...stage, pace: Math.round(pace * 100) / 100 }
+  }
+
   return {
     PIG_LEVELS,
     HOUSE_LEVELS,
+    CHARACTER_STAGES,
     getPigState,
     getPigStateByLevel,
     getHouseInfo,
     calcNextHouseLevel,
     formatCurrency,
     formatDate,
+    getCharacterStage,
   }
 }
