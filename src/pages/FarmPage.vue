@@ -22,29 +22,31 @@ const farms = ref([]);
 const farmMembers = ref([]);
 const isLoading = ref(true);
 const isMemberLoading = ref(false);
+const isMutatingMembership = ref(false);
+const isCreatingFarm = ref(false);
 const errorMessage = ref('');
 const memberPigLevelById = ref({});
+const memberCountByFarm = ref({});
+const myFarmIds = ref([]);
 const showCreateModal = ref(false);
 const newFarmName = ref('');
 
 const farmList = computed(() =>
   Array.isArray(farms.value) ? farms.value : [],
 );
-const myFarmIds = computed(() =>
-  Array.isArray(authStore.currentUser?.farm) ? authStore.currentUser.farm : [],
-);
 const farmsMine = computed(() =>
-  farmList.value.filter((farm) => myFarmIds.value.includes(farm.id)),
+  farmList.value.filter((farm) => myFarmIds.value.includes(String(farm.id))),
 );
 const farmsNotMine = computed(() =>
-  farmList.value.filter((farm) => !myFarmIds.value.includes(farm.id)),
+  farmList.value.filter((farm) => !myFarmIds.value.includes(String(farm.id))),
 );
 
 const selectedFarm = computed(
-  () => farmList.value.find((farm) => farm.id === selectedFarmId.value) ?? null,
+  () =>
+    farmList.value.find((farm) => String(farm.id) === String(selectedFarmId.value)) ?? null,
 );
 const isMyFarm = computed(
-  () => !!selectedFarm.value && myFarmIds.value.includes(selectedFarm.value.id),
+  () => !!selectedFarm.value && myFarmIds.value.includes(String(selectedFarm.value.id)),
 );
 
 const FARM_THUMBS = [
@@ -85,12 +87,22 @@ function getFarmCardImage(farmId) {
   return FARM_THUMBS[seed % FARM_THUMBS.length];
 }
 
+function getFarmMemberCount(farmId) {
+  return memberCountByFarm.value[String(farmId)] ?? 0;
+}
+
 async function fetchFarms() {
   isLoading.value = true;
   errorMessage.value = '';
   try {
-    const farmRes = await axios.get(`${API_BASE}/farm`);
+    const [farmRes, ids, counts] = await Promise.all([
+      axios.get(`${API_BASE}/farm`),
+      authStore.fetchCurrentUserFarmIds(),
+      authStore.fetchFarmCounts(),
+    ]);
     farms.value = Array.isArray(farmRes.data) ? farmRes.data : [];
+    myFarmIds.value = Array.isArray(ids) ? ids.map(String) : [];
+    memberCountByFarm.value = counts ?? {};
   } catch (error) {
     errorMessage.value = '농장 목록을 불러오지 못했어요.';
   } finally {
@@ -99,16 +111,21 @@ async function fetchFarms() {
 }
 
 async function openFarm(farmId) {
-  selectedFarmId.value = farmId;
+  selectedFarmId.value = String(farmId);
   isMemberLoading.value = true;
   try {
-    const farm = farmList.value.find((item) => item.id === farmId);
-    const memberIds = Array.isArray(farm?.members)
-      ? farm.members.filter(Boolean)
-      : [];
+    const farm = farmList.value.find(
+      (item) => String(item.id) === String(farmId),
+    );
+    const today = new Date().toISOString().slice(0, 10);
     const [members, recordsRes] = await Promise.all([
-      authStore.fetchFarmMembers(memberIds),
-      axios.get(`${API_BASE}/records`),
+      authStore.fetchFarmMembersByFarmId(String(farm?.id ?? farmId)),
+      axios.get(`${API_BASE}/records`, {
+        params: {
+          date: today,
+          type: 'expense',
+        },
+      }),
     ]);
 
     const sortedMembers = (Array.isArray(members) ? members : []).sort((a, b) =>
@@ -116,19 +133,19 @@ async function openFarm(farmId) {
     );
 
     const records = Array.isArray(recordsRes.data) ? recordsRes.data : [];
-    const today = new Date().toISOString().slice(0, 10);
+    const memberIdSet = new Set(sortedMembers.map((member) => String(member.id)));
+    const todayExpenseByUserId = {};
+    records.forEach((record) => {
+      const uid = String(record.userId);
+      if (!memberIdSet.has(uid)) return;
+      todayExpenseByUserId[uid] =
+        (todayExpenseByUserId[uid] ?? 0) + Number(record.amount || 0);
+    });
     const nextPigLevels = {};
 
     sortedMembers.forEach((member) => {
       const memberId = String(member.id);
-      const todayExpense = records
-        .filter(
-          (record) =>
-            String(record.userId) === memberId &&
-            record.type === 'expense' &&
-            record.date === today,
-        )
-        .reduce((sum, record) => sum + Number(record.amount || 0), 0);
+      const todayExpense = todayExpenseByUserId[memberId] ?? 0;
 
       const monthlyIncome = Number(member.monthlyIncome || 0);
       const targetExpenseRatio = Number(member.targetExpenseRatio || 0);
@@ -146,80 +163,82 @@ async function openFarm(farmId) {
 }
 
 async function closeFarm() {
-  await fetchFarms();
   selectedFarmId.value = null;
   farmMembers.value = [];
   memberPigLevelById.value = {};
 }
 
-async function openCreateModal() {
-  await fetchFarms();
+function openCreateModal() {
   newFarmName.value = '';
   showCreateModal.value = true;
 }
 
-async function closeCreateModal() {
+function closeCreateModal() {
   showCreateModal.value = false;
-  await fetchFarms();
 }
 
 async function submitCreateModal() {
   const farmName = newFarmName.value.trim();
-  if (!farmName || !authStore.currentUser) return;
+  if (!farmName || !authStore.currentUser || isCreatingFarm.value) return;
 
-  const createdFarmRes = await axios.post(`${API_BASE}/farm`, {
-    name: farmName,
-    members: [authStore.currentUser.id],
-  });
+  isCreatingFarm.value = true;
+  errorMessage.value = '';
+  try {
+    const createdFarm = await authStore.createFarm(farmName);
+    const createdFarmId = String(createdFarm?.id ?? '');
+    if (!createdFarmId) throw new Error('생성된 농장 ID를 받지 못했어요.');
+    await authStore.joinFarm(createdFarmId);
 
-  const nextFarmIds = Array.from(
-    new Set([...myFarmIds.value, createdFarmRes.data.id]),
-  );
-  await authStore.updateProfile({ farm: nextFarmIds });
-
-  showCreateModal.value = false;
-  await fetchFarms();
+    showCreateModal.value = false;
+    await fetchFarms();
+    await openFarm(createdFarmId);
+  } catch (error) {
+    const status = error?.response?.status;
+    errorMessage.value =
+      status != null
+        ? `농장 만들기에 실패했어요. (HTTP ${status})`
+        : '농장 만들기에 실패했어요. 잠시 후 다시 시도해주세요.';
+  } finally {
+    isCreatingFarm.value = false;
+  }
 }
 
 async function enterFarm() {
-  if (!selectedFarm.value || !authStore.currentUser || isMyFarm.value) return;
+  if (
+    !selectedFarm.value ||
+    !authStore.currentUser ||
+    isMyFarm.value ||
+    isMutatingMembership.value
+  ) return;
 
-  const nextFarmIds = Array.from(
-    new Set([...myFarmIds.value, selectedFarm.value.id]),
-  );
-  await authStore.updateProfile({ farm: nextFarmIds });
-
-  const nextMembers = Array.from(
-    new Set([
-      ...(selectedFarm.value.members ?? []).filter(Boolean),
-      authStore.currentUser.id,
-    ]),
-  );
-  await axios.patch(`${API_BASE}/farm/${selectedFarm.value.id}`, {
-    members: nextMembers,
-  });
-
-  await fetchFarms();
-  await openFarm(selectedFarm.value.id);
+  isMutatingMembership.value = true;
+  try {
+    const farmId = String(selectedFarm.value.id);
+    await authStore.joinFarm(farmId);
+    await fetchFarms();
+    await openFarm(farmId);
+  } finally {
+    isMutatingMembership.value = false;
+  }
 }
 
 async function exitFarm() {
-  if (!selectedFarm.value || !authStore.currentUser || !isMyFarm.value) return;
+  if (
+    !selectedFarm.value ||
+    !authStore.currentUser ||
+    !isMyFarm.value ||
+    isMutatingMembership.value
+  ) return;
 
-  const nextFarmIds = myFarmIds.value.filter(
-    (id) => id !== selectedFarm.value.id,
-  );
-  await authStore.updateProfile({ farm: nextFarmIds });
-
-  const nextMembers = (selectedFarm.value.members ?? []).filter(
-    (memberId) => String(memberId) !== String(authStore.currentUser.id),
-  );
-  await axios.patch(`${API_BASE}/farm/${selectedFarm.value.id}`, {
-    members: nextMembers,
-  });
-
-  closeFarm();
-  await fetchFarms();
+  isMutatingMembership.value = true;
+  try {
+    const farmId = String(selectedFarm.value.id);
+    await authStore.leaveFarm(farmId);
+    closeFarm();
+    await fetchFarms();
+  } finally {
+    isMutatingMembership.value = false;
+  }
 }
 
 onMounted(fetchFarms);
@@ -273,7 +292,7 @@ onMounted(fetchFarms);
             <p class="farm-meta">
               <PixelIcon icon="pig" size="0.9rem" />
               <span
-                >멤버 {{ farm.members?.filter(Boolean).length ?? 0 }}명</span
+                >멤버 {{ getFarmMemberCount(farm.id) }}명</span
               >
             </p>
           </div>
@@ -301,7 +320,7 @@ onMounted(fetchFarms);
             <p class="farm-meta">
               <PixelIcon icon="pig" size="0.9rem" />
               <span
-                >멤버 {{ farm.members?.filter(Boolean).length ?? 0 }}명</span
+                >멤버 {{ getFarmMemberCount(farm.id) }}명</span
               >
             </p>
           </div>
@@ -329,6 +348,7 @@ onMounted(fetchFarms);
             v-if="!isMyFarm"
             class="farm-action-btn join"
             type="button"
+            :disabled="isMutatingMembership"
             @click="enterFarm"
           >
             농장 가입하기
@@ -337,6 +357,7 @@ onMounted(fetchFarms);
             v-else
             class="farm-action-btn leave"
             type="button"
+            :disabled="isMutatingMembership"
             @click="exitFarm"
           >
             농장 탈퇴하기
@@ -417,10 +438,10 @@ onMounted(fetchFarms);
           <button
             class="farm-modal-btn create"
             type="button"
-            :disabled="!newFarmName.trim()"
+            :disabled="!newFarmName.trim() || isCreatingFarm"
             @click="submitCreateModal"
           >
-            만들기
+            {{ isCreatingFarm ? '생성 중...' : '만들기' }}
           </button>
         </div>
       </div>
@@ -633,6 +654,11 @@ onMounted(fetchFarms);
   background: #fff3f3;
   border-color: #ffd2d2;
   color: #c62828;
+}
+
+.farm-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .back-btn {
