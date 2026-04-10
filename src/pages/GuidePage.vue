@@ -10,6 +10,8 @@ const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
 const { PIG_LEVELS, HOUSE_LEVELS } = usePigSystem();
+
+const activeTab = ref('pig');
 const topAnchor = ref(null);
 const bottomAnchor = ref(null);
 
@@ -59,13 +61,13 @@ function scrollToBottom() {
 <template>
   <div class="guide-page">
     <div ref="topAnchor" class="scroll-anchor" aria-hidden="true"></div>
+
     <section class="guide-hero">
       <div>
         <p class="eyebrow">APP GUIDE</p>
         <h1 class="page-title">돼지와 집 변화 가이드</h1>
         <p class="page-desc">
-          하루 지출 비율에 따라 돼지 표정이 변하고, 한 달 소비 흐름에 따라
-          집이 단계별로 성장하거나 내려가요.
+          돼지 상태와 집 성장 단계를 탭으로 나눠서 볼 수 있어요.
         </p>
       </div>
       <button class="close-btn" @click="goNext">
@@ -73,7 +75,26 @@ function scrollToBottom() {
       </button>
     </section>
 
-    <section class="guide-section">
+    <section class="guide-tabs">
+      <button
+        type="button"
+        class="tab-btn"
+        :class="{ active: activeTab === 'pig' }"
+        @click="activeTab = 'pig'"
+      >
+        돼지 상태 가이드
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        :class="{ active: activeTab === 'house' }"
+        @click="activeTab = 'house'"
+      >
+        집 변화 가이드
+      </button>
+    </section>
+
+    <section v-if="activeTab === 'pig'" class="guide-section">
       <div class="section-head">
         <h2>돼지 상태 10단계</h2>
         <p>하루 예산을 얼마나 잘 지켰는지에 따라 오늘의 돼지가 달라져요.</p>
@@ -96,9 +117,7 @@ function scrollToBottom() {
           <div class="pig-copy">
             <div class="pig-topline">
               <span class="pig-level">Lv.{{ pig.level }}</span>
-              <span class="pig-range">
-                {{ getPigRangeLabel(index) }}
-              </span>
+              <span class="pig-range">{{ getPigRangeLabel(index) }}</span>
             </div>
             <strong class="pig-label">{{ pig.label }}</strong>
             <p class="pig-message">{{ pig.message }}</p>
@@ -107,7 +126,7 @@ function scrollToBottom() {
       </div>
     </section>
 
-    <section class="guide-section">
+    <section v-else class="guide-section">
       <div class="section-head">
         <h2>집 성장 5단계</h2>
         <p>월 평균 소비를 안정적으로 관리하면 집도 점점 좋아져요.</p>
@@ -152,6 +171,7 @@ function scrollToBottom() {
         DN
       </button>
     </div>
+
     <div ref="bottomAnchor" class="scroll-anchor" aria-hidden="true"></div>
   </div>
 </template>
@@ -169,7 +189,8 @@ function scrollToBottom() {
 }
 
 .guide-hero,
-.guide-section {
+.guide-section,
+.guide-tabs {
   background: #fff;
   border: 1.5px solid var(--border);
   border-radius: 20px;
@@ -217,6 +238,40 @@ function scrollToBottom() {
   cursor: pointer;
 }
 
+.guide-tabs {
+  padding: 0.55rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  background:
+    linear-gradient(180deg, #fff8fb 0%, #fff 100%);
+}
+
+.tab-btn {
+  border: 1.5px solid #f3dce5;
+  border-radius: 16px;
+  padding: 0.9rem 1rem;
+  background: linear-gradient(180deg, #fffdfd 0%, #fff4f8 100%);
+  color: #9b7d89;
+  font-size: 0.86rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.tab-btn.active {
+  border-color: #ffb7cc;
+  background: linear-gradient(135deg, #ff84ad 0%, #ff6b9d 100%);
+  color: #fff;
+  box-shadow: 0 10px 18px rgba(255, 107, 157, 0.22);
+  transform: translateY(-1px);
+}
+
 .guide-section {
   padding: 1.1rem;
 }
@@ -250,6 +305,7 @@ function scrollToBottom() {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  box-shadow: 0 10px 24px rgba(255, 107, 157, 0.08);
 }
 
 .pig-visual {
@@ -317,6 +373,7 @@ function scrollToBottom() {
   border-radius: 18px;
   overflow: hidden;
   background: #fffaf6;
+  box-shadow: 0 10px 24px rgba(255, 179, 71, 0.08);
 }
 
 .house-preview {
@@ -401,6 +458,10 @@ function scrollToBottom() {
 
   .close-btn {
     width: 100%;
+  }
+
+  .guide-tabs {
+    grid-template-columns: 1fr;
   }
 
   .pig-grid {
