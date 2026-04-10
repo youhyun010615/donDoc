@@ -2,9 +2,11 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/useAuthStore.js'
+import { useBudgetStore } from '../stores/useBudgetStore.js'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const budgetStore = useBudgetStore()
 
 const form = reactive({
   age: null,
@@ -30,6 +32,7 @@ async function handleSetup() {
       monthlyIncome: Number(form.monthlyIncome),
       targetExpenseRatio: Number(form.targetExpenseRatio)
     })
+    await budgetStore.settleProfileState()
     alert('설정이 완료되었습니다!')
     // 설정 완료 후 가이드 페이지로 이동
     router.push({ name: 'Guide', query: { source: 'login' } })

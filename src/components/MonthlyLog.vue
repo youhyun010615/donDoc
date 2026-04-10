@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useBudgetStore } from '../stores/useBudgetStore.js'
+import { useAuthStore } from '../stores/useAuthStore.js'
 import { usePigSystem } from '../composables/usePigSystem.js'
 import PixelIcon from './PixelIcon.vue'
 
@@ -9,6 +10,7 @@ const props = defineProps({
 })
 
 const store = useBudgetStore()
+const authStore = useAuthStore()
 const { getPigState, getHouseInfo, calcNextHouseLevel, formatCurrency } = usePigSystem()
 
 const monthRecords = computed(() =>
@@ -24,8 +26,8 @@ const monthExpense = computed(() =>
 )
 
 const monthlyBudget = computed(() => {
-  if (!store.profile) return 0
-  return Math.round((store.profile.monthlyIncome * store.profile.targetExpenseRatio) / 100)
+  if (!authStore.currentUser) return 0
+  return Math.round((authStore.currentUser.monthlyIncome * authStore.currentUser.targetExpenseRatio) / 100)
 })
 
 const avgExpenseRatio = computed(() => {
@@ -35,7 +37,7 @@ const avgExpenseRatio = computed(() => {
 
 const avgPigState = computed(() => getPigState(monthExpense.value, monthlyBudget.value))
 
-const currentHouseLevel = computed(() => store.profile?.houseLevel ?? 3)
+const currentHouseLevel = computed(() => authStore.currentUser?.houseLevel ?? 3)
 const nextHouseLevel = computed(() =>
   calcNextHouseLevel(avgExpenseRatio.value, currentHouseLevel.value)
 )
