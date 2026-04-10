@@ -1,30 +1,29 @@
 <script setup>
-import { onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import NavBar from './components/NavBar.vue'
-import { useAuthStore } from './stores/useAuthStore.js'
-import { useBudgetStore } from './stores/useBudgetStore.js'
+import { onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import NavBar from './components/NavBar.vue';
+import { useAuthStore } from './stores/useAuthStore.js';
+import { useBudgetStore } from './stores/useBudgetStore.js';
 
-const route = useRoute()
-const authStore = useAuthStore()
-const budgetStore = useBudgetStore()
+const route = useRoute();
+const authStore = useAuthStore();
+const budgetStore = useBudgetStore();
 
-const hideNavRoutes = ['Login', 'Guide']
+const hideNavRoutes = ['Login', 'Guide', 'Setup'];
 
 onMounted(async () => {
   if (authStore.isLoggedIn) {
-    await budgetStore.initStore()
+    await budgetStore.initStore();
   }
-})
+});
 </script>
 
 <template>
   <div id="app-wrapper">
-    <NavBar v-if="authStore.isLoggedIn && !hideNavRoutes.includes(route.name)" />
-    <main
-      class="main-content"
-      :class="{ 'no-nav': !authStore.isLoggedIn }"
-    >
+    <NavBar
+      v-if="authStore.isLoggedIn && !hideNavRoutes.includes(route.name)"
+    />
+    <main class="main-content" :class="{ 'no-nav': !authStore.isLoggedIn }">
       <RouterView />
     </main>
   </div>
