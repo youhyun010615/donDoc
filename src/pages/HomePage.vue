@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useBudgetStore } from '../stores/useBudgetStore.js';
 import { useAuthStore } from '../stores/useAuthStore.js';
@@ -32,6 +32,23 @@ function togglePigBubble() {
 function toggleCharacterBubble() {
   activeBubble.value = activeBubble.value === 'character' ? null : 'character'
 }
+
+function handleOutsideClick(e) {
+  if (!activeBubble.value) return
+  const bubble = document.querySelector('.pig-bubble, .character-bubble')
+  const pigEl = document.querySelector('.pig-pixel')
+  const charEl = document.querySelector('.character-overlay')
+  if (
+    bubble && !bubble.contains(e.target) &&
+    pigEl && !pigEl.contains(e.target) &&
+    charEl && !charEl.contains(e.target)
+  ) {
+    activeBubble.value = null
+  }
+}
+
+onMounted(() => document.addEventListener('click', handleOutsideClick))
+onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
 
 const character = computed(() =>
   getCharacterStage(store.totalExpenseThisMonth, store.dailyBudget, store.currentMonth),
