@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useBudgetStore } from '../stores/useBudgetStore.js';
 import { useAuthStore } from '../stores/useAuthStore.js';
@@ -7,11 +7,31 @@ import { usePigSystem } from '../composables/usePigSystem.js';
 import PigPixelArt from '../components/PigPixelArt.vue';
 import PigBackground from '../components/PigBackground.vue';
 import PixelIcon from '../components/PixelIcon.vue';
+import PixelSpeechBubble from '../components/PixelSpeechBubble.vue';
 
 const store = useBudgetStore();
 const authStore = useAuthStore();
 const router = useRouter();
-const { getPigState, getHouseInfo, formatCurrency, getCharacterStage } = usePigSystem();
+const { getPigState, getHouseInfo, formatCurrency, getCharacterStage, getPigGuideMessage, getCharacterGuideMessage } = usePigSystem();
+
+// 말풍선 상태
+const activeBubble = ref(null) // 'pig' | 'character' | null
+
+const pigBubbleText = computed(() =>
+  getPigGuideMessage(store.todayExpense, store.dailyBudget, store.totalExpenseThisMonth, store.currentMonth)
+)
+
+const characterBubbleText = computed(() =>
+  getCharacterGuideMessage(store.totalExpenseThisMonth, store.dailyBudget, store.currentMonth)
+)
+
+function togglePigBubble() {
+  activeBubble.value = activeBubble.value === 'pig' ? null : 'pig'
+}
+
+function toggleCharacterBubble() {
+  activeBubble.value = activeBubble.value === 'character' ? null : 'character'
+}
 
 const character = computed(() =>
   getCharacterStage(store.totalExpenseThisMonth, store.dailyBudget, store.currentMonth),
@@ -129,12 +149,39 @@ const todayRecordsSorted = computed(() =>
             :scale="pigVisualScale"
             class="pig-bg-layer"
           />
-          <PigPixelArt :level="pigState.level" class="pig-pixel" />
+
+          <!-- 돼지 말풍선 -->
+          <PixelSpeechBubble
+            v-if="activeBubble === 'pig'"
+            :text="pigBubbleText"
+            tail="left"
+            class="pig-bubble"
+            @close="activeBubble = null"
+          />
+
+          <!-- 돼지 (클릭 가능) -->
+          <PigPixelArt
+            :level="pigState.level"
+            class="pig-pixel"
+            @click="togglePigBubble"
+          />
+
+          <!-- 캐릭터 말풍선 -->
+          <PixelSpeechBubble
+            v-if="activeBubble === 'character'"
+            :text="characterBubbleText"
+            tail="right"
+            class="character-bubble"
+            @close="activeBubble = null"
+          />
+
+          <!-- 캐릭터 이미지 (클릭 가능) -->
           <img
             v-if="character"
             :src="character.image"
             :alt="character.name"
             class="character-overlay"
+            @click="toggleCharacterBubble"
           />
         </div>
 
@@ -418,6 +465,28 @@ const todayRecordsSorted = computed(() =>
   image-rendering: pixelated;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
   animation: characterFloat 3.4s ease-in-out infinite;
+  cursor: pointer;
+}
+
+.pig-pixel {
+  cursor: pointer;
+}
+
+/* 돼지 말풍선 — 돼지 위 중앙 */
+.pig-bubble {
+  position: absolute;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-20%);
+  z-index: 10;
+}
+
+/* 캐릭터 말풍선 — 캐릭터 위 왼쪽 */
+.character-bubble {
+  position: absolute;
+  bottom: 90px;
+  left: 0;
+  z-index: 10;
 }
 
 @keyframes characterFloat {
