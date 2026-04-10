@@ -27,7 +27,6 @@ onMounted(async () => {
   farmsNotMine.value = farms.value.filter(
     (farm) => !authStore.currentUser.farm.includes(farm.id),
   );
-  console.log(farmsMine.value, farmsNotMine.value);
 
   isLoading.value = false;
 });
@@ -40,14 +39,78 @@ const selectedFarm = computed(() => {
 
 const farmMembers = ref([]);
 
+const isMyFarm = ref(false);
+
 async function openFarm(farmId) {
   selectedFarmId.value = farmId;
+
+  if (farmsMine.value.find((f) => f.id === farmId)) isMyFarm.value = true;
+  else isMyFarm.value = false;
+
   const farm = farms.value.find((f) => f.id === farmId);
   farmMembers.value = await authStore.fetchFarmMembers(farm.members);
 }
 
 function closeFarm() {
   selectedFarmId.value = null;
+}
+
+const showCreateModal = ref(false);
+const newFarmName = ref('');
+
+function openCreateModal() {
+  newFarmName.value = '';
+  showCreateModal.value = true;
+}
+
+function closeCreateModal() {
+  showCreateModal.value = false;
+}
+
+async function submitCreateModal() {
+  showCreateModal.value = false;
+  const createdFarm = await authStore.createFarm(newFarmName.value);
+  await authStore.updateProfile({
+    farm: [...authStore.currentUser.farm, createdFarm.id],
+  });
+  farms.value = await authStore.fetchAllFarms();
+  farmsMine.value = farms.value.filter((farm) =>
+    authStore.currentUser.farm.includes(farm.id),
+  );
+}
+
+async function enterFarm() {
+  await authStore.updateProfile({
+    farm: [...authStore.currentUser.farm, selectedFarm.value.id],
+  });
+  await authStore.registerCurrentUsertoFarm(selectedFarm.value);
+  selectedFarmId.value = false;
+
+  farms.value = await authStore.fetchAllFarms();
+  farmsMine.value = farms.value.filter((farm) =>
+    authStore.currentUser.farm.includes(farm.id),
+  );
+  farmsNotMine.value = farms.value.filter(
+    (farm) => !authStore.currentUser.farm.includes(farm.id),
+  );
+}
+
+async function exitFarm() {
+  await authStore.updateProfile({
+    farm: authStore.currentUser.farm.filter(
+      (id) => id !== selectedFarm.value.id,
+    ),
+  });
+  await authStore.unregisterCurrentUserFromFarm(selectedFarm.value);
+  selectedFarmId.value = false;
+
+  farms.value = await authStore.fetchAllFarms();
+  farmsMine.value = farms.value.filter((farm) =>
+    authStore.currentUser.farm.includes(farm.id),
+  );
+  farmsNotMine.value = farms.value.filter(
+    (farm) => !authStore.currentUser.farm.includes(farm.id),
+  );
 }
 </script>
 
@@ -62,6 +125,24 @@ function closeFarm() {
         다른 유저 농장을 둘러보고 성장 상태를 확인해요
       </p>
     </header>
+
+    <button v-if="!selectedFarm" @click="openCreateModal">농장 만들기</button>
+    <div v-if="showCreateModal && !selectedFarm" @click.self="closeCreateModal">
+      <div>
+        <h3>농장 만들기</h3>
+        <input
+          type="text"
+          v-model="newFarmName"
+          placeholder="농장 이름을 입력하세요"
+        />
+      </div>
+      <div>
+        <button @click="closeCreateModal">취소</button>
+        <button :disabled="!newFarmName.trim()" @click="submitCreateModal">
+          만들기
+        </button>
+      </div>
+    </div>
 
     <section v-if="!selectedFarm">
       <h2>내 농장</h2>
@@ -86,6 +167,8 @@ function closeFarm() {
 
     <section v-else>
       <button @click="closeFarm">← 목록으로</button>
+      <button @click="enterFarm" v-if="!isMyFarm">농장 가입하기</button>
+      <button @click="exitFarm" v-else>농장 탈퇴하기</button>
       <h1>여기는 {{ selectedFarm.name }} 입니다!!</h1>
       <hr />
       <div v-for="farmMember in farmMembers" :key="farmMember.id">

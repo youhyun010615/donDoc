@@ -90,6 +90,34 @@ export const useAuthStore = defineStore(
       return res.data.filter((user) => membersId.includes(user.id));
     }
 
+    async function createFarm(name) {
+      const farm = {
+        name: name,
+        members: [currentUser.value.id],
+      };
+      const res = await axios.post(`${API_BASE}/farm`, farm);
+      return res.data;
+    }
+
+    async function registerCurrentUsertoFarm(farm) {
+      console.log(farm.members.includes(currentUser.value.id));
+      const updatedFarm = {
+        ...farm,
+        members: farm.members.includes(currentUser.value.id)
+          ? farm.members
+          : [...farm.members, currentUser.value.id],
+      };
+      await axios.put(`${API_BASE}/farm/${farm.id}`, updatedFarm);
+    }
+
+    async function unregisterCurrentUserFromFarm(farm) {
+      const updatedFarm = {
+        ...farm,
+        members: farm.members.filter((id) => id !== currentUser.value.id),
+      };
+      await axios.put(`${API_BASE}/farm/${farm.id}`, updatedFarm);
+    }
+
     return {
       currentUser,
       isLoggedIn,
@@ -100,6 +128,9 @@ export const useAuthStore = defineStore(
       fetchCurrentUserFarms,
       fetchFarmMembers,
       fetchAllFarms,
+      createFarm,
+      registerCurrentUsertoFarm,
+      unregisterCurrentUserFromFarm,
     };
   },
   {
