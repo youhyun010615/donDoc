@@ -1,41 +1,41 @@
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '../stores/useAuthStore.js'
-import { useBudgetStore } from '../stores/useBudgetStore.js'
-import PixelIcon from '../components/PixelIcon.vue'
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '../stores/useAuthStore.js';
+import { useBudgetStore } from '../stores/useBudgetStore.js';
+import PixelIcon from '../components/PixelIcon.vue';
 
-const router = useRouter()
-const authStore = useAuthStore()
-const budgetStore = useBudgetStore()
+const router = useRouter();
+const authStore = useAuthStore();
+const budgetStore = useBudgetStore();
 
-const userId = ref('')
-const password = ref('')
-const errorMsg = ref('')
-const loading = ref(false)
+const userId = ref('');
+const password = ref('');
+const errorMsg = ref('');
+const loading = ref(false);
 
 async function handleLogin() {
-  errorMsg.value = ''
+  errorMsg.value = '';
   if (!userId.value.trim() || !password.value.trim()) {
-    errorMsg.value = '아이디와 비밀번호를 입력해주세요'
-    return
+    errorMsg.value = '아이디와 비밀번호를 입력해주세요';
+    return;
   }
 
   try {
-    loading.value = true
-    await authStore.login(userId.value.trim(), password.value)
-    await budgetStore.initStore()
+    loading.value = true;
+    await authStore.login(userId.value.trim(), password.value);
+    await budgetStore.initStore();
 
-    // 수입 정보가 없으면 설정으로, 있으면 홈으로
-    if (!authStore.currentUser.monthlyIncome) {
-      router.push({ name: 'Setup' })
+    // 나이 정보가 없으면 설정으로, 있으면 홈으로
+    if (!authStore.currentUser.age) {
+      router.push({ name: 'Setup' });
     } else {
-      router.push({ name: 'Home' })
+      router.push({ name: 'Home' });
     }
   } catch (e) {
-    errorMsg.value = e.message
+    errorMsg.value = e.message;
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 </script>
@@ -124,8 +124,13 @@ async function handleLogin() {
 }
 
 @keyframes pigFloat {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-8px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 .app-title {
@@ -177,7 +182,7 @@ async function handleLogin() {
 
 .error-msg {
   font-size: 0.82rem;
-  color: #E53935;
+  color: #e53935;
   margin: 0;
 }
 
