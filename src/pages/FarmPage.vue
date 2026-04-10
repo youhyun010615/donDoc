@@ -145,14 +145,14 @@ async function openFarm(farmId) {
   }
 }
 
-function closeFarm() {
+async function closeFarm() {
   await fetchFarms();
   selectedFarmId.value = null;
   farmMembers.value = [];
   memberPigLevelById.value = {};
 }
 
-function openCreateModal() {
+async function openCreateModal() {
   await fetchFarms();
   newFarmName.value = '';
   showCreateModal.value = true;
