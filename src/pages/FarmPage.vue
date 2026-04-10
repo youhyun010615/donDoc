@@ -127,7 +127,7 @@ async function exitFarm() {
     </header>
 
     <button v-if="!selectedFarm" @click="openCreateModal">농장 만들기</button>
-    <div v-if="showCreateModal && !selectedFarm" @click.self="closeCreateModal">
+    <div v-if="showCreateModal || !selectedFarm" @click.self="closeCreateModal">
       <div>
         <h3>농장 만들기</h3>
         <input
