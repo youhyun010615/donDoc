@@ -50,10 +50,10 @@ router.beforeEach((to) => {
     return { name: 'Home' };
   }
 
-  // 3. 로그인 상태인데 아직 수입 정보가 없으면 설정 페이지로 (단, 가이드/설정 페이지면 제외)
+  // 3. 로그인 상태인데 아직 나이 정보가 없으면 설정 페이지로 (단, 가이드/설정 페이지면 제외)
   if (
     authStore.isLoggedIn &&
-    !authStore.currentUser.monthlyIncome &&
+    !authStore.currentUser.age &&
     to.name !== 'Guide' &&
     to.name !== 'Setup'
   ) {

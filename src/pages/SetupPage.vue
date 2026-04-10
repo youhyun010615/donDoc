@@ -11,22 +11,32 @@ const budgetStore = useBudgetStore()
 const form = reactive({
   age: null,
   monthlyIncome: null,
-  targetExpenseRatio: 60
-})
+  targetExpenseRatio: 60,
+});
 
-const errorMsg = ref('')
-const loading = ref(false)
+const errorMsg = ref('');
+const loading = ref(false);
 
 async function handleSetup() {
-  errorMsg.value = ''
-  
+  errorMsg.value = '';
+
+  if (form.age > 100 || form.age < 0) {
+    errorMsg.value = '올바른 나이를 입력해주세요';
+    return;
+  }
+
+  if (form.monthlyIncome < 0 || form.monthlyIncome > 1000000000) {
+    errorMsg.value = '올바른 월 수입을 입력해주세요';
+    return;
+  }
+
   if (form.age === null || form.monthlyIncome === null) {
-    errorMsg.value = '나이와 월 수입을 입력해주세요'
-    return
+    errorMsg.value = '나이와 월 수입을 입력해주세요';
+    return;
   }
 
   try {
-    loading.value = true
+    loading.value = true;
     await authStore.updateProfile({
       age: Number(form.age),
       monthlyIncome: Number(form.monthlyIncome),
@@ -35,11 +45,11 @@ async function handleSetup() {
     await budgetStore.settleProfileState()
     alert('설정이 완료되었습니다!')
     // 설정 완료 후 가이드 페이지로 이동
-    router.push({ name: 'Guide', query: { source: 'login' } })
+    router.push({ name: 'Guide', query: { source: 'login' } });
   } catch (e) {
-    errorMsg.value = '설정 저장 중 오류가 발생했습니다'
+    errorMsg.value = '설정 저장 중 오류가 발생했습니다';
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 </script>
@@ -48,25 +58,46 @@ async function handleSetup() {
   <div class="setup-page">
     <div class="setup-card">
       <div class="setup-header">
-        <h1 class="page-title">반가워요, {{ authStore.currentUser?.userName }}님!</h1>
+        <h1 class="page-title">
+          반가워요, {{ authStore.currentUser?.userName }}님!
+        </h1>
         <p class="page-subtitle">정확한 진단을 위해 기초 정보를 알려주세요</p>
       </div>
 
       <form class="setup-form" @submit.prevent="handleSetup">
         <div class="form-group">
           <label>나이</label>
-          <input v-model="form.age" type="number" class="form-input" placeholder="25" required />
+          <input
+            v-model="form.age"
+            type="number"
+            class="form-input"
+            placeholder="25"
+            required
+          />
         </div>
 
         <div class="form-group">
           <label>월 평균 수입 (원)</label>
-          <input v-model="form.monthlyIncome" type="number" class="form-input" placeholder="3000000" required />
+          <input
+            v-model="form.monthlyIncome"
+            type="number"
+            class="form-input"
+            placeholder="3000000"
+            required
+          />
         </div>
 
         <div class="form-group">
           <label>목표 지출 비율 (%)</label>
           <div class="range-container">
-            <input v-model="form.targetExpenseRatio" type="range" min="10" max="90" step="5" class="form-range" />
+            <input
+              v-model="form.targetExpenseRatio"
+              type="range"
+              min="10"
+              max="90"
+              step="5"
+              class="form-range"
+            />
             <span class="range-value">{{ form.targetExpenseRatio }}%</span>
           </div>
           <p class="help-text">수입의 몇 %를 지출 목표로 잡을까요?</p>
@@ -182,7 +213,7 @@ async function handleSetup() {
 
 .error-msg {
   font-size: 0.82rem;
-  color: #E53935;
+  color: #e53935;
   margin: 0;
   text-align: center;
 }
