@@ -87,7 +87,8 @@ export const useAuthStore = defineStore(
 
     async function fetchFarmMembers(membersId) {
       const res = await axios.get(`${API_BASE}/profile`);
-      return res.data.filter((user) => membersId.includes(user.id));
+      const ids = membersId.map(String);
+      return res.data.filter((user) => ids.includes(String(user.id)));
     }
 
     async function createFarm(name) {
