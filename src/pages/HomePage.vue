@@ -12,14 +12,12 @@ import PixelSpeechBubble from '../components/PixelSpeechBubble.vue';
 const store = useBudgetStore();
 const authStore = useAuthStore();
 const router = useRouter();
-const { getPigState, getHouseInfo, formatCurrency, getCharacterStage, getPigGuideMessage, getCharacterGuideMessage } = usePigSystem();
+const { getPigState, getHouseInfo, formatCurrency, getCharacterStage, getPigMessage, getCharacterGuideMessage } = usePigSystem();
 
 // 말풍선 상태
 const activeBubble = ref(null) // 'pig' | 'character' | null
 
-const pigBubbleText = computed(() =>
-  getPigGuideMessage(store.todayExpense, store.dailyBudget, store.totalExpenseThisMonth, store.currentMonth)
-)
+const pigBubbleText = computed(() => getPigMessage(pigState.value.level))
 
 const characterBubbleText = computed(() =>
   getCharacterGuideMessage(store.totalExpenseThisMonth, store.dailyBudget, store.currentMonth)

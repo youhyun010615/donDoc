@@ -260,40 +260,26 @@ export function usePigSystem() {
     return { ...stage, pace: Math.round(pace * 100) / 100 }
   }
 
+  // 돼지 레벨별 귀여운 멘트
+  const PIG_MESSAGES = {
+    10: '꿀꿀~ 나 요즘 너무 행복해!\n밥도 많이 먹고 살도 찌고\n이게 바로 황금 돼지야!',
+    9:  '꿀꿀! 오늘도 든든해~\n이 기세라면 곧 황금이 될 거야!',
+    8:  '음냐~ 배불러.\n요즘 잘 먹고 잘 살고 있어!',
+    7:  '꿀꿀... 평범하게 살고 있어.\n그냥 그런 하루야.',
+    6:  '흠... 요즘 좀 걱정돼.\n밥은 먹고 있는데 뭔가 불안해.',
+    5:  '꿀꿀... 배가 좀 고픈 것 같기도 하고.\n지갑이 얇아지는 느낌이야...',
+    4:  '으으... 요즘 힘들어.\n밥을 줄여야 하나 봐.',
+    3:  '꿀꿀... 갈비뼈가 보여.\n나 지금 많이 힘들거든?',
+    2:  '살려줘... 너무 배고파.\n이러다가 진짜 쓰러질 것 같아...',
+    1:  '...\n나... 이제 삼겹살이 되는 건가.',
+  }
+
   /**
-   * 돼지 클릭 시 말풍선 가이드 메시지 생성
-   * @param {number} todayExpense - 오늘 지출
-   * @param {number} dailyBudget - 일일 예산
-   * @param {number} monthlyExpense - 이번 달 지출
-   * @param {string} currentMonth - 'YYYY-MM'
+   * 돼지 클릭 시 레벨별 귀여운 멘트 반환
+   * @param {number} level - 돼지 레벨 (1~10)
    */
-  function getPigGuideMessage(todayExpense, dailyBudget, monthlyExpense, currentMonth) {
-    if (!dailyBudget || dailyBudget <= 0) return '예산을 설정하면\n가이드를 드릴게요!'
-
-    const [year, month] = currentMonth.split('-').map(Number)
-    const totalDays = new Date(year, month, 0).getDate()
-    const today = new Date()
-    const elapsedDays = today.getDate()
-    const remainDays = totalDays - elapsedDays
-    const monthlyBudget = dailyBudget * totalDays
-
-    const todayRatio = Math.round((todayExpense / dailyBudget) * 100)
-    const monthlyRatio = Math.round((monthlyExpense / monthlyBudget) * 100)
-    const remainBudget = monthlyBudget - monthlyExpense
-    const recommendPerDay = remainDays > 0 ? Math.floor(remainBudget / remainDays) : 0
-
-    const fmt = (n) => new Intl.NumberFormat('ko-KR').format(n)
-
-    let guide = ''
-    if (remainBudget <= 0) {
-      guide = `이미 예산 초과!\n지출을 멈춰야 해요.`
-    } else if (recommendPerDay < dailyBudget * 0.5) {
-      guide = `하루 ${fmt(recommendPerDay)}원 이하로\n써야 예산을 지킬 수 있어요.`
-    } else {
-      guide = `하루 ${fmt(recommendPerDay)}원 이하면\n이번 달 안전해요!`
-    }
-
-    return `오늘 지출: ${fmt(todayExpense)}원 (${todayRatio}%)\n이번 달: ${fmt(monthlyExpense)} / ${fmt(monthlyBudget)}원 (${monthlyRatio}%)\n남은 예산: ${fmt(Math.max(remainBudget, 0))}원\n\n${guide}`
+  function getPigMessage(level) {
+    return PIG_MESSAGES[level] ?? PIG_MESSAGES[5]
   }
 
   /**
@@ -324,7 +310,7 @@ export function usePigSystem() {
       bad: `지출 속도가 너무 빨라요!\n하루 ${fmt(Math.max(recommendPerDay, 0))}원 이하로 줄여야 해요.`,
     }
 
-    return `[ ${character.name} 단계 ]\n페이스: ${character.pace}x\n\n${stageGuides[character.effect]}`
+    return `${character.name}\n페이스: ${character.pace}x\n\n${stageGuides[character.effect]}`
   }
 
   return {
@@ -338,7 +324,7 @@ export function usePigSystem() {
     formatCurrency,
     formatDate,
     getCharacterStage,
-    getPigGuideMessage,
+    getPigMessage,
     getCharacterGuideMessage,
   }
 }
