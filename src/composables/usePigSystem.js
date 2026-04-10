@@ -305,12 +305,14 @@ export function usePigSystem() {
     const fmt = (n) => new Intl.NumberFormat('ko-KR').format(n)
 
     const stageGuides = {
-      good: `지금 페이스면 이번 달\n예산 안에서 끝낼 수 있어요!`,
-      neutral: `조금만 더 아끼면\n다음 달 집이 업그레이드돼요.`,
-      bad: `지출 속도가 너무 빨라요!\n하루 ${fmt(Math.max(recommendPerDay, 0))}원 이하로 줄여야 해요.`,
+      1: `지금 페이스면 이번 달\n예산 안에서 끝낼 수 있어요!`,
+      2: `지금 페이스면 이번 달\n예산 안에서 끝낼 수 있어요!`,
+      3: `조금만 더 아끼면\n다음 달 집이 업그레이드돼요.`,
+      4: `지출을 줄여야 해요.\n도둑이 볏짚을 훔쳐가고 있어요.`,
+      5: `당장 지출을 멈추세요.\n아니면 도축사가 돼지를 죽이러 올거에요.`,
     }
 
-    return `${character.name}\n페이스: ${character.pace}x\n\n${stageGuides[character.effect]}`
+    return `${character.name}\n페이스: ${character.pace}x\n\n${stageGuides[character.stage]}`
   }
 
   return {
