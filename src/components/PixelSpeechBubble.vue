@@ -60,13 +60,11 @@ onUnmounted(() => clearInterval(timer))
   background: rgba(26, 26, 46, 0.82);
   color: #e8f4e8;
   font-family: 'DungGeunMo', 'Galmuri11', 'Courier New', monospace;
-  font-size: 0.72rem;
-  line-height: 1.6;
-  padding: 10px 12px 8px;
-  min-width: 140px;
-  max-width: 190px;
-  max-height: 130px;
-  overflow-y: auto;
+  font-size: 0.65rem;
+  line-height: 1.5;
+  padding: 8px 10px 6px;
+  min-width: 110px;
+  max-width: 155px;
 
   /* 픽셀 테두리 — box-shadow로 계단 표현 */
   box-shadow:

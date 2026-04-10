@@ -346,6 +346,61 @@ export function usePigSystem() {
     return `${character.name}\n페이스: ${character.pace}x\n\n${stageGuides[character.effect]}`;
   }
 
+  // 돼지 레벨별 귀여운 멘트
+  const PIG_MESSAGES = {
+    10: '꿀꿀~ 나 요즘 너무 행복해!\n밥도 많이 먹고 살도 찌고\n이게 바로 황금 돼지야!',
+    9:  '꿀꿀! 오늘도 든든해~\n이 기세라면 곧 황금이 될 거야!',
+    8:  '음냐~ 배불러.\n요즘 잘 먹고 잘 살고 있어!',
+    7:  '꿀꿀... 평범하게 살고 있어.\n그냥 그런 하루야.',
+    6:  '흠... 요즘 좀 걱정돼.\n밥은 먹고 있는데 뭔가 불안해.',
+    5:  '꿀꿀... 배가 좀 고픈 것 같기도 하고.\n지갑이 얇아지는 느낌이야...',
+    4:  '으으... 요즘 힘들어.\n밥을 줄여야 하나 봐.',
+    3:  '꿀꿀... 갈비뼈가 보여.\n나 지금 많이 힘들거든?',
+    2:  '살려줘... 너무 배고파.\n이러다가 진짜 쓰러질 것 같아...',
+    1:  '...\n나... 이제 삼겹살이 되는 건가.',
+  }
+
+  /**
+   * 돼지 클릭 시 레벨별 귀여운 멘트 반환
+   * @param {number} level - 돼지 레벨 (1~10)
+   */
+  function getPigMessage(level) {
+    return PIG_MESSAGES[level] ?? PIG_MESSAGES[5]
+  }
+
+  /**
+   * 캐릭터 클릭 시 말풍선 가이드 메시지 생성
+   * @param {number} monthlyExpense - 이번 달 지출
+   * @param {number} dailyBudget - 일일 예산
+   * @param {string} currentMonth - 'YYYY-MM'
+   */
+  function getCharacterGuideMessage(monthlyExpense, dailyBudget, currentMonth) {
+    if (!dailyBudget || dailyBudget <= 0) return '예산을 설정하면\n가이드를 드릴게요!'
+
+    const character = getCharacterStage(monthlyExpense, dailyBudget, currentMonth)
+    if (!character) return '데이터가 없어요.'
+
+    const [year, month] = currentMonth.split('-').map(Number)
+    const totalDays = new Date(year, month, 0).getDate()
+    const today = new Date()
+    const remainDays = totalDays - today.getDate()
+    const monthlyBudget = dailyBudget * totalDays
+    const remainBudget = monthlyBudget - monthlyExpense
+    const recommendPerDay = remainDays > 0 ? Math.floor(remainBudget / remainDays) : 0
+
+    const fmt = (n) => new Intl.NumberFormat('ko-KR').format(n)
+
+    const stageGuides = {
+      1: `지금 페이스면 이번 달\n예산 안에서 끝낼 수 있어요!`,
+      2: `지금 페이스면 이번 달\n예산 안에서 끝낼 수 있어요!`,
+      3: `조금만 더 아끼면\n다음 달 집이 업그레이드돼요.`,
+      4: `지출을 줄여야 해요.\n도둑이 볏짚을 훔쳐가고 있어요.`,
+      5: `당장 지출을 멈추세요.\n아니면 도축사가 돼지를 죽이러 올거에요.`,
+    }
+
+    return `${character.name}\n페이스: ${character.pace}x\n\n${stageGuides[character.stage]}`
+  }
+
   return {
     PIG_LEVELS,
     HOUSE_LEVELS,
@@ -359,5 +414,6 @@ export function usePigSystem() {
     getCharacterStage,
     getPigMessage,
     getCharacterGuideMessage,
+  }
   };
 }
