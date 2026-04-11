@@ -4,6 +4,9 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import router from './router/index.js'
 import App from './App.vue'
 import './style.css'
+import { registerSW } from 'virtual:pwa-register'
+
+registerSW({ immediate: true })
 
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
