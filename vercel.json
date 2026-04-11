@@ -1,10 +1,6 @@
 {
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "https://dondoc-json-server-production-3c7c.up.railway.app/:path*"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

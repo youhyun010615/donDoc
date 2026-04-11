@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import axios from 'axios';
+import api from '../lib/api.js';
 import { usePigSystem } from '../composables/usePigSystem.js';
 import { useAuthStore } from './useAuthStore.js';
 
@@ -181,7 +181,7 @@ export const useBudgetStore = defineStore('budget', () => {
   // --- Actions ---
   async function fetchIncomeCategories() {
     try {
-      const res = await axios.get(`${API_BASE}/incomeCategories`);
+      const res = await api.get(`${API_BASE}/incomeCategories`);
       incomeCategories.value = res.data;
     } catch (e) {
       error.value = '수입 카테고리 조회 실패';
@@ -191,7 +191,7 @@ export const useBudgetStore = defineStore('budget', () => {
 
   async function fetchExpenseCategories() {
     try {
-      const res = await axios.get(`${API_BASE}/expenseCategories`);
+      const res = await api.get(`${API_BASE}/expenseCategories`);
       expenseCategories.value = res.data;
     } catch (e) {
       error.value = '지출 카테고리 조회 실패';
@@ -202,7 +202,7 @@ export const useBudgetStore = defineStore('budget', () => {
   async function fetchRecords() {
     try {
       const userId = authStore.currentUser?.id;
-      const res = await axios.get(`${API_BASE}/records?userId=${userId}`);
+      const res = await api.get(`${API_BASE}/records?userId=${userId}`);
       records.value = res.data.sort((a, b) => b.date.localeCompare(a.date));
     } catch (e) {
       error.value = '거래 내역 조회 실패';
@@ -213,7 +213,7 @@ export const useBudgetStore = defineStore('budget', () => {
   async function addRecord(newRecord) {
     try {
       loading.value = true;
-      const res = await axios.post(`${API_BASE}/records`, {
+      const res = await api.post(`${API_BASE}/records`, {
         ...newRecord,
         userId: authStore.currentUser?.id,
         createdAt: new Date().toISOString(),
@@ -235,7 +235,7 @@ export const useBudgetStore = defineStore('budget', () => {
   async function updateRecord(id, updatedRecord) {
     try {
       loading.value = true;
-      const res = await axios.patch(`${API_BASE}/records/${id}`, updatedRecord);
+      const res = await api.patch(`${API_BASE}/records/${id}`, updatedRecord);
       records.value = records.value
         .map((record) => (record.id === id ? res.data : record))
         .sort((a, b) => b.date.localeCompare(a.date));
@@ -253,7 +253,7 @@ export const useBudgetStore = defineStore('budget', () => {
   async function deleteRecord(id) {
     try {
       loading.value = true;
-      await axios.delete(`${API_BASE}/records/${id}`);
+      await api.delete(`${API_BASE}/records/${id}`);
       records.value = records.value.filter((r) => r.id !== id);
       void scheduleProfileSettlement();
     } catch (e) {
