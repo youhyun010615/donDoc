@@ -34,4 +34,22 @@ export default defineConfig({
       }
     })
   ],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://dondoc-json-server-production-3c7c.up.railway.app', // 실제 백엔드 주소
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
+  },
+  preview: {
+    proxy: {
+      '/api': {
+        target: 'https://dondoc-json-server-production-3c7c.up.railway.app',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
+  },
 })
