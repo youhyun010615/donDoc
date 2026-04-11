@@ -2,17 +2,15 @@
 import { ref, watch, onUnmounted } from 'vue'
 
 const props = defineProps({
-  /** 표시할 전체 텍스트 */
   text: { type: String, required: true },
-  /** 말풍선 꼬리 방향: 'left' | 'right' */
   tail: { type: String, default: 'left' },
-  /** 한 글자 타이핑 간격 (ms) */
   speed: { type: Number, default: 45 },
 })
 
 const emit = defineEmits(['close'])
 
 const displayed = ref('')
+const scrollEl = ref(null)
 let timer = null
 
 function startTyping() {
@@ -23,14 +21,26 @@ function startTyping() {
     if (i < props.text.length) {
       displayed.value += props.text[i]
       i++
+      scrollToBottom()
     } else {
       clearInterval(timer)
     }
   }, props.speed)
 }
 
-watch(() => props.text, startTyping, { immediate: true })
+function scrollToBottom() {
+  if (scrollEl.value) scrollEl.value.scrollTop = scrollEl.value.scrollHeight
+}
 
+function scrollUp() {
+  if (scrollEl.value) scrollEl.value.scrollBy({ top: -40, behavior: 'smooth' })
+}
+
+function scrollDown() {
+  if (scrollEl.value) scrollEl.value.scrollBy({ top: 40, behavior: 'smooth' })
+}
+
+watch(() => props.text, startTyping, { immediate: true })
 onUnmounted(() => clearInterval(timer))
 </script>
 
@@ -38,7 +48,11 @@ onUnmounted(() => clearInterval(timer))
   <div class="bubble-wrap" :class="'tail-' + tail">
     <div class="bubble">
       <button class="close-btn" type="button" @click="emit('close')">✕</button>
-      <p class="bubble-text">{{ displayed }}<span class="cursor">█</span></p>
+      <p ref="scrollEl" class="bubble-text">{{ displayed }}<span class="cursor">█</span></p>
+      <div class="scroll-btns">
+        <button type="button" @click="scrollUp">▲</button>
+        <button type="button" @click="scrollDown">▼</button>
+      </div>
     </div>
     <div class="tail-pixel" />
   </div>
@@ -54,7 +68,6 @@ onUnmounted(() => clearInterval(timer))
   pointer-events: auto;
 }
 
-/* 말풍선 본체 */
 .bubble {
   position: relative;
   background: rgba(26, 26, 46, 0.82);
@@ -62,23 +75,19 @@ onUnmounted(() => clearInterval(timer))
   font-family: 'DungGeunMo', 'Galmuri11', 'Courier New', monospace;
   font-size: 0.65rem;
   line-height: 1.5;
-  padding: 8px 10px 6px;
+  padding: 8px 10px 24px;
   min-width: 110px;
   max-width: 155px;
 
-  /* 픽셀 테두리 — box-shadow로 계단 표현 */
   box-shadow:
-    /* 상단 */
     4px 0px 0 0 #e8f4e8,
     -4px 0px 0 0 #e8f4e8,
     0px -4px 0 0 #e8f4e8,
     0px 4px 0 0 #e8f4e8,
-    /* 모서리 컷 */
     4px -4px 0 0 #e8f4e8,
     -4px -4px 0 0 #e8f4e8,
     4px 4px 0 0 #e8f4e8,
     -4px 4px 0 0 #e8f4e8,
-    /* 외곽 그림자 */
     8px 0px 0 0 #000,
     -8px 0px 0 0 #000,
     0px -8px 0 0 #000,
@@ -89,7 +98,6 @@ onUnmounted(() => clearInterval(timer))
     -8px 8px 0 0 #000;
 }
 
-/* 닫기 버튼 */
 .close-btn {
   position: absolute;
   top: 4px;
@@ -108,9 +116,47 @@ onUnmounted(() => clearInterval(timer))
   padding-right: 12px;
   white-space: pre-wrap;
   word-break: keep-all;
+  max-height: 90px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #90caf9 transparent;
 }
 
-/* 커서 깜빡임 */
+.bubble-text::-webkit-scrollbar {
+  width: 4px;
+}
+
+.bubble-text::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.bubble-text::-webkit-scrollbar-thumb {
+  background: #90caf9;
+  border-radius: 2px;
+}
+
+.scroll-btns {
+  position: absolute;
+  bottom: 4px;
+  right: 6px;
+  display: flex;
+  gap: 2px;
+}
+
+.scroll-btns button {
+  background: none;
+  border: none;
+  color: #90caf9;
+  font-size: 0.5rem;
+  cursor: pointer;
+  padding: 1px 3px;
+  line-height: 1;
+}
+
+.scroll-btns button:hover {
+  color: #e8f4e8;
+}
+
 .cursor {
   display: inline-block;
   color: #90caf9;
@@ -124,7 +170,6 @@ onUnmounted(() => clearInterval(timer))
   50%       { opacity: 0; }
 }
 
-/* 꼬리 픽셀 (왼쪽 방향) */
 .tail-pixel {
   width: 8px;
   height: 16px;
@@ -144,7 +189,6 @@ onUnmounted(() => clearInterval(timer))
   background: #1a1a2e;
 }
 
-/* 꼬리 오른쪽 */
 .tail-right .tail-pixel {
   margin-left: auto;
   margin-right: 20px;
