@@ -10,6 +10,7 @@ const INITIAL_HOUSE_LEVEL = 3;
 export const useBudgetStore = defineStore('budget', () => {
   const { calcNextHouseLevel, getPigState } = usePigSystem();
   const authStore = useAuthStore();
+  let profileSettleChain = Promise.resolve();
 
   // --- State ---
   const records = ref([]);
@@ -143,39 +144,38 @@ export const useBudgetStore = defineStore('budget', () => {
     return getPigState(todayExpense.value, dailyBudget.value).level;
   }
 
-  async function settleHouseLevelForCurrentMonth() {
+  async function settleProfileState() {
     if (!authStore.currentUser) return;
 
     const calculatedHouseLevel = calculateHouseLevelFromRecords();
-    const currentHouseLevel = authStore.currentUser.houseLevel ?? INITIAL_HOUSE_LEVEL;
-
-    if (currentHouseLevel !== calculatedHouseLevel) {
-      try {
-        await authStore.updateProfile({ houseLevel: calculatedHouseLevel });
-      } catch (e) {
-        console.error('월간 houseLevel 정산 실패', e);
-      }
-    }
-  }
-
-  async function settleCurrentPigLevel() {
-    if (!authStore.currentUser) return;
-
     const calculatedPigLevel = calculateCurrentPigLevel();
+    const currentHouseLevel = authStore.currentUser.houseLevel ?? INITIAL_HOUSE_LEVEL;
     const currentPigLevel = authStore.currentUser.currentPigLevel ?? 5;
 
+    const updates = {};
+    if (currentHouseLevel !== calculatedHouseLevel) {
+      updates.houseLevel = calculatedHouseLevel;
+    }
     if (currentPigLevel !== calculatedPigLevel) {
-      try {
-        await authStore.updateProfile({ currentPigLevel: calculatedPigLevel });
-      } catch (e) {
-        console.error('현재 currentPigLevel 정산 실패', e);
-      }
+      updates.currentPigLevel = calculatedPigLevel;
+    }
+
+    if (Object.keys(updates).length === 0) return;
+
+    try {
+      await authStore.updateProfile(updates);
+    } catch (e) {
+      console.error('프로필 상태 정산 실패', e);
     }
   }
 
-  async function settleProfileState() {
-    await settleHouseLevelForCurrentMonth();
-    await settleCurrentPigLevel();
+  function scheduleProfileSettlement() {
+    profileSettleChain = profileSettleChain
+      .then(() => settleProfileState())
+      .catch((e) => {
+        console.error('프로필 상태 백그라운드 정산 실패', e);
+      });
+    return profileSettleChain;
   }
 
   // --- Actions ---
@@ -221,7 +221,7 @@ export const useBudgetStore = defineStore('budget', () => {
       records.value = [res.data, ...records.value].sort((a, b) =>
         b.date.localeCompare(a.date),
       );
-      await settleProfileState();
+      void scheduleProfileSettlement();
       return res.data;
     } catch (e) {
       error.value = '거래 추가 실패';
@@ -235,17 +235,11 @@ export const useBudgetStore = defineStore('budget', () => {
   async function updateRecord(id, updatedRecord) {
     try {
       loading.value = true;
-      const currentRes = await axios.get(`${API_BASE}/records/${id}`);
-      const merged = {
-        ...(currentRes.data ?? {}),
-        ...updatedRecord,
-        id,
-      };
-      await axios.delete(`${API_BASE}/records/${id}`);
-      const res = await axios.post(`${API_BASE}/records`, merged);
-      const idx = records.value.findIndex((r) => r.id === id);
-      if (idx !== -1) records.value[idx] = res.data;
-      await settleProfileState();
+      const res = await axios.patch(`${API_BASE}/records/${id}`, updatedRecord);
+      records.value = records.value
+        .map((record) => (record.id === id ? res.data : record))
+        .sort((a, b) => b.date.localeCompare(a.date));
+      void scheduleProfileSettlement();
       return res.data;
     } catch (e) {
       error.value = '거래 수정 실패';
@@ -261,7 +255,7 @@ export const useBudgetStore = defineStore('budget', () => {
       loading.value = true;
       await axios.delete(`${API_BASE}/records/${id}`);
       records.value = records.value.filter((r) => r.id !== id);
-      await settleProfileState();
+      void scheduleProfileSettlement();
     } catch (e) {
       error.value = '거래 삭제 실패';
       console.error(e);
@@ -280,7 +274,7 @@ export const useBudgetStore = defineStore('budget', () => {
         fetchExpenseCategories(),
         fetchRecords(),
       ]);
-      await settleProfileState();
+      void scheduleProfileSettlement();
     } finally {
       loading.value = false;
     }
@@ -312,8 +306,6 @@ export const useBudgetStore = defineStore('budget', () => {
     todayNetIncome,
     dailyBudget,
     allCategories,
-    settleHouseLevelForCurrentMonth,
-    settleCurrentPigLevel,
     settleProfileState,
     // actions
     fetchIncomeCategories,
