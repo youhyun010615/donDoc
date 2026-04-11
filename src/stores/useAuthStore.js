@@ -94,24 +94,15 @@ export const useAuthStore = defineStore(
       currentUser.value = null;
     }
 
-    async function replaceProfileById(profileId, mergedFields) {
-      const baseRes = await axios.get(`${API_BASE}/profile/${profileId}`);
-      const base = baseRes.data ?? {};
-      const next = {
-        ...base,
-        ...mergedFields,
-        id: base.id ?? profileId,
-      };
-      await axios.delete(`${API_BASE}/profile/${profileId}`);
-      const createdRes = await axios.post(`${API_BASE}/profile`, next);
-      return createdRes.data;
-    }
-
     // 프로필(설정) 업데이트
     async function updateProfile(updates) {
       if (!currentUser.value) throw new Error('로그인 정보가 없어요');
       try {
-        const next = await replaceProfileById(currentUser.value.id, updates);
+        const res = await axios.patch(
+          `${API_BASE}/profile/${currentUser.value.id}`,
+          updates,
+        );
+        const next = res.data;
         currentUser.value = next;
         return next;
       } catch (error) {
@@ -126,7 +117,11 @@ export const useAuthStore = defineStore(
         if (!matched?.id) throw error;
 
         currentUser.value = matched;
-        const retry = await replaceProfileById(matched.id, updates);
+        const retryRes = await axios.patch(
+          `${API_BASE}/profile/${matched.id}`,
+          updates,
+        );
+        const retry = retryRes.data;
         currentUser.value = retry;
         return retry;
       }
