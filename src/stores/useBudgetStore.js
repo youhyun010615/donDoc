@@ -304,7 +304,7 @@ export const useBudgetStore = defineStore('budget', () => {
         fetchExpenseCategories(),
         fetchRecords(),
       ]);
-      await settleProfileState();
+      void scheduleProfileSettlement();
     } finally {
       loading.value = false;
     }
