@@ -144,36 +144,6 @@ export const useBudgetStore = defineStore('budget', () => {
     return getPigState(todayExpense.value, dailyBudget.value).level;
   }
 
-  async function settleHouseLevelForCurrentMonth() {
-    if (!authStore.currentUser) return;
-
-    const calculatedHouseLevel = calculateHouseLevelFromRecords();
-    const currentHouseLevel = authStore.currentUser.houseLevel ?? INITIAL_HOUSE_LEVEL;
-
-    if (currentHouseLevel !== calculatedHouseLevel) {
-      try {
-        await authStore.updateProfile({ houseLevel: calculatedHouseLevel });
-      } catch (e) {
-        console.error('월간 houseLevel 정산 실패', e);
-      }
-    }
-  }
-
-  async function settleCurrentPigLevel() {
-    if (!authStore.currentUser) return;
-
-    const calculatedPigLevel = calculateCurrentPigLevel();
-    const currentPigLevel = authStore.currentUser.currentPigLevel ?? 5;
-
-    if (currentPigLevel !== calculatedPigLevel) {
-      try {
-        await authStore.updateProfile({ currentPigLevel: calculatedPigLevel });
-      } catch (e) {
-        console.error('현재 currentPigLevel 정산 실패', e);
-      }
-    }
-  }
-
   async function settleProfileState() {
     if (!authStore.currentUser) return;
 
@@ -336,8 +306,6 @@ export const useBudgetStore = defineStore('budget', () => {
     todayNetIncome,
     dailyBudget,
     allCategories,
-    settleHouseLevelForCurrentMonth,
-    settleCurrentPigLevel,
     settleProfileState,
     // actions
     fetchIncomeCategories,
