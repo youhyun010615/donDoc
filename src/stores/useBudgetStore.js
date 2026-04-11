@@ -235,16 +235,10 @@ export const useBudgetStore = defineStore('budget', () => {
   async function updateRecord(id, updatedRecord) {
     try {
       loading.value = true;
-      const currentRes = await axios.get(`${API_BASE}/records/${id}`);
-      const merged = {
-        ...(currentRes.data ?? {}),
-        ...updatedRecord,
-        id,
-      };
-      await axios.delete(`${API_BASE}/records/${id}`);
-      const res = await axios.post(`${API_BASE}/records`, merged);
-      const idx = records.value.findIndex((r) => r.id === id);
-      if (idx !== -1) records.value[idx] = res.data;
+      const res = await axios.patch(`${API_BASE}/records/${id}`, updatedRecord);
+      records.value = records.value
+        .map((record) => (record.id === id ? res.data : record))
+        .sort((a, b) => b.date.localeCompare(a.date));
       await settleProfileState();
       return res.data;
     } catch (e) {
