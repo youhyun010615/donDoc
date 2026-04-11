@@ -174,8 +174,28 @@ export const useBudgetStore = defineStore('budget', () => {
   }
 
   async function settleProfileState() {
-    await settleHouseLevelForCurrentMonth();
-    await settleCurrentPigLevel();
+    if (!authStore.currentUser) return;
+
+    const calculatedHouseLevel = calculateHouseLevelFromRecords();
+    const calculatedPigLevel = calculateCurrentPigLevel();
+    const currentHouseLevel = authStore.currentUser.houseLevel ?? INITIAL_HOUSE_LEVEL;
+    const currentPigLevel = authStore.currentUser.currentPigLevel ?? 5;
+
+    const updates = {};
+    if (currentHouseLevel !== calculatedHouseLevel) {
+      updates.houseLevel = calculatedHouseLevel;
+    }
+    if (currentPigLevel !== calculatedPigLevel) {
+      updates.currentPigLevel = calculatedPigLevel;
+    }
+
+    if (Object.keys(updates).length === 0) return;
+
+    try {
+      await authStore.updateProfile(updates);
+    } catch (e) {
+      console.error('프로필 상태 정산 실패', e);
+    }
   }
 
   // --- Actions ---
