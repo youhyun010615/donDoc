@@ -10,6 +10,7 @@ const INITIAL_HOUSE_LEVEL = 3;
 export const useBudgetStore = defineStore('budget', () => {
   const { calcNextHouseLevel, getPigState } = usePigSystem();
   const authStore = useAuthStore();
+  let profileSettleChain = Promise.resolve();
 
   // --- State ---
   const records = ref([]);
@@ -198,6 +199,15 @@ export const useBudgetStore = defineStore('budget', () => {
     }
   }
 
+  function scheduleProfileSettlement() {
+    profileSettleChain = profileSettleChain
+      .then(() => settleProfileState())
+      .catch((e) => {
+        console.error('프로필 상태 백그라운드 정산 실패', e);
+      });
+    return profileSettleChain;
+  }
+
   // --- Actions ---
   async function fetchIncomeCategories() {
     try {
@@ -241,7 +251,7 @@ export const useBudgetStore = defineStore('budget', () => {
       records.value = [res.data, ...records.value].sort((a, b) =>
         b.date.localeCompare(a.date),
       );
-      await settleProfileState();
+      void scheduleProfileSettlement();
       return res.data;
     } catch (e) {
       error.value = '거래 추가 실패';
@@ -259,7 +269,7 @@ export const useBudgetStore = defineStore('budget', () => {
       records.value = records.value
         .map((record) => (record.id === id ? res.data : record))
         .sort((a, b) => b.date.localeCompare(a.date));
-      await settleProfileState();
+      void scheduleProfileSettlement();
       return res.data;
     } catch (e) {
       error.value = '거래 수정 실패';
@@ -275,7 +285,7 @@ export const useBudgetStore = defineStore('budget', () => {
       loading.value = true;
       await axios.delete(`${API_BASE}/records/${id}`);
       records.value = records.value.filter((r) => r.id !== id);
-      await settleProfileState();
+      void scheduleProfileSettlement();
     } catch (e) {
       error.value = '거래 삭제 실패';
       console.error(e);
