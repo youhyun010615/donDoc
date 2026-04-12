@@ -1,6 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue';
-import axios from 'axios';
+import api from '../lib/api.js';
 import { useAuthStore } from '../stores/useAuthStore.js';
 import { usePigSystem } from '../composables/usePigSystem.js';
 import PigPixelArt from '../components/PigPixelArt.vue';
@@ -96,7 +96,7 @@ async function fetchFarms() {
   errorMessage.value = '';
   try {
     const [farmRes, ids, counts] = await Promise.all([
-      axios.get(`${API_BASE}/farm`),
+      api.get(`${API_BASE}/farm`),
       authStore.fetchCurrentUserFarmIds(),
       authStore.fetchFarmCounts(),
     ]);
@@ -120,7 +120,7 @@ async function openFarm(farmId) {
     const today = new Date().toISOString().slice(0, 10);
     const [members, recordsRes] = await Promise.all([
       authStore.fetchFarmMembersByFarmId(String(farm?.id ?? farmId)),
-      axios.get(`${API_BASE}/records`, {
+      api.get(`${API_BASE}/records`, {
         params: {
           date: today,
           type: 'expense',

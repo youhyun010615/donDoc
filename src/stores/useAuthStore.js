@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import axios from 'axios';
+import api from '../lib/api.js';
 import {
   fetchFarmIdsByUser,
   fetchFarmMemberCounts,
@@ -21,11 +21,11 @@ export const useAuthStore = defineStore(
     let farmMutationChain = Promise.resolve();
 
     async function ensureDefaultFarm() {
-      const res = await axios.get(`${API_BASE}/farm?id=${DEFAULT_FARM_ID}`);
+      const res = await api.get(`${API_BASE}/farm?id=${DEFAULT_FARM_ID}`);
       const existing = Array.isArray(res.data) ? res.data[0] : null;
       if (existing) return existing;
 
-      const created = await axios.post(`${API_BASE}/farm`, {
+      const created = await api.post(`${API_BASE}/farm`, {
         id: DEFAULT_FARM_ID,
         name: DEFAULT_FARM_NAME,
       });
@@ -34,7 +34,7 @@ export const useAuthStore = defineStore(
 
     async function cleanupEmptyFarms() {
       const [farmRes, counts] = await Promise.all([
-        axios.get(`${API_BASE}/farm`),
+        api.get(`${API_BASE}/farm`),
         fetchFarmMemberCounts(),
       ]);
       const farms = Array.isArray(farmRes.data) ? farmRes.data : [];
@@ -45,13 +45,13 @@ export const useAuthStore = defineStore(
       });
 
       await Promise.all(
-        deleteTargets.map((farm) => axios.delete(`${API_BASE}/farm/${farm.id}`)),
+        deleteTargets.map((farm) => api.delete(`${API_BASE}/farm/${farm.id}`)),
       );
     }
 
     // 로그인: userId + password로 profile 조회
     async function login(userId, password) {
-      const res = await axios.get(`${API_BASE}/profile?userId=${userId}`);
+      const res = await api.get(`${API_BASE}/profile?userId=${userId}`);
       const users = Array.isArray(res.data) ? res.data : [res.data];
       const user = users.find(
         (u) => u.userId === userId && u.password === password,
@@ -63,7 +63,7 @@ export const useAuthStore = defineStore(
     // 회원가입
     async function signup(userData) {
       // 1. 아이디 중복 확인
-      const checkRes = await axios.get(
+      const checkRes = await api.get(
         `${API_BASE}/profile?userId=${userData.userId}`,
       );
       const existingUsers = Array.isArray(checkRes.data)
@@ -86,7 +86,7 @@ export const useAuthStore = defineStore(
       };
 
       await ensureDefaultFarm();
-      const userRes = await axios.post(`${API_BASE}/profile`, newUser);
+      const userRes = await api.post(`${API_BASE}/profile`, newUser);
       await joinFarmIn(DEFAULT_FARM_ID, userRes.data.id);
     }
 
@@ -98,7 +98,7 @@ export const useAuthStore = defineStore(
     async function updateProfile(updates) {
       if (!currentUser.value) throw new Error('로그인 정보가 없어요');
       try {
-        const res = await axios.patch(
+        const res = await api.patch(
           `${API_BASE}/profile/${currentUser.value.id}`,
           updates,
         );
@@ -110,14 +110,14 @@ export const useAuthStore = defineStore(
         if (status !== 404 || !currentUser.value?.userId) throw error;
 
         // Persisted currentUser.id가 서버와 어긋난 경우 userId로 다시 찾아 재시도
-        const lookupRes = await axios.get(
+        const lookupRes = await api.get(
           `${API_BASE}/profile?userId=${currentUser.value.userId}`,
         );
         const matched = Array.isArray(lookupRes.data) ? lookupRes.data[0] : null;
         if (!matched?.id) throw error;
 
         currentUser.value = matched;
-        const retryRes = await axios.patch(
+        const retryRes = await api.patch(
           `${API_BASE}/profile/${matched.id}`,
           updates,
         );
@@ -130,14 +130,14 @@ export const useAuthStore = defineStore(
     async function fetchAllFarms() {
       await ensureDefaultFarm();
       await cleanupEmptyFarms();
-      const farmRes = await axios.get(`${API_BASE}/farm`);
+      const farmRes = await api.get(`${API_BASE}/farm`);
       return farmRes.data;
     }
 
     async function fetchCurrentUserFarms() {
       if (!currentUser.value) return [];
       const [farmRes, myFarmIds] = await Promise.all([
-        axios.get(`${API_BASE}/farm`),
+        api.get(`${API_BASE}/farm`),
         fetchFarmIdsByUser(currentUser.value.id),
       ]);
       const farms = Array.isArray(farmRes.data) ? farmRes.data : [];
@@ -160,14 +160,14 @@ export const useAuthStore = defineStore(
       const farm = {
         name: trimmedName,
       };
-      const res = await axios.post(`${API_BASE}/farm`, farm);
+      const res = await api.post(`${API_BASE}/farm`, farm);
       return res.data;
     }
 
     async function fetchFarmMembersByFarmId(farmId) {
       const targetFarmId = String(farmId);
       const [profilesRes, memberIds] = await Promise.all([
-        axios.get(`${API_BASE}/profile`),
+        api.get(`${API_BASE}/profile`),
         fetchUserIdsByFarm(targetFarmId),
       ]);
       const users = Array.isArray(profilesRes.data) ? profilesRes.data : [];
