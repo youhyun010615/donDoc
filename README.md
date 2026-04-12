@@ -1,5 +1,265 @@
-# Vue 3 + Vite
+# 돈독 (DonDoc)
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+> 내 소비의 주치의, 돼지 건강으로 보는 나의 재정 상태
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+지출 수준에 따라 돼지 캐릭터가 살이 찌거나 야위는 **시각적 피드백 가계부**입니다.  
+숫자 대신 이미지로 재정 상태를 체감하고, 농장 커뮤니티에서 다른 유저의 돼지도 구경할 수 있습니다.
+
+---
+
+## 목차
+
+1. [핵심 기능](#핵심-기능)
+2. [아키텍처](#아키텍처)
+3. [기술 스택](#기술-스택)
+4. [시작하기](#시작하기)
+5. [의의 및 개선 사항](#의의-및-개선-사항)
+
+---
+
+## 핵심 기능
+
+### 1. 기획 기반 MVP 빠르게 출시 (Claude Code 바이브코딩)
+
+Vue + Pinia + JSON Server 기반으로 기획 문서를 바탕으로 한 MVP를 Claude Code를 활용해 빠르게 출시했습니다.
+
+- 가계부 CRUD (수입/지출 입력·수정·삭제)
+- 일별·달력·월간·요약 4가지 통계 뷰
+- 돼지 상태 10단계 (오늘 지출 / 일일 예산 비율 기반)
+- 집 업그레이드 5단계 (전월 실적 기반 월초 정산)
+
+---
+
+### 2. MVP 이후 기능 확장
+
+#### 캐릭터·배경·말풍선 시스템
+
+기존에는 돼지 하나만 표시했습니다. 여기에 감독관 캐릭터와 집 배경을 추가하고, 두 요소 모두 지출 상태에 따라 변하도록 로직을 설계했습니다.
+
+- **돼지** (10단계): 오늘 지출 / 일일 예산 비율 기반
+- **집 배경** (5단계: 흙바닥·오두막·집·빌라·대저택): 전월 소비 실적 기반으로 매달 정산
+- **감독관 캐릭터** (5단계: 집사·농부·평민·도둑·도축사): 이달 소비 페이스(소비 비율 ÷ 경과 시간 비율) 기반
+- 돼지·캐릭터 클릭 시 각 상태에 맞는 독백 메시지를 픽셀 말풍선으로 표시
+
+#### 사용자 편의 UI 개선
+
+- **월 선택 DatePicker**: 통계 화면에서 조회 월을 손쉽게 변경
+- **입력값 검증 & 오버플로우 방지**: 매우 큰 금액을 입력해도 레이아웃이 깨지지 않도록 디자인 보완
+- **SVG 픽셀 아이콘**: 기본 이모지 아이콘을 직접 디자인한 SVG 픽셀 아이콘으로 전면 교체
+- **가이드 페이지**: 돼지 레벨·집 레벨·캐릭터 시스템을 처음 사용자가 쉽게 이해하도록 안내 페이지 제작
+
+#### 로그인 & 회원가입
+
+JSON Server를 통한 간단한 아이디/비밀번호 인증 방식으로 구현했습니다.
+
+- 회원가입 시 기본 농장(`kb농장`) 자동 가입
+- 가입 후 이름·월수입·목표 지출 비율을 입력하는 초기 설정 플로우
+
+#### 농장 커뮤니티 CRUD
+
+- 농장 생성·가입·탈퇴 기능 구현 및 UI 제작
+- 농장 상세 화면: 멤버 그리드로 각 멤버의 돼지 레벨과 집 레벨 실시간 확인
+
+#### Race Condition 해결
+
+농장 기능에서 CRUD가 비정상적으로 동작하는 문제가 발생했습니다.  
+가입했는데 멤버 목록에 반영이 안 되거나, 탈퇴했는데 여전히 멤버로 남아 있는 상황이었습니다.
+
+**원인**: 각 농장 문서가 `members` 배열을 직접 보유하는 구조에서, 여러 유저가 동시에 PATCH 요청을 보내면 마지막 요청만 반영되고 나머지가 덮어씌워지는 경쟁 조건이 발생합니다.
+
+```jsonc
+// 변경 전: 농장 문서가 members 배열을 직접 관리
+{
+  "id": "1",
+  "name": "kb농장",
+  "members": ["1", "2", "3", "4"],
+}
+```
+
+**해결**: 농장이 멤버를 직접 관리하지 않고, `farmIn` 중간 테이블을 도입해 각 유저의 입·퇴장 이벤트를 독립 문서로 관리하도록 변경했습니다. 각 입장 기록이 별도 문서이므로 동시 요청이 들어와도 서로 덮어쓰지 않습니다.
+
+```jsonc
+// 변경 후: farmIn 중간 테이블로 멤버십 관리
+{
+  "id": "fi_1_U7NsIRb",
+  "targetFarm": "1",
+  "userId": "U7NsIRb",
+}
+```
+
+#### Vercel Serverless Function을 통한 보안 미들웨어 도입
+
+**문제**: 네트워크 탭이나 빌드된 JS 파일을 통해 백엔드 Railway 서버 주소를 누구나 알아낼 수 있었습니다. JSON Server는 기본적으로 모든 HTTP 요청을 허가하기 때문에, 주소를 아는 사람이라면 GET으로 계정 정보를 조회하거나 PUT으로 DB를 임의로 수정할 수 있었습니다.
+
+**해결**: Vercel Serverless Function을 API 미들웨어로 도입했습니다.
+
+- 프론트엔드의 모든 API 요청은 Vercel Serverless Function(`/api/*`)을 통해 Railway로 프록시됩니다
+- Axios 인터셉터(`src/lib/api.js`)가 모든 요청에 `X-Internal-Token` 헤더를 자동으로 첨부합니다
+- Vercel Serverless Function이 토큰을 검증하고, 유효하지 않으면 Railway로 전달하지 않고 `403 Forbidden`을 즉시 반환합니다
+- 엔드포인트별 보호 수준이 다르게 적용됩니다
+  - `/api/profile`, `/api/profile/:id`: 모든 메서드에 토큰 필수 (계정 정보 보호)
+  - `/api/*` 그 외 경로: 외부에서 오는 PUT 요청만 차단
+- 외부에서는 백엔드 Railway 주소를 알 수 없고, 알아도 토큰 없이는 요청이 차단됩니다
+
+---
+
+### 3. 배포
+
+| 레이어               | 플랫폼  |
+| -------------------- | ------- |
+| 프론트엔드           | Vercel  |
+| JSON Server (백엔드) | Railway |
+
+---
+
+### 4. Google Analytics 4
+
+- `vue-gtag-next` 연동
+- 라우터 기반 `page_view` 이벤트 자동 추적으로 페이지별 사용자 유입 분석
+
+---
+
+### 5. PWA
+
+- `vite-plugin-pwa` 적용
+- 모바일 홈 화면에 앱으로 설치 가능
+
+---
+
+## 아키텍처
+
+```
+┌──────────────────────────────────────────────────┐
+│                   사용자 브라우저                │
+│             Vue 3 SPA (Vercel CDN)               │
+│                                                  │
+│   ┌─────────────┐       ┌─────────────────────┐  │
+│   │    Pinia    │       │     Vue Router      │  │
+│   │ (전역 상태) │       │ (클라이언트 라우팅) │  │
+│   └──────┬──────┘       └─────────────────────┘  │
+└──────────┼───────────────────────────────────────┘
+           │ HTTP (Axios, /api/*)
+           ▼
+┌──────────────────────────────────────────────────┐
+│          Vercel Serverless Function              │
+│                                                  │
+│  /api/profile, /api/profile/:id                  │
+│    → 모든 메서드에 토큰 필수                     │
+│  /api/[...path] 그 외 경로                       │
+│    → 외부 PUT 요청만 차단                        │
+│                                                  │
+│  토큰 검증 실패 시 403 Forbidden 즉시 반환       │
+│  검증 통과 시 Railway로 프록시                   │
+└──────────────────────┬───────────────────────────┘
+                       │ HTTP Proxy
+                       ▼
+┌──────────────────────────────────────────────────┐
+│              JSON Server (Railway)               │
+│                                                  │
+│   /profile          유저 프로필                  │
+│   /records          수입/지출 기록               │
+│   /incomeCategories  수입 카테고리               │
+│   /expenseCategories 지출 카테고리               │
+│   /farm             농장 목록                    │
+│   /farmIn           농장 멤버십 이벤트 테이블    │
+└──────────────────────────────────────────────────┘
+```
+
+---
+
+## 기술 스택
+
+| 분류            | 기술                                |
+| --------------- | ----------------------------------- |
+| 프레임워크      | Vue 3 (Composition API)             |
+| 상태 관리       | Pinia + pinia-plugin-persistedstate |
+| 라우터          | Vue Router 4                        |
+| 빌드 도구       | Vite                                |
+| 백엔드          | JSON Server                         |
+| HTTP 클라이언트 | Axios                               |
+| 차트            | Chart.js + vue-chartjs              |
+| 날짜 선택       | vue-datepicker-next                 |
+| 분석            | Google Analytics 4 (vue-gtag-next)  |
+| PWA             | vite-plugin-pwa                     |
+| 보안 미들웨어   | Vercel Serverless Functions         |
+| 프론트 배포     | Vercel                              |
+| 백엔드 배포     | Railway                             |
+
+---
+
+## 시작하기
+
+### Prerequisites
+
+- Node.js 18 이상
+- npm
+
+### Installation
+
+```bash
+# 저장소 클론
+git clone https://github.com/your-org/dondoc.git
+cd dondoc
+
+# 패키지 설치
+npm install
+```
+
+### Environment Variables
+
+프로젝트 루트에 `.env` 파일을 생성합니다.
+
+```env
+# API 요청 기본 경로
+# 로컬에서는 Vite 프록시가 JSON Server(포트 3000)로 자동 연결합니다
+VITE_API_BASE=/api
+
+# Google Analytics 측정 ID (선택 사항)
+VITE_GA_ID=G-XXXXXXXXXX
+
+# 내부 API 인증 토큰
+# 프론트 → Vercel Serverless Function 통신에 사용됩니다
+# 로컬 개발 시에는 Vite 프록시를 사용하므로 이 값이 없어도 동작합니다
+VITE_INTERNAL_API_SECRET=your_secret_token
+```
+
+> **Vercel 배포 시**: `INTERNAL_API_SECRET` 환경 변수를 Vercel 대시보드 → Settings → Environment Variables에 동일하게 등록해야 합니다. 이 값은 Railway 서버에서 토큰 검증에 사용됩니다.
+
+### Run (로컬 개발)
+
+터미널 두 개를 열어 각각 실행합니다.
+
+```bash
+# 터미널 1: JSON Server 실행 (포트 3000)
+npm run server
+
+# 터미널 2: Vite 개발 서버 실행 (포트 5173)
+npm run dev
+```
+
+로컬에서는 `vite.config.js`의 프록시 설정에 의해 `/api` 요청이 JSON Server로 직접 전달됩니다.
+
+---
+
+## 의의 및 개선 사항
+
+### 의의
+
+Vue를 제대로 학습한 상태에서 기획과 컴포넌트 설계를 먼저 완료하고, Claude Code를 활용한 바이브코딩으로 MVP를 빠르게 출시했습니다. 이후 MVP를 기반으로 다양한 기능들을 AI의 도움을 받아 빠르게 덧붙였으며, Vue와 JSON Server에 대한 이해를 바탕으로 에러도 스스로 진단하고 빠르게 해결했습니다. 그 결과 **일주일 만에 높은 완성도의 결과물**을 만들어낼 수 있었습니다.
+
+---
+
+### 개선 사항
+
+#### 1. Race Condition — farmIn 방식의 성능 한계
+
+현재 `farmIn` 테이블 방식은 경쟁 조건을 해소하지만 새로운 성능 문제를 안고 있습니다.  
+특정 농장의 멤버를 조회하려면 전체 `farmIn` 데이터를 순회해야 하기 때문에, 사용자가 많아질수록 조회 속도가 급격히 느려질 것으로 예상됩니다.
+
+**개선 방향**: 원래의 `members` 배열 자료구조를 유지하되, Redis나 Kafka 같은 큐를 활용하는 백엔드 로직을 도입해 동시성 문제를 처리하는 방식으로 전환해야 합니다.
+
+#### 2. 보안 인증 — 토큰 노출 가능성
+
+현재 방식은 백엔드 Railway 주소를 직접 알아내는 경로는 차단했지만, 네트워크 탭에서 Vercel Serverless Function으로 보내는 요청을 관찰하면 `x-internal-token` 값을 알아낼 가능성이 여전히 존재합니다. 때문에 엄밀히 말해 완전한 보안이라고 보기 어렵습니다. 다만 개발자 도구를 통해 백엔드 서버 주소를 직접 파악하거나, 주소를 알아도 토큰 없이 직접 요청을 보내는 방식의 기초적인 공격은 방어할 수 있습니다.
+
+**개선 방향**: JSON Server를 버리고 Express 등의 서버를 도입한 뒤, JWT 방식의 인증 토큰을 발급하는 구조로 전환해야 합니다.
