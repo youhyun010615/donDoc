@@ -46,8 +46,6 @@ const bgStyle = computed(() => {
 .bg {
   width: 100%;
   height: 100%;
-  transform: scale(var(--bg-scale, 1));
-  transform-origin: center center;
   pointer-events: none;
 
   background-size: cover;
