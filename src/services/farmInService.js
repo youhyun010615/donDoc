@@ -1,25 +1,25 @@
-import axios from 'axios';
+import api from '../lib/api.js';
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
 const toStr = (v) => String(v);
 
 async function replaceProfileById(profileId, mergedFields) {
-  const baseRes = await axios.get(`${API_BASE}/profile/${profileId}`);
+  const baseRes = await api.get(`${API_BASE}/profile/${profileId}`);
   const base = baseRes.data ?? {};
   const next = {
     ...base,
     ...mergedFields,
     id: base.id ?? profileId,
   };
-  await axios.delete(`${API_BASE}/profile/${profileId}`);
-  const createdRes = await axios.post(`${API_BASE}/profile`, next);
+  await api.delete(`${API_BASE}/profile/${profileId}`);
+  const createdRes = await api.post(`${API_BASE}/profile`, next);
   return createdRes.data;
 }
 
 async function tryFetchFarmInAll() {
   try {
-    const res = await axios.get(`${API_BASE}/farmIn`);
+    const res = await api.get(`${API_BASE}/farmIn`);
     return Array.isArray(res.data) ? res.data : [];
   } catch (error) {
     const status = error?.response?.status;
@@ -47,7 +47,7 @@ export async function fetchFarmIdsByUser(userId) {
   }
 
   // fallback: legacy source from profile.farm
-  const profileRes = await axios.get(`${API_BASE}/profile`);
+  const profileRes = await api.get(`${API_BASE}/profile`);
   const profiles = Array.isArray(profileRes.data) ? profileRes.data : [];
   const me = profiles.find((p) => toStr(p.id) === uid);
   const farms = Array.isArray(me?.farm) ? me.farm.map(toStr) : [];
@@ -66,7 +66,7 @@ export async function fetchFarmMemberCounts() {
   }
 
   // fallback: count from profile.farm
-  const profileRes = await axios.get(`${API_BASE}/profile`);
+  const profileRes = await api.get(`${API_BASE}/profile`);
   const profiles = Array.isArray(profileRes.data) ? profileRes.data : [];
   const counts = {};
   profiles.forEach((user) => {
@@ -92,7 +92,7 @@ export async function fetchUserIdsByFarm(targetFarm) {
   }
 
   // fallback: legacy source from profile.farm
-  const profileRes = await axios.get(`${API_BASE}/profile`);
+  const profileRes = await api.get(`${API_BASE}/profile`);
   const profiles = Array.isArray(profileRes.data) ? profileRes.data : [];
   return profiles
     .filter((user) => Array.isArray(user.farm) && user.farm.map(toStr).includes(farmId))
@@ -109,7 +109,7 @@ export async function joinFarmIn(targetFarm, userId) {
     );
     if (exists) return null;
 
-    const res = await axios.post(`${API_BASE}/farmIn`, {
+    const res = await api.post(`${API_BASE}/farmIn`, {
       targetFarm: farmId,
       userId: uid,
     });
@@ -117,7 +117,7 @@ export async function joinFarmIn(targetFarm, userId) {
   }
 
   // fallback: legacy write to profile.farm
-  const profileRes = await axios.get(`${API_BASE}/profile/${uid}`);
+  const profileRes = await api.get(`${API_BASE}/profile/${uid}`);
   const profile = profileRes.data ?? {};
   const nextFarm = Array.from(
     new Set([...(Array.isArray(profile.farm) ? profile.farm.map(toStr) : []), farmId]),
@@ -135,13 +135,13 @@ export async function leaveFarmIn(targetFarm, userId) {
       (row) => toStr(row.targetFarm) === farmId && toStr(row.userId) === uid,
     );
     await Promise.all(
-      targets.map((row) => axios.delete(`${API_BASE}/farmIn/${row.id}`)),
+      targets.map((row) => api.delete(`${API_BASE}/farmIn/${row.id}`)),
     );
     return;
   }
 
   // fallback: legacy write to profile.farm
-  const profileRes = await axios.get(`${API_BASE}/profile/${uid}`);
+  const profileRes = await api.get(`${API_BASE}/profile/${uid}`);
   const profile = profileRes.data ?? {};
   const nextFarm = (Array.isArray(profile.farm) ? profile.farm.map(toStr) : []).filter(
     (id) => id !== farmId,
