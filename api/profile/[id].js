@@ -3,10 +3,7 @@ import { isValidToken, proxyToRailway } from '../_proxy.js';
 export default async function handler(req, res) {
   const { id } = req.query;
 
-  if (req.method === 'GET' && !isValidToken(req)) {
-    return res.status(403).json({ error: 'Forbidden' });
-  }
-  if (req.method === 'PUT' && !isValidToken(req)) {
+  if (!isValidToken(req)) {
     return res.status(403).json({ error: 'Forbidden' });
   }
 

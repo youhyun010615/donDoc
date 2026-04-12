@@ -5,7 +5,12 @@ export function isValidToken(req) {
   return secret && req.headers['x-internal-token'] === secret;
 }
 
-export async function proxyToRailway(req, res, railwayPath) {
+const MODIFICATION_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'];
+
+export async function proxyToRailway(req, res, railwayPath, { blockMods = false } = {}) {
+  if (blockMods && MODIFICATION_METHODS.includes(req.method) && !isValidToken(req)) {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
   const qs = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
   const targetUrl = `${RAILWAY_BASE}${railwayPath}${qs}`;
 
