@@ -203,6 +203,19 @@ JSON Server를 통한 간단한 아이디/비밀번호 인증 방식으로 구�
 
 ## 기술 스택
 
+<div align=left>
+  <img src="https://img.shields.io/badge/vue.js-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white"> 
+  <img src="https://img.shields.io/badge/json-000000?style=for-the-badge&logo=json&logoColor=white"> 
+  <img src="https://img.shields.io/badge/vercel-000000?style=for-the-badge&logo=vercel&logoColor=white"> 
+  <img src="https://img.shields.io/badge/railway-0B0D0E?style=for-the-badge&logo=railway&logoColor=white"> 
+</div>
+
+<div align=left>
+  <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white"> 
+  <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"> 
+  <img src="https://img.shields.io/badge/googleanalytics-E37400?style=for-the-badge&logo=googleanalytics&logoColor=white"> 
+</div>
+
 | 분류             | 기술                                |
 | --------------- | ----------------------------------- |
 | 프레임워크         | Vue 3 (Composition API)             |
