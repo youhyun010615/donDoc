@@ -7,6 +7,42 @@
 
 ---
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/b7c523a8-e569-4ecb-9186-5073cbeb65ee" alt="image 1" width="100%">
+</p>
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/0a84d25b-4b33-45bb-ae31-72054f209a4d" alt="image 2" width="100%">
+</p>
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/cb1b3823-cfb4-4892-9d60-d0d712c8fdd0" alt="image 3" width="100%">
+</p>
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/93de6b12-0b31-4f68-a57b-73eb9ee5e20c" alt="image 4">
+</p>
+
+<br>
+<hr>
+<br>
+
+<table structure="fixed" width="100%">
+  <tr>
+    <td align="center" width="33.3%">
+      <img src="https://github.com/user-attachments/assets/156088c4-3258-4adc-b2e8-829f5d95c849" alt="image 5" style="width:100%; max-width:100%;">
+    </td>
+    <td align="center" width="33.3%">
+      <img src="https://github.com/user-attachments/assets/b4531566-c56a-434e-b3ca-73366949c730" alt="image 6" style="width:100%; max-width:100%;">
+    </td>
+    <td align="center" width="33.3%">
+      <img src="https://github.com/user-attachments/assets/3b43c405-263c-43b3-9bd6-2fc694a811e5" alt="image 7" style="width:100%; max-width:100%;">
+    </td>
+  </tr>
+  </table>
+
+---
+
 ## 목차
 
 1. [핵심 기능](#핵심-기능)
@@ -130,12 +166,12 @@ JSON Server를 통한 간단한 아이디/비밀번호 인증 방식으로 구�
 
 ```
 ┌──────────────────────────────────────────────────┐
-│                   사용자 브라우저                │
+│                   사용자 브라우저                    │
 │             Vue 3 SPA (Vercel CDN)               │
 │                                                  │
 │   ┌─────────────┐       ┌─────────────────────┐  │
 │   │    Pinia    │       │     Vue Router      │  │
-│   │ (전역 상태) │       │ (클라이언트 라우팅) │  │
+│   │ (전역 상태)   │       │   (클라이언트 라우팅)    │  │
 │   └──────┬──────┘       └─────────────────────┘  │
 └──────────┼───────────────────────────────────────┘
            │ HTTP (Axios, /api/*)
@@ -144,24 +180,24 @@ JSON Server를 통한 간단한 아이디/비밀번호 인증 방식으로 구�
 │          Vercel Serverless Function              │
 │                                                  │
 │  /api/profile, /api/profile/:id                  │
-│    → 모든 메서드에 토큰 필수                     │
-│  /api/[...path] 그 외 경로                       │
-│    → 외부 PUT 요청만 차단                        │
+│    → 모든 메서드에 토큰 필수                          │
+│  /api/[...path] 그 외 경로                         │
+│    → 외부 PUT 요청만 차단                            │
 │                                                  │
-│  토큰 검증 실패 시 403 Forbidden 즉시 반환       │
-│  검증 통과 시 Railway로 프록시                   │
+│  토큰 검증 실패 시 403 Forbidden 즉시 반환             │
+│  검증 통과 시 Railway로 프록시                        │
 └──────────────────────┬───────────────────────────┘
                        │ HTTP Proxy
                        ▼
 ┌──────────────────────────────────────────────────┐
 │              JSON Server (Railway)               │
 │                                                  │
-│   /profile          유저 프로필                  │
-│   /records          수입/지출 기록               │
-│   /incomeCategories  수입 카테고리               │
-│   /expenseCategories 지출 카테고리               │
-│   /farm             농장 목록                    │
-│   /farmIn           농장 멤버십 이벤트 테이블    │
+│   /profile          유저 프로필                     │
+│   /records          수입/지출 기록                  │
+│   /incomeCategories  수입 카테고리                  │
+│   /expenseCategories 지출 카테고리                  │
+│   /farm             농장 목록                      │
+│   /farmIn           농장 멤버십 이벤트 테이블          │
 └──────────────────────────────────────────────────┘
 ```
 
@@ -169,21 +205,21 @@ JSON Server를 통한 간단한 아이디/비밀번호 인증 방식으로 구�
 
 ## 기술 스택
 
-| 분류            | 기술                                |
+| 분류             | 기술                                |
 | --------------- | ----------------------------------- |
-| 프레임워크      | Vue 3 (Composition API)             |
-| 상태 관리       | Pinia + pinia-plugin-persistedstate |
-| 라우터          | Vue Router 4                        |
-| 빌드 도구       | Vite                                |
-| 백엔드          | JSON Server                         |
-| HTTP 클라이언트 | Axios                               |
-| 차트            | Chart.js + vue-chartjs              |
-| 날짜 선택       | vue-datepicker-next                 |
-| 분석            | Google Analytics 4 (vue-gtag-next)  |
+| 프레임워크         | Vue 3 (Composition API)             |
+| 상태 관리         | Pinia + pinia-plugin-persistedstate |
+| 라우터            | Vue Router 4                        |
+| 빌드 도구         | Vite                                |
+| 백엔드            | JSON Server                         |
+| HTTP 클라이언트    | Axios                               |
+| 차트             | Chart.js + vue-chartjs              |
+| 날짜 선택         | vue-datepicker-next                 |
+| 분석             | Google Analytics 4 (vue-gtag-next)  |
 | PWA             | vite-plugin-pwa                     |
-| 보안 미들웨어   | Vercel Serverless Functions         |
-| 프론트 배포     | Vercel                              |
-| 백엔드 배포     | Railway                             |
+| 보안 미들웨어      | Vercel Serverless Functions         |
+| 프론트 배포        | Vercel                              |
+| 백엔드 배포        | Railway                             |
 
 ---
 
