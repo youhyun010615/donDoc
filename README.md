@@ -19,27 +19,25 @@
   <img src="https://github.com/user-attachments/assets/cb1b3823-cfb4-4892-9d60-d0d712c8fdd0" alt="image 3" width="100%">
 </p>
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/93de6b12-0b31-4f68-a57b-73eb9ee5e20c" alt="image 4">
-</p>
-
-<br>
-<hr>
-<br>
-
-<table structure="fixed" width="100%">
+<table table-layout="fixed" width="100%">
   <tr>
     <td align="center" width="33.3%">
-      <img src="https://github.com/user-attachments/assets/156088c4-3258-4adc-b2e8-829f5d95c849" alt="image 5" style="width:100%; max-width:100%;">
+      <img src="https://github.com/user-attachments/assets/b4176997-f323-44f3-b666-db37c8ef0569" 
+           alt="image 4" 
+           style="height: 300px; width: 100%; object-fit: cover;">
     </td>
     <td align="center" width="33.3%">
-      <img src="https://github.com/user-attachments/assets/b4531566-c56a-434e-b3ca-73366949c730" alt="image 6" style="width:100%; max-width:100%;">
+      <img src="https://github.com/user-attachments/assets/4c9edbf9-6865-45c3-a054-eff0f790944e" 
+           alt="image 5" 
+           style="height: 300px; width: 100%; object-fit: cover;">
     </td>
     <td align="center" width="33.3%">
-      <img src="https://github.com/user-attachments/assets/3b43c405-263c-43b3-9bd6-2fc694a811e5" alt="image 7" style="width:100%; max-width:100%;">
+      <img src="https://github.com/user-attachments/assets/a5b635a7-af42-4a1a-ba87-7e4fd3e0e800" 
+           alt="image 6" 
+           style="height: 300px; width: 100%; object-fit: cover;">
     </td>
   </tr>
-  </table>
+</table>
 
 ---
 
